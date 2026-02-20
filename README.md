@@ -10,6 +10,7 @@ npm run dev
 - React 18+
 - TypeScript
 - Vite
+- Tailwind CSS
 
 ## 구현 기능
 - [ ] 완성한 기능
