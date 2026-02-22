@@ -137,7 +137,6 @@ export function getImageFilenameForSelection(
     const revisions = getRevisionsForDiscipline(drawingId, disciplineKey, metadata)
     const latest = getLatestRevision(revisions)
     if (latest?.image) return latest.image
-    // 공종만 선택된 경우(예: 구조) 상위 노드의 image 사용. 구조는 regions 안에만 revisions가 있어 상위에는 없음.
     const node = getDisciplineNode(drawing, disciplineKey)
     if (node?.image) return node.image
     return null
@@ -145,7 +144,6 @@ export function getImageFilenameForSelection(
   return drawing.image
 }
 
-/** disciplineKey 경로의 노드 반환 (예: "구조" → 구조 노드, "구조.regions.A" → A 노드) */
 function getDisciplineNode(
   drawing: Drawing,
   disciplineKey: string,

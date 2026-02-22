@@ -1,6 +1,6 @@
 import { ChevronRight, Home, MapPin, Map, Layers, GitCommit } from 'lucide-react'
 import type { Metadata } from '../types/metadata'
-import { getBreadcrumbIds, getDrawingPartLabel } from '../lib/drawings'
+import { getBreadcrumbIds } from '../lib/drawings'
 
 type CrumbType = 'space' | 'discipline' | 'revision'
 
@@ -97,11 +97,6 @@ export function Breadcrumb({
       </nav>
       {drawingName && (
         <div className="p-2">
-          {drawingId && getDrawingPartLabel(drawingId) && (
-            <p className="mb-1 text-xs font-medium uppercase tracking-wider text-neutral-400">
-              데이터 소스: {getDrawingPartLabel(drawingId)} (metadata-{getDrawingPartLabel(drawingId)}.json)
-            </p>
-          )}
           <p className="text-[30px] font-medium text-neutral-600">
             현재 도면 :
             {disciplineShort ? (

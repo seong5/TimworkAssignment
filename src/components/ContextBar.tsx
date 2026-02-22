@@ -1,7 +1,7 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
 import type { Metadata } from '../types/metadata'
 import type { DisciplineOption, Revision } from '../types/metadata'
-import { getDisciplineOptions, getDrawingPartLabel } from '../lib/drawings'
+import { getDisciplineOptions } from '../lib/drawings'
 
 export interface SelectionState {
   drawingId: string | null
@@ -42,16 +42,14 @@ export function ContextBar({
   const drawing = drawingId ? metadata.drawings[drawingId] : null
   const disciplineOptions: DisciplineOption[] = drawing ? getDisciplineOptions(drawing) : []
   const selectedDisciplineOption = disciplineOptions.find(
-    (o) => o.key === disciplineKey || (o.keyPrefix && disciplineKey?.startsWith(o.keyPrefix + '.'))
+    (o) => o.key === disciplineKey || (o.keyPrefix && disciplineKey?.startsWith(o.keyPrefix + '.')),
   )
   const showRegionSelect =
     selectedDisciplineOption?.hasRegions &&
     selectedDisciplineOption.regionKeys &&
     selectedDisciplineOption.regionKeys.length > 0
   const effectiveDisciplineKey =
-    showRegionSelect && disciplineKey === selectedDisciplineOption?.key
-      ? null
-      : disciplineKey
+    showRegionSelect && disciplineKey === selectedDisciplineOption?.key ? null : disciplineKey
   const regionKeys = selectedDisciplineOption?.regionKeys ?? []
   const keyPrefix = selectedDisciplineOption?.keyPrefix ?? ''
   const currentRegionKey =
@@ -81,14 +79,6 @@ export function ContextBar({
             <span className="text-sm font-semibold leading-none text-neutral-800">
               {drawing ? drawing.name : '—'}
             </span>
-            {drawing && getDrawingPartLabel(drawing.id) && (
-              <span
-                className="text-[10px] font-medium text-neutral-500"
-                title={`metadata-${getDrawingPartLabel(drawing.id)}.json`}
-              >
-                데이터: {getDrawingPartLabel(drawing.id)}
-              </span>
-            )}
           </div>
         </div>
 
