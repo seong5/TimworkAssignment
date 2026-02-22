@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import type { Metadata } from '../types/metadata'
+import type { Metadata } from '@/shared/types/metadata'
 
 export function useMetadata(): {
   data: Metadata | null

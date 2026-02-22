@@ -1,7 +1,7 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
-import type { Metadata } from '../types/metadata'
-import type { DisciplineOption, Revision } from '../types/metadata'
-import { getDisciplineOptions } from '../lib/drawings'
+import type { Metadata } from '@/shared/types/metadata'
+import type { DisciplineOption, Revision } from '@/shared/types/metadata'
+import { getDisciplineOptions } from '@/shared/lib/drawings'
 
 export interface SelectionState {
   drawingId: string | null

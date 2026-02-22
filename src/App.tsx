@@ -1,16 +1,19 @@
 import { useState, useCallback } from 'react'
 import './App.css'
-import { useMetadata } from './hooks/useMetadata'
-import { SpaceTree } from './components/SpaceTree'
-import { Breadcrumb } from './components/Breadcrumb'
-import { ContextBar, type SelectionState } from './components/ContextBar'
-import { DrawingViewer } from './components/DrawingViewer'
+import { useMetadata } from '@/shared/hooks/useMetadata'
+import {
+  SpaceTree,
+  ContextBar,
+  Breadcrumb,
+  DrawingViewer,
+  type SelectionState,
+} from '@/features/drawing-explorer'
 import {
   getImageFilenameForSelection,
   getDisciplineOptions,
   getRevisionChanges,
   getRevisionDate,
-} from './lib/drawings'
+} from '@/shared/lib/drawings'
 
 function App() {
   const { data: metadata, loading, error } = useMetadata()

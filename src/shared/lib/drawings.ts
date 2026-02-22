@@ -1,5 +1,5 @@
-import type { Drawing, DisciplineNode, Revision, Metadata } from '../types/metadata'
-import type { DisciplineOption } from '../types/metadata'
+import type { Drawing, DisciplineNode, Revision, Metadata } from '@/shared/types/metadata'
+import type { DisciplineOption } from '@/shared/types/metadata'
 
 export const DRAWING_PART_LABELS: Record<string, string> = {
   '01': '101동',

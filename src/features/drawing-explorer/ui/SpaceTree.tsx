@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon } from 'lucide-react'
-import type { Metadata } from '../types/metadata'
-import type { DrawingImageEntry } from '../lib/drawings'
+import type { Metadata } from '@/shared/types/metadata'
+import type { DrawingImageEntry } from '@/shared/lib/drawings'
 import {
   getDrawingIdsInOrder,
   getDrawingPartLabel,
   getImageEntriesForDrawing,
-} from '../lib/drawings'
-import { useClickOutside } from '../hooks/useClickOutside'
+} from '@/shared/lib/drawings'
+import { useClickOutside } from '@/shared/hooks/useClickOutside'
 
 interface SpaceTreeProps {
   metadata: Metadata

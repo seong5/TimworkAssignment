@@ -1,6 +1,6 @@
 import { ChevronRight, Home, MapPin, Map, Layers, GitCommit } from 'lucide-react'
-import type { Metadata } from '../types/metadata'
-import { getBreadcrumbIds } from '../lib/drawings'
+import type { Metadata } from '@/shared/types/metadata'
+import { getBreadcrumbIds } from '@/shared/lib/drawings'
 
 type CrumbType = 'space' | 'discipline' | 'revision'
 
