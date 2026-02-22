@@ -13,9 +13,9 @@ export function useMetadata(): {
   useEffect(() => {
     const urls = [
       '/data/metadata-common.json',
-      '/data/metadata-101동.json',
-      '/data/metadata-주차장.json',
-      '/data/metadata-주민공동시설.json',
+      '/data/metadata-101building.json',
+      '/data/metadata-parkinglot.json',
+      '/data/metadata-publicfacility.json',
     ]
     Promise.all(urls.map((url) => fetch(url).then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}: ${url}`))))))
       .then(([common, d101, parking, facility]) => {

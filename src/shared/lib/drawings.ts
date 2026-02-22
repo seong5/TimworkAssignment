@@ -141,7 +141,6 @@ export interface DrawingImageEntry {
   disciplineKey: string
   revisionVersion: string | null
   label: string
-  /** 리비전 날짜 (YYYY-MM-DD). 기본 이미지 등은 없을 수 있음 */
   date?: string
 }
 
