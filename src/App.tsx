@@ -10,7 +10,7 @@ import {
 } from '@/features/drawing-explorer'
 import {
   getImageFilenameForSelection,
-  getDisciplineOptions,
+  getDisciplineLabel,
   getRevisionChanges,
   getRevisionDate,
 } from '@/shared/lib/drawings'
@@ -104,30 +104,11 @@ function App() {
                   metadata={metadata}
                   drawingId={selection.drawingId}
                   onSelectDrawing={handleSelectDrawing}
-                  disciplineLabel={
-                    selection.disciplineKey
-                      ? (() => {
-                          const opts = getDisciplineOptions(metadata.drawings[selection.drawingId])
-                          const o = opts.find(
-                            (opt) =>
-                              opt.key === selection.disciplineKey ||
-                              (opt.keyPrefix &&
-                                selection.disciplineKey?.startsWith(opt.keyPrefix + '.')),
-                          )
-                          if (!o) return null
-                          if (
-                            o.keyPrefix &&
-                            selection.disciplineKey?.startsWith(o.keyPrefix + '.')
-                          ) {
-                            const regionKey = selection.disciplineKey.slice(
-                              (o.keyPrefix + '.').length,
-                            )
-                            return `${o.label} > ${regionKey}`
-                          }
-                          return o.label
-                        })()
-                      : null
-                  }
+                  disciplineLabel={getDisciplineLabel(
+                    metadata,
+                    selection.drawingId,
+                    selection.disciplineKey,
+                  )}
                   revisionVersion={selection.revisionVersion}
                   revisionDate={getRevisionDate(
                     metadata,

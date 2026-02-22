@@ -2,11 +2,7 @@ import { useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon } from 'lucide-react'
 import type { Metadata } from '@/shared/types/metadata'
 import type { DrawingImageEntry } from '@/shared/lib/drawings'
-import {
-  getDrawingIdsInOrder,
-  getDrawingPartLabel,
-  getImageEntriesForDrawing,
-} from '@/shared/lib/drawings'
+import { getDrawingIdsInOrder, getImageEntriesForDrawing } from '@/shared/lib/drawings'
 import { useClickOutside } from '@/shared/hooks/useClickOutside'
 
 interface SpaceTreeProps {
@@ -32,17 +28,13 @@ function ImageDropdown({
           <li key={`${entry.disciplineKey}-${entry.revisionVersion ?? 'base'}-${idx}`}>
             <button
               type="button"
-              onClick={() =>
-                onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)
-              }
+              onClick={() => onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)}
               className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors hover:bg-gray-200"
             >
               <ImageIcon className="h-3.5 w-3.5 shrink-0 text-gray-400" />
               <span className="min-w-0 truncate">
                 {entry.label}
-                {entry.date && (
-                  <span className="ml-1.5 text-neutral-500">· {entry.date}</span>
-                )}
+                {entry.date && <span className="ml-1.5 text-neutral-500">· {entry.date}</span>}
               </span>
             </button>
           </li>
@@ -93,16 +85,17 @@ export function SpaceTree({
               </span>
               <span className="truncate font-medium">{root.name}</span>
             </button>
-            {expandedDrawingId === root.id && (() => {
-              const entries = getImageEntriesForDrawing(metadata, root.id)
-              return entries.length > 0 ? (
-                <ImageDropdown
-                  drawingId={root.id}
-                  entries={entries}
-                  onSelectImage={onSelectImage}
-                />
-              ) : null
-            })()}
+            {expandedDrawingId === root.id &&
+              (() => {
+                const entries = getImageEntriesForDrawing(metadata, root.id)
+                return entries.length > 0 ? (
+                  <ImageDropdown
+                    drawingId={root.id}
+                    entries={entries}
+                    onSelectImage={onSelectImage}
+                  />
+                ) : null
+              })()}
           </div>
         )}
         <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-2">
@@ -110,7 +103,6 @@ export function SpaceTree({
             const drawing = metadata.drawings[id]
             const isSelected = selectedDrawingId === id
             const isExpanded = expandedDrawingId === id
-            const partLabel = getDrawingPartLabel(id)
             const entries = isExpanded ? getImageEntriesForDrawing(metadata, id) : []
             return (
               <div key={id} className="flex flex-col gap-0.5">
@@ -129,21 +121,9 @@ export function SpaceTree({
                     )}
                   </span>
                   <span className="min-w-0 flex-1 truncate">{drawing.name}</span>
-                  {partLabel && (
-                    <span
-                      className="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600"
-                      title={`데이터: metadata-${partLabel}.json`}
-                    >
-                      {partLabel}
-                    </span>
-                  )}
                 </button>
                 {isExpanded && entries.length > 0 && (
-                  <ImageDropdown
-                    drawingId={id}
-                    entries={entries}
-                    onSelectImage={onSelectImage}
-                  />
+                  <ImageDropdown drawingId={id} entries={entries} onSelectImage={onSelectImage} />
                 )}
               </div>
             )

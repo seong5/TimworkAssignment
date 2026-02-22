@@ -1,7 +1,7 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
 import type { Metadata } from '@/shared/types/metadata'
-import type { DisciplineOption, Revision } from '@/shared/types/metadata'
-import { getDisciplineOptions } from '@/shared/lib/drawings'
+import type { DisciplineOption } from '@/shared/types/metadata'
+import { getDisciplineOptions, getRevisionsForDiscipline } from '@/shared/lib/drawings'
 
 export interface SelectionState {
   drawingId: string | null
@@ -14,22 +14,6 @@ interface ContextBarProps {
   selection: SelectionState
   onDisciplineChange: (key: string | null) => void
   onRevisionChange: (version: string | null) => void
-}
-
-function getRevisionsForDiscipline(
-  drawingId: string,
-  disciplineKey: string | null,
-  metadata: Metadata,
-): Revision[] {
-  if (!disciplineKey) return []
-  const drawing = metadata.drawings[drawingId]
-  if (!drawing?.disciplines) return []
-  const parts = disciplineKey.split('.')
-  let node: unknown = drawing.disciplines[parts[0]]
-  for (let i = 1; i < parts.length && node; i++) {
-    node = (node as Record<string, unknown>)[parts[i]]
-  }
-  return (node as { revisions?: Revision[] })?.revisions ?? []
 }
 
 export function ContextBar({

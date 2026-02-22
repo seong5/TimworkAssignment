@@ -32,6 +32,27 @@ export function getBreadcrumbIds(metadata: Metadata, drawingId: string): string[
   return path
 }
 
+export function getDisciplineLabel(
+  metadata: Metadata,
+  drawingId: string | null,
+  disciplineKey: string | null,
+): string | null {
+  if (!drawingId || !disciplineKey) return null
+  const drawing = metadata.drawings[drawingId]
+  if (!drawing) return null
+  const opts = getDisciplineOptions(drawing)
+  const o = opts.find(
+    (opt) =>
+      opt.key === disciplineKey || (opt.keyPrefix && disciplineKey.startsWith(opt.keyPrefix + '.')),
+  )
+  if (!o) return null
+  if (o.keyPrefix && disciplineKey.startsWith(o.keyPrefix + '.')) {
+    const regionKey = disciplineKey.slice((o.keyPrefix + '.').length)
+    return `${o.label} > ${regionKey}`
+  }
+  return o.label
+}
+
 export function getDisciplineOptions(drawing: Drawing): DisciplineOption[] {
   const options: DisciplineOption[] = []
   const disciplines = drawing.disciplines ?? {}
@@ -233,7 +254,7 @@ function getDisciplineNode(
   return (node as DisciplineNode & { image?: string }) ?? null
 }
 
-function getRevisionsForDiscipline(
+export function getRevisionsForDiscipline(
   drawingId: string,
   disciplineKey: string,
   metadata: Metadata,
