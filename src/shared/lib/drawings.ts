@@ -7,6 +7,27 @@ export const DRAWING_PART_LABELS: Record<string, string> = {
   '13': '주차장',
 }
 
+export const SPACE_LIST: {
+  id: string
+  slug: string
+  displayName: string
+  metadataFile: string
+}[] = [
+  {
+    id: '01',
+    slug: '101building',
+    displayName: '101동',
+    metadataFile: 'metadata-101building.json',
+  },
+  {
+    id: '09',
+    slug: 'publicfacility',
+    displayName: '주민공동시설',
+    metadataFile: 'metadata-publicfacility.json',
+  },
+  { id: '13', slug: 'parkinglot', displayName: '주차장', metadataFile: 'metadata-parkinglot.json' },
+]
+
 export function getDrawingPartLabel(drawingId: string): string | null {
   return DRAWING_PART_LABELS[drawingId] ?? null
 }
