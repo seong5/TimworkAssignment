@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useMetadata } from '@/shared/hooks/useMetadata'
 import {
   SpaceTree,
@@ -13,6 +13,7 @@ import {
   getDisciplineLabel,
   getRevisionChanges,
   getRevisionDate,
+  getRootChildIds,
 } from '@/shared/lib/drawings'
 import { SPACE_LIST } from '@/shared/lib/drawings'
 
@@ -27,6 +28,19 @@ export function DrawingExplorerPage() {
     disciplineKey: null,
     revisionVersion: null,
   })
+
+  useEffect(() => {
+    setSelection({ drawingId: null, disciplineKey: null, revisionVersion: null })
+  }, [slug])
+
+  useEffect(() => {
+    if (!metadata || selection.drawingId !== null) return
+    const rootChildIds = getRootChildIds(metadata)
+    const defaultDrawingId = rootChildIds[0] ?? Object.keys(metadata.drawings)[0]
+    if (defaultDrawingId) {
+      setSelection((prev) => ({ ...prev, drawingId: defaultDrawingId }))
+    }
+  }, [metadata, selection.drawingId])
 
   const handleSelectDrawing = useCallback((drawingId: string) => {
     setSelection((prev) => ({
@@ -102,7 +116,11 @@ export function DrawingExplorerPage() {
             ← 목록
           </button>
           <span className="text-gray-300">|</span>
-          <h1 className="text-lg font-semibold text-gray-900">{metadata.project.name}</h1>
+          <h1 className="text-lg font-semibold text-gray-900">
+            {selection.drawingId
+              ? metadata.drawings[selection.drawingId].name
+              : metadata.project.name}
+          </h1>
         </div>
         <div className="mt-2">
           <ContextBar
