@@ -1,62 +1,150 @@
+import { useRef, useState } from 'react'
+import { ChevronDown, ChevronRight, ImageIcon } from 'lucide-react'
 import type { Metadata } from '../types/metadata'
-import { getDrawingIdsInOrder, getDrawingPartLabel } from '../lib/drawings'
+import type { DrawingImageEntry } from '../lib/drawings'
+import {
+  getDrawingIdsInOrder,
+  getDrawingPartLabel,
+  getImageEntriesForDrawing,
+} from '../lib/drawings'
+import { useClickOutside } from '../hooks/useClickOutside'
 
 interface SpaceTreeProps {
   metadata: Metadata
   selectedDrawingId: string | null
   onSelectDrawing: (id: string) => void
+  onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
 }
 
-export function SpaceTree({ metadata, selectedDrawingId, onSelectDrawing }: SpaceTreeProps) {
+function ImageDropdown({
+  drawingId,
+  entries,
+  onSelectImage,
+}: {
+  drawingId: string
+  entries: DrawingImageEntry[]
+  onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
+}) {
+  return (
+    <div className="ml-6 mt-0.5 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80 py-1 shadow-sm">
+      <ul className="flex flex-col gap-0.5 py-1">
+        {entries.map((entry, idx) => (
+          <li key={`${entry.disciplineKey}-${entry.revisionVersion ?? 'base'}-${idx}`}>
+            <button
+              type="button"
+              onClick={() =>
+                onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)
+              }
+              className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors hover:bg-gray-200"
+            >
+              <ImageIcon className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+              <span className="min-w-0 truncate">{entry.label}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export function SpaceTree({
+  metadata,
+  selectedDrawingId,
+  onSelectDrawing,
+  onSelectImage,
+}: SpaceTreeProps) {
+  const [expandedDrawingId, setExpandedDrawingId] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  useClickOutside(containerRef, () => setExpandedDrawingId(null))
+
   const ids = getDrawingIdsInOrder(metadata)
   const rootId = ids[0]
   const root = rootId ? metadata.drawings[rootId] : null
   const childIds = ids.filter((id) => metadata.drawings[id].parent === rootId)
 
+  const handleRowClick = (id: string) => {
+    onSelectDrawing(id)
+    setExpandedDrawingId((prev) => (prev === id ? null : id))
+  }
+
   return (
-    <nav className="flex flex-col gap-0.5 p-2" aria-label="공간(건물) 트리">
-      {root && (
-        <button
-          type="button"
-          onClick={() => onSelectDrawing(root.id)}
-          className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
-            selectedDrawingId === root.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
-          }`}
-        >
-          <span className="shrink-0 text-gray-500" aria-hidden>
-            📄{' '}
-          </span>
-          <span className="truncate font-medium">{root.name}</span>
-        </button>
-      )}
-      <div className="ml-3 flex flex-col gap-0.5 border-l border-gray-200 pl-2">
-        {childIds.map((id) => {
-          const drawing = metadata.drawings[id]
-          const isSelected = selectedDrawingId === id
-          const partLabel = getDrawingPartLabel(id)
-          return (
+    <div ref={containerRef} className="flex flex-col gap-0.5 p-2">
+      <nav className="flex flex-col gap-0.5" aria-label="공간(건물) 트리">
+        {root && (
+          <div className="flex flex-col gap-0.5">
             <button
-              key={id}
               type="button"
-              onClick={() => onSelectDrawing(id)}
+              onClick={() => handleRowClick(root.id)}
               className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                isSelected ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
+                selectedDrawingId === root.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
               }`}
             >
-              <span className="shrink-0 text-gray-500" aria-hidden></span>
-              <span className="min-w-0 flex-1 truncate">{drawing.name}</span>
-              {partLabel && (
-                <span
-                  className="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600"
-                  title={`데이터: metadata-${partLabel}.json`}
-                >
-                  {partLabel}
-                </span>
-              )}
+              <span className="shrink-0 text-gray-500" aria-hidden>
+                {expandedDrawingId === root.id ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </span>
+              <span className="truncate font-medium">{root.name}</span>
             </button>
-          )
-        })}
-      </div>
-    </nav>
+            {expandedDrawingId === root.id && (() => {
+              const entries = getImageEntriesForDrawing(metadata, root.id)
+              return entries.length > 0 ? (
+                <ImageDropdown
+                  drawingId={root.id}
+                  entries={entries}
+                  onSelectImage={onSelectImage}
+                />
+              ) : null
+            })()}
+          </div>
+        )}
+        <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-2">
+          {childIds.map((id) => {
+            const drawing = metadata.drawings[id]
+            const isSelected = selectedDrawingId === id
+            const isExpanded = expandedDrawingId === id
+            const partLabel = getDrawingPartLabel(id)
+            const entries = isExpanded ? getImageEntriesForDrawing(metadata, id) : []
+            return (
+              <div key={id} className="flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => handleRowClick(id)}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
+                    isSelected ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="shrink-0 text-gray-500" aria-hidden>
+                    {isExpanded ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{drawing.name}</span>
+                  {partLabel && (
+                    <span
+                      className="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600"
+                      title={`데이터: metadata-${partLabel}.json`}
+                    >
+                      {partLabel}
+                    </span>
+                  )}
+                </button>
+                {isExpanded && entries.length > 0 && (
+                  <ImageDropdown
+                    drawingId={id}
+                    entries={entries}
+                    onSelectImage={onSelectImage}
+                  />
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </nav>
+    </div>
   )
 }

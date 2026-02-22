@@ -115,6 +115,78 @@ export function getLatestRevision(revisions: Revision[]): Revision | undefined {
   return [...revisions].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]
 }
 
+export interface DrawingImageEntry {
+  image: string
+  disciplineKey: string
+  revisionVersion: string | null
+  label: string
+}
+
+export function getImageEntriesForDrawing(
+  metadata: Metadata,
+  drawingId: string,
+): DrawingImageEntry[] {
+  const drawing = metadata.drawings[drawingId]
+  if (!drawing) return []
+  if (!drawing.disciplines || Object.keys(drawing.disciplines).length === 0) {
+    if (drawing.image) {
+      return [{ image: drawing.image, disciplineKey: '', revisionVersion: null, label: '기본' }]
+    }
+    return []
+  }
+  const opts = getDisciplineOptions(drawing)
+  const entries: DrawingImageEntry[] = []
+  for (const opt of opts) {
+    if (opt.hasRegions && opt.regionKeys?.length && opt.keyPrefix) {
+      for (const rk of opt.regionKeys) {
+        const key = `${opt.keyPrefix}.${rk}`
+        const revs = getRevisionsForDiscipline(drawingId, key, metadata)
+        for (const r of revs) {
+          entries.push({
+            image: r.image,
+            disciplineKey: key,
+            revisionVersion: r.version,
+            label: `${opt.label} ${rk} ${r.version}`,
+          })
+        }
+      }
+      const node = getDisciplineNode(drawing, opt.key)
+      if (node?.image) {
+        entries.push({
+          image: node.image,
+          disciplineKey: opt.key,
+          revisionVersion: null,
+          label: `${opt.label} (기본)`,
+        })
+      }
+      continue
+    }
+    {
+      if (opt.revisions?.length) {
+        for (const r of opt.revisions) {
+          entries.push({
+            image: r.image,
+            disciplineKey: opt.key,
+            revisionVersion: r.version,
+            label: `${opt.label} ${r.version}`,
+          })
+        }
+      } else {
+        const node = getDisciplineNode(drawing, opt.key)
+        if (node?.image) {
+          entries.push({
+            image: node.image,
+            disciplineKey: opt.key,
+            revisionVersion: null,
+            label: `${opt.label} (기본)`,
+          })
+        }
+      }
+    }
+  }
+  return entries
+}
+
 export function getImageFilenameForSelection(
   metadata: Metadata,
   selection: {

@@ -36,6 +36,17 @@ function App() {
     setSelection((prev) => ({ ...prev, revisionVersion: version }))
   }, [])
 
+  const handleSelectImage = useCallback(
+    (drawingId: string, disciplineKey: string, revisionVersion: string | null) => {
+      setSelection({
+        drawingId,
+        disciplineKey,
+        revisionVersion,
+      })
+    },
+    [],
+  )
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -76,6 +87,7 @@ function App() {
               metadata={metadata}
               selectedDrawingId={selection.drawingId}
               onSelectDrawing={handleSelectDrawing}
+              onSelectImage={handleSelectImage}
             />
           </div>
         </aside>
