@@ -9,6 +9,7 @@ import {
   getImageFilenameForSelection,
   getDisciplineOptions,
   getRevisionChanges,
+  getRevisionDate,
 } from './lib/drawings'
 
 function App() {
@@ -125,6 +126,12 @@ function App() {
                       : null
                   }
                   revisionVersion={selection.revisionVersion}
+                  revisionDate={getRevisionDate(
+                    metadata,
+                    selection.drawingId,
+                    selection.disciplineKey,
+                    selection.revisionVersion,
+                  )}
                   revisionChanges={getRevisionChanges(
                     metadata,
                     selection.drawingId,

@@ -120,6 +120,8 @@ export interface DrawingImageEntry {
   disciplineKey: string
   revisionVersion: string | null
   label: string
+  /** 리비전 날짜 (YYYY-MM-DD). 기본 이미지 등은 없을 수 있음 */
+  date?: string
 }
 
 export function getImageEntriesForDrawing(
@@ -147,6 +149,7 @@ export function getImageEntriesForDrawing(
             disciplineKey: key,
             revisionVersion: r.version,
             label: `${opt.label} ${rk} ${r.version}`,
+            date: r.date,
           })
         }
       }
@@ -169,6 +172,7 @@ export function getImageEntriesForDrawing(
             disciplineKey: opt.key,
             revisionVersion: r.version,
             label: `${opt.label} ${r.version}`,
+            date: r.date,
           })
         }
       } else {
@@ -254,4 +258,16 @@ export function getRevisionChanges(
   const revisions = getRevisionsForDiscipline(drawingId, disciplineKey, metadata)
   const rev = revisions.find((r) => r.version === revisionVersion)
   return Array.isArray(rev?.changes) ? rev.changes : []
+}
+
+export function getRevisionDate(
+  metadata: Metadata,
+  drawingId: string,
+  disciplineKey: string | null,
+  revisionVersion: string | null,
+): string | null {
+  if (!drawingId || !disciplineKey || !revisionVersion) return null
+  const revisions = getRevisionsForDiscipline(drawingId, disciplineKey, metadata)
+  const rev = revisions.find((r) => r.version === revisionVersion)
+  return rev?.date ?? null
 }

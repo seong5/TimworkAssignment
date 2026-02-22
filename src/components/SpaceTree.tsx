@@ -38,7 +38,12 @@ function ImageDropdown({
               className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors hover:bg-gray-200"
             >
               <ImageIcon className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-              <span className="min-w-0 truncate">{entry.label}</span>
+              <span className="min-w-0 truncate">
+                {entry.label}
+                {entry.date && (
+                  <span className="ml-1.5 text-neutral-500">· {entry.date}</span>
+                )}
+              </span>
             </button>
           </li>
         ))}

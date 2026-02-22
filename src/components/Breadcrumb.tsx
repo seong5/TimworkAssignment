@@ -16,6 +16,7 @@ interface BreadcrumbProps {
   onSelectDrawing: (id: string) => void
   disciplineLabel?: string | null
   revisionVersion?: string | null
+  revisionDate?: string | null
   revisionChanges?: string[]
 }
 
@@ -25,6 +26,7 @@ export function Breadcrumb({
   onSelectDrawing,
   disciplineLabel = null,
   revisionVersion = null,
+  revisionDate = null,
   revisionChanges = [],
 }: BreadcrumbProps) {
   const pathIds = drawingId ? getBreadcrumbIds(metadata, drawingId) : []
@@ -36,7 +38,12 @@ export function Breadcrumb({
 
   const path: CrumbItem[] = [...spaceCrumbs]
   if (disciplineLabel) path.push({ id: 'discipline', name: disciplineLabel, type: 'discipline' })
-  if (revisionVersion) path.push({ id: 'revision', name: revisionVersion, type: 'revision' })
+  if (revisionVersion)
+    path.push({
+      id: 'revision',
+      name: revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion,
+      type: 'revision',
+    })
 
   const drawingName = drawingId ? metadata.drawings[drawingId]?.name : null
   const disciplineShort = disciplineLabel ? disciplineLabel.split(' > ')[0] : null
@@ -103,7 +110,12 @@ export function Breadcrumb({
               <>
                 {' '}
                 <strong>"{drawingName}</strong>의 <strong>{disciplineShort}</strong>
-                <strong>{revisionVersion ? ` ${revisionVersion} ` : ' '}"</strong>
+                <strong>
+                  {revisionVersion
+                    ? ` ${revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion} `
+                    : ' '}
+                  "
+                </strong>
               </>
             ) : (
               <>
