@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/seong5/TimworkAssignment#readme",
   "dependencies": {
+    "lucide-react": "^0.575.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
