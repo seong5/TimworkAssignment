@@ -32,10 +32,18 @@ function ImageDropdown({
               className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-sm transition-colors hover:bg-gray-200"
             >
               <ImageIcon className="h-3.5 w-3.5 shrink-0 text-gray-400" />
-              <span className="min-w-0 truncate">
+              <span className="min-w-0 flex-1 truncate">
                 {entry.label}
                 {entry.date && <span className="ml-1.5 text-neutral-500">· {entry.date}</span>}
               </span>
+              {entry.isLatest && (
+                <span
+                  className="shrink-0 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700"
+                  title="최신 리비전"
+                >
+                  최신
+                </span>
+              )}
             </button>
           </li>
         ))}

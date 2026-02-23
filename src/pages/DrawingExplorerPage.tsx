@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { useMetadata } from '@/shared/hooks/useMetadata'
 import {
   SpaceTree,
@@ -11,8 +11,10 @@ import {
 import {
   getImageFilenameForSelection,
   getDisciplineLabel,
+  getLatestRevision,
   getRevisionChanges,
   getRevisionDate,
+  getRevisionsForDiscipline,
   getRootChildIds,
 } from '@/shared/lib/drawings'
 import { SPACE_LIST } from '@/shared/lib/drawings'
@@ -41,6 +43,33 @@ export function DrawingExplorerPage() {
       setSelection((prev) => ({ ...prev, drawingId: defaultDrawingId }))
     }
   }, [metadata, selection.drawingId])
+
+  // 공종/영역 선택 시 기본값을 최신 리비전으로
+  useEffect(() => {
+    if (!metadata || !selection.drawingId || !selection.disciplineKey || selection.revisionVersion !== null)
+      return
+    const revisions = getRevisionsForDiscipline(
+      selection.drawingId,
+      selection.disciplineKey,
+      metadata,
+    )
+    const latest = getLatestRevision(revisions)
+    if (latest) {
+      setSelection((prev) => ({ ...prev, revisionVersion: latest.version }))
+    }
+  }, [metadata, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
+
+  const isCurrentLatestRevision = useMemo(() => {
+    if (!metadata || !selection.drawingId || !selection.disciplineKey || !selection.revisionVersion)
+      return false
+    const revisions = getRevisionsForDiscipline(
+      selection.drawingId,
+      selection.disciplineKey,
+      metadata,
+    )
+    const latest = getLatestRevision(revisions)
+    return latest?.version === selection.revisionVersion
+  }, [metadata, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
   const handleSelectDrawing = useCallback((drawingId: string) => {
     setSelection((prev) => ({
@@ -174,6 +203,16 @@ export function DrawingExplorerPage() {
                     selection.revisionVersion,
                   )}
                 />
+                {isCurrentLatestRevision && (
+                  <div className="mt-2 flex items-center justify-start">
+                    <span
+                      className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                      title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
+                    >
+                      ★ 최신 도면
+                    </span>
+                  </div>
+                )}
               </div>
               <DrawingViewer
                 imageFilename={getImageFilenameForSelection(metadata, selection)}

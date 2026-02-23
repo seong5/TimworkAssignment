@@ -163,6 +163,7 @@ export interface DrawingImageEntry {
   revisionVersion: string | null
   label: string
   date?: string
+  isLatest?: boolean
 }
 
 export function getImageEntriesForDrawing(
@@ -184,6 +185,7 @@ export function getImageEntriesForDrawing(
       for (const rk of opt.regionKeys) {
         const key = `${opt.keyPrefix}.${rk}`
         const revs = getRevisionsForDiscipline(drawingId, key, metadata)
+        const latest = getLatestRevision(revs)
         for (const r of revs) {
           entries.push({
             image: r.image,
@@ -191,6 +193,7 @@ export function getImageEntriesForDrawing(
             revisionVersion: r.version,
             label: `${opt.label} ${rk} ${r.version}`,
             date: r.date,
+            isLatest: latest?.version === r.version,
           })
         }
       }
@@ -207,6 +210,7 @@ export function getImageEntriesForDrawing(
     }
     {
       if (opt.revisions?.length) {
+        const latest = getLatestRevision(opt.revisions)
         for (const r of opt.revisions) {
           entries.push({
             image: r.image,
@@ -214,6 +218,7 @@ export function getImageEntriesForDrawing(
             revisionVersion: r.version,
             label: `${opt.label} ${r.version}`,
             date: r.date,
+            isLatest: latest?.version === r.version,
           })
         }
       } else {

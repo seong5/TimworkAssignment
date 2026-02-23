@@ -1,7 +1,11 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
 import type { Metadata } from '@/shared/types/metadata'
 import type { DisciplineOption } from '@/shared/types/metadata'
-import { getDisciplineOptions, getRevisionsForDiscipline } from '@/shared/lib/drawings'
+import {
+  getDisciplineOptions,
+  getRevisionsForDiscipline,
+  getLatestRevision,
+} from '@/shared/lib/drawings'
 
 export interface SelectionState {
   drawingId: string | null
@@ -44,6 +48,7 @@ export function ContextBar({
     drawingId && effectiveDisciplineKey
       ? getRevisionsForDiscipline(drawingId, effectiveDisciplineKey, metadata)
       : []
+  const latestRevision = revisions.length > 0 ? getLatestRevision(revisions) : null
 
   return (
     <div
@@ -154,6 +159,7 @@ export function ContextBar({
                 {revisions.map((r) => (
                   <option key={r.version} value={r.version}>
                     {r.version} ({r.date}) {r.description ? `- ${r.description}` : ''}
+                    {latestRevision?.version === r.version ? ' ★ 최신' : ''}
                   </option>
                 ))}
               </select>
