@@ -111,12 +111,12 @@ export function DrawingExplorerPage() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-[20px] text-gray-500 hover:text-gray-700"
           >
-            ← 목록
+            ← 도면 목록
           </button>
           <span className="text-gray-300">|</span>
-          <h1 className="text-lg font-semibold text-gray-900">
+          <h1 className="text-[30px] font-bold text-gray-900">
             {selection.drawingId
               ? metadata.drawings[selection.drawingId].name
               : metadata.project.name}

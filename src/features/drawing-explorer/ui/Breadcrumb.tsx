@@ -105,22 +105,23 @@ export function Breadcrumb({
       {drawingName && (
         <div className="p-2">
           <p className="text-[30px] font-medium text-neutral-600">
-            현재 도면 :
+            현재 보고있는 도면은
             {disciplineShort ? (
               <>
                 {' '}
-                <strong>"{drawingName}</strong>의 <strong>{disciplineShort}</strong>
+                <strong>"{drawingName}"</strong>의 <strong>{disciplineShort}</strong>
                 <strong>
                   {revisionVersion
-                    ? ` ${revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion} `
-                    : ' '}
-                  "
+                    ? ` ${revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion}`
+                    : ''}
                 </strong>
+                <span className="font-medium"> 입니다.</span>
               </>
             ) : (
               <>
                 {' '}
                 <strong>"{drawingName}"</strong>
+                <span className="font-medium"> 입니다.</span>
               </>
             )}
           </p>

@@ -14,19 +14,22 @@ export function MainPage() {
     if (!q) return SPACE_LIST
     return SPACE_LIST.filter(
       (space) =>
-        space.displayName.toLowerCase().includes(q) ||
-        space.slug.toLowerCase().includes(q),
+        space.displayName.toLowerCase().includes(q) || space.slug.toLowerCase().includes(q),
     )
   }, [searchQuery])
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white px-4 py-4">
-        <h1 className="text-xl font-semibold text-gray-900">
-          {loading ? '…' : project?.name ?? '도면 탐색'}
+      <header className="border-b text-center border-gray-200 bg-white px-4 py-4">
+        <h1 className="text-[40px] font-bold text-gray-900">
+          {loading ? '…' : (project?.name ?? '도면 탐색')}
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {loading ? '…' : project ? `${project.name}의 도면을 조회할 수 있습니다.` : '공간을 선택하면 해당 도면을 조회할 수 있습니다.'}
+        <p className="mt-1 text-[20px] text-gray-500">
+          {loading
+            ? '…'
+            : project
+              ? `'${project.name}' 프로젝트의 전체 도면을 조회할 수 있습니다.`
+              : '공간을 선택하면 해당 도면을 조회할 수 있습니다.'}
         </p>
       </header>
 
@@ -42,7 +45,7 @@ export function MainPage() {
         </div>
 
         <h2 className="mb-6 text-sm font-semibold uppercase tracking-wide text-gray-500">
-          {loading ? '…' : project ? `${project.name} 공간 목록` : '공간 목록'}
+          {loading ? '…' : project ? `${project.name} 도면 목록` : '공간 목록'}
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSpaces.length === 0 ? (
