@@ -7,6 +7,7 @@ import {
   Breadcrumb,
   DrawingViewer,
   type SelectionState,
+  type DrawingImageEntry,
 } from '@/features/drawing-explorer'
 import {
   getImageForSelection,
@@ -17,6 +18,10 @@ import {
   getRevisionsForDiscipline,
   getRootChildIds,
   getDefaultDrawingIdForSlug,
+  getBreadcrumbIds,
+  getDrawingIdsInOrder,
+  getDisciplineOptionsForDrawing,
+  getImageEntriesForDrawing,
 } from '@/shared/lib/normalizedDrawings'
 import { SPACE_LIST } from '@/shared/lib/normalizedDrawings'
 
@@ -40,13 +45,13 @@ export function DrawingExplorerPage() {
     if (!data || selection.drawingId !== null) return
     const defaultBySlug = slug ? getDefaultDrawingIdForSlug(slug) : null
     const rootChildIds = getRootChildIds(data)
-    const defaultDrawingId = defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
+    const defaultDrawingId =
+      defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
     if (defaultDrawingId) {
       setSelection((prev) => ({ ...prev, drawingId: defaultDrawingId }))
     }
   }, [data, slug, selection.drawingId])
 
-  // 공종/영역 선택 시 기본값을 최신 리비전으로
   useEffect(() => {
     if (
       !data ||
@@ -55,7 +60,11 @@ export function DrawingExplorerPage() {
       selection.revisionVersion !== null
     )
       return
-    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
+    const revisions = getRevisionsForDiscipline(
+      data,
+      selection.drawingId,
+      selection.disciplineKey,
+    )
     const latest = getLatestRevision(revisions)
     if (latest) {
       setSelection((prev) => ({ ...prev, revisionVersion: latest.version }))
@@ -65,7 +74,11 @@ export function DrawingExplorerPage() {
   const isCurrentLatestRevision = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey || !selection.revisionVersion)
       return false
-    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
+    const revisions = getRevisionsForDiscipline(
+      data,
+      selection.drawingId,
+      selection.disciplineKey,
+    )
     const latest = getLatestRevision(revisions)
     return latest?.version === selection.revisionVersion
   }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
@@ -93,6 +106,117 @@ export function DrawingExplorerPage() {
     },
     [],
   )
+
+  // —— Breadcrumb: pathIds + drawingNames (drawings만 사용)
+  const breadcrumbPathIds = useMemo(
+    () => (data && selection.drawingId ? getBreadcrumbIds(data, selection.drawingId) : []),
+    [data, selection.drawingId],
+  )
+  const drawingNames = useMemo(
+    () =>
+      data
+        ? Object.fromEntries(
+            Object.entries(data.drawings).map(([id, d]) => [id, d.name]),
+          )
+        : {},
+    [data],
+  )
+
+  // —— SpaceTree: rootDrawing, childDrawings, entriesByDrawingId
+  const { rootDrawing, childDrawings, entriesByDrawingId } = useMemo(() => {
+    if (!data) {
+      return {
+        rootDrawing: null as { id: string; name: string } | null,
+        childDrawings: [] as { id: string; name: string }[],
+        entriesByDrawingId: {} as Record<string, DrawingImageEntry[]>,
+      }
+    }
+    const ids = getDrawingIdsInOrder(data)
+    const rootId = ids[0] ?? null
+    const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
+    const rootDrawing: { id: string; name: string } | null =
+      rootId ? { id: rootId, name: data.drawings[rootId].name } : null
+    const childDrawings = childIds.map((id) => ({
+      id,
+      name: data.drawings[id].name,
+    }))
+    const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
+    const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
+    for (const id of allDrawingIds) {
+      entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
+    }
+    return { rootDrawing, childDrawings, entriesByDrawingId }
+  }, [data])
+
+  // —— ContextBar: 공종/리비전 옵션 및 파생 상태 전부 페이지에서 계산
+  const contextBarProps = useMemo((): Omit<
+    import('@/features/drawing-explorer').ContextBarProps,
+    'onDisciplineChange' | 'onRevisionChange'
+  > => {
+    if (!data || !selection.drawingId) {
+      return {
+        drawingName: null,
+        disciplineOptions: [],
+        selectedDisciplineSelectValue: '',
+        disciplineKey: selection.disciplineKey,
+        revisions: [],
+        revisionVersion: selection.revisionVersion,
+        latestRevision: null,
+        showRegionSelect: false,
+        regionKeys: [],
+        keyPrefix: '',
+        currentRegionKey: '',
+        revisionEmptyMessage: '—',
+      }
+    }
+    const drawingName = data.drawings[selection.drawingId].name
+    const disciplineOptions = getDisciplineOptionsForDrawing(data, selection.drawingId)
+    const selectedDisciplineOption = disciplineOptions.find(
+      (o) =>
+        o.key === selection.disciplineKey ||
+        (o.keyPrefix && selection.disciplineKey?.startsWith(o.keyPrefix + '.')),
+    )
+    const showRegionSelect =
+      !!(
+        selectedDisciplineOption?.hasRegions &&
+        selectedDisciplineOption.regionKeys?.length
+      )
+    const effectiveDisciplineKey =
+      showRegionSelect && selection.disciplineKey === selectedDisciplineOption?.key
+        ? null
+        : selection.disciplineKey
+    const regionKeys = selectedDisciplineOption?.regionKeys ?? []
+    const keyPrefix = selectedDisciplineOption?.keyPrefix ?? ''
+    const currentRegionKey =
+      keyPrefix && selection.disciplineKey?.startsWith(keyPrefix + '.')
+        ? selection.disciplineKey.slice((keyPrefix + '.').length)
+        : ''
+    const revisions = effectiveDisciplineKey
+      ? getRevisionsForDiscipline(data, selection.drawingId, effectiveDisciplineKey)
+      : []
+    const latestRevision = getLatestRevision(revisions) ?? null
+    const selectedDisciplineSelectValue =
+      selectedDisciplineOption?.key ?? selection.disciplineKey ?? ''
+    let revisionEmptyMessage = '—'
+    if (showRegionSelect && !currentRegionKey)
+      revisionEmptyMessage = '영역(A/B)을 선택하면 리비전이 표시됩니다'
+    else if (effectiveDisciplineKey) revisionEmptyMessage = '리비전을 선택하세요'
+
+    return {
+      drawingName,
+      disciplineOptions,
+      selectedDisciplineSelectValue,
+      disciplineKey: selection.disciplineKey,
+      revisions,
+      revisionVersion: selection.revisionVersion,
+      latestRevision,
+      showRegionSelect,
+      regionKeys,
+      keyPrefix,
+      currentRegionKey,
+      revisionEmptyMessage,
+    }
+  }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
   if (!slug || !space) {
     return (
@@ -145,13 +269,14 @@ export function DrawingExplorerPage() {
           </button>
           <span className="text-gray-300">|</span>
           <h1 className="text-[30px] font-bold text-gray-900">
-            {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
+            {selection.drawingId
+              ? data.drawings[selection.drawingId].name
+              : data.project.name}
           </h1>
         </div>
         <div className="mt-2">
           <ContextBar
-            data={data}
-            selection={selection}
+            {...contextBarProps}
             onDisciplineChange={handleDisciplineChange}
             onRevisionChange={handleRevisionChange}
           />
@@ -165,7 +290,9 @@ export function DrawingExplorerPage() {
               공간(건물)
             </h2>
             <SpaceTree
-              data={data}
+              rootDrawing={rootDrawing}
+              childDrawings={childDrawings}
+              entriesByDrawingId={entriesByDrawingId}
               selectedDrawingId={selection.drawingId}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}
@@ -178,7 +305,8 @@ export function DrawingExplorerPage() {
             <>
               <div className="shrink-0 p-2">
                 <Breadcrumb
-                  data={data}
+                  pathIds={breadcrumbPathIds}
+                  drawingNames={drawingNames}
                   drawingId={selection.drawingId}
                   onSelectDrawing={handleSelectDrawing}
                   disciplineLabel={getDisciplineLabel(

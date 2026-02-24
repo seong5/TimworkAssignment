@@ -1,16 +1,9 @@
 import { useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon } from 'lucide-react'
-import type { NormalizedProjectData } from '@/entities/project'
-import type { DrawingImageEntry } from '@/shared/lib/normalizedDrawings'
-import { getDrawingIdsInOrder, getImageEntriesForDrawing } from '@/shared/lib/normalizedDrawings'
 import { useClickOutside } from '@/shared/hooks/useClickOutside'
+import type { DrawingImageEntry } from '@/shared/lib/normalizedDrawings'
 
-interface SpaceTreeProps {
-  data: NormalizedProjectData
-  selectedDrawingId: string | null
-  onSelectDrawing: (id: string) => void
-  onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
-}
+export type { DrawingImageEntry }
 
 function ImageDropdown({
   drawingId,
@@ -52,8 +45,19 @@ function ImageDropdown({
   )
 }
 
+export interface SpaceTreeProps {
+  rootDrawing: { id: string; name: string } | null
+  childDrawings: { id: string; name: string }[]
+  entriesByDrawingId: Record<string, DrawingImageEntry[]>
+  selectedDrawingId: string | null
+  onSelectDrawing: (id: string) => void
+  onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
+}
+
 export function SpaceTree({
-  data,
+  rootDrawing,
+  childDrawings,
+  entriesByDrawingId,
   selectedDrawingId,
   onSelectDrawing,
   onSelectImage,
@@ -61,11 +65,6 @@ export function SpaceTree({
   const [expandedDrawingId, setExpandedDrawingId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   useClickOutside(containerRef, () => setExpandedDrawingId(null))
-
-  const ids = getDrawingIdsInOrder(data)
-  const rootId = ids[0]
-  const root = rootId ? data.drawings[rootId] : null
-  const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
 
   const handleRowClick = (id: string) => {
     onSelectDrawing(id)
@@ -75,43 +74,41 @@ export function SpaceTree({
   return (
     <div ref={containerRef} className="flex flex-col gap-0.5 p-2">
       <nav className="flex flex-col gap-0.5" aria-label="공간(건물) 트리">
-        {root && (
+        {rootDrawing && (
           <div className="flex flex-col gap-0.5">
             <button
               type="button"
-              onClick={() => handleRowClick(root.id)}
+              onClick={() => handleRowClick(rootDrawing.id)}
               className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors ${
-                selectedDrawingId === root.id ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
+                selectedDrawingId === rootDrawing.id
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'hover:bg-gray-100'
               }`}
             >
               <span className="shrink-0 text-gray-500" aria-hidden>
-                {expandedDrawingId === root.id ? (
+                {expandedDrawingId === rootDrawing.id ? (
                   <ChevronDown className="h-4 w-4" />
                 ) : (
                   <ChevronRight className="h-4 w-4" />
                 )}
               </span>
-              <span className="truncate font-medium">{root.name}</span>
+              <span className="truncate font-medium">{rootDrawing.name}</span>
             </button>
-            {expandedDrawingId === root.id &&
-              (() => {
-                const entries = getImageEntriesForDrawing(data, root.id)
-                return entries.length > 0 ? (
-                  <ImageDropdown
-                    drawingId={root.id}
-                    entries={entries}
-                    onSelectImage={onSelectImage}
-                  />
-                ) : null
-              })()}
+            {expandedDrawingId === rootDrawing.id &&
+              (entriesByDrawingId[rootDrawing.id]?.length ?? 0) > 0 && (
+                <ImageDropdown
+                  drawingId={rootDrawing.id}
+                  entries={entriesByDrawingId[rootDrawing.id]}
+                  onSelectImage={onSelectImage}
+                />
+              )}
           </div>
         )}
         <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-2">
-          {childIds.map((id) => {
-            const drawing = data.drawings[id]
+          {childDrawings.map(({ id, name }) => {
             const isSelected = selectedDrawingId === id
             const isExpanded = expandedDrawingId === id
-            const entries = isExpanded ? getImageEntriesForDrawing(data, id) : []
+            const entries = entriesByDrawingId[id] ?? []
             return (
               <div key={id} className="flex flex-col gap-0.5">
                 <button
@@ -128,7 +125,7 @@ export function SpaceTree({
                       <ChevronRight className="h-4 w-4" />
                     )}
                   </span>
-                  <span className="min-w-0 flex-1 truncate">{drawing.name}</span>
+                  <span className="min-w-0 flex-1 truncate">{name}</span>
                 </button>
                 {isExpanded && entries.length > 0 && (
                   <ImageDropdown drawingId={id} entries={entries} onSelectImage={onSelectImage} />

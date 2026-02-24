@@ -8,7 +8,7 @@ async function fetchJson<T>(path: string): Promise<T> {
   return res.json() as Promise<T>
 }
 
-/** project.json */
+/* project.json */
 export async function fetchProject(): Promise<{
   project: NormalizedProjectData['project']
   disciplines: NormalizedProjectData['disciplines']
@@ -16,15 +16,17 @@ export async function fetchProject(): Promise<{
   return fetchJson('project.json')
 }
 
-/** drawings.json */
+/* drawings.json */
 export async function fetchDrawings(): Promise<{
   drawings: NormalizedProjectData['drawings']
 }> {
   return fetchJson('drawings.json')
 }
 
-/** discipline_revisions.json */
-export async function fetchDisciplineRevisions(): Promise<NormalizedProjectData['disciplineRevisions']> {
+/* discipline_revisions.json */
+export async function fetchDisciplineRevisions(): Promise<
+  NormalizedProjectData['disciplineRevisions']
+> {
   return fetchJson('discipline_revisions.json')
 }
 

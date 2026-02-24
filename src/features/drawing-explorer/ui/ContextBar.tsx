@@ -1,11 +1,6 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
-import type { NormalizedProjectData } from '@/entities/project'
 import type { DisciplineOption } from '@/shared/types/metadata'
-import {
-  getDisciplineOptionsForDrawing,
-  getRevisionsForDiscipline,
-  getLatestRevision,
-} from '@/shared/lib/normalizedDrawings'
+import type { NormalizedRevision } from '@/entities/project'
 
 export interface SelectionState {
   drawingId: string | null
@@ -13,44 +8,41 @@ export interface SelectionState {
   revisionVersion: string | null
 }
 
-interface ContextBarProps {
-  data: NormalizedProjectData
-  selection: SelectionState
+export interface ContextBarProps {
+  drawingName: string | null
+  disciplineOptions: DisciplineOption[]
+  selectedDisciplineSelectValue: string
+  disciplineKey: string | null
+  revisions: NormalizedRevision[]
+  revisionVersion: string | null
+  latestRevision: NormalizedRevision | null
+  showRegionSelect: boolean
+  regionKeys: string[]
+  keyPrefix: string
+  currentRegionKey: string
+  revisionEmptyMessage: string
   onDisciplineChange: (key: string | null) => void
   onRevisionChange: (version: string | null) => void
 }
 
 export function ContextBar({
-  data,
-  selection,
+  drawingName,
+  disciplineOptions,
+  selectedDisciplineSelectValue,
+  disciplineKey,
+  revisions,
+  revisionVersion,
+  latestRevision,
+  showRegionSelect,
+  regionKeys,
+  keyPrefix,
+  currentRegionKey,
+  revisionEmptyMessage,
   onDisciplineChange,
   onRevisionChange,
 }: ContextBarProps) {
-  const { drawingId, disciplineKey, revisionVersion } = selection
-  const drawing = drawingId ? data.drawings[drawingId] : null
-  const disciplineOptions: DisciplineOption[] = drawingId
-    ? getDisciplineOptionsForDrawing(data, drawingId)
-    : []
-  const selectedDisciplineOption = disciplineOptions.find(
-    (o) => o.key === disciplineKey || (o.keyPrefix && disciplineKey?.startsWith(o.keyPrefix + '.')),
-  )
-  const showRegionSelect =
-    selectedDisciplineOption?.hasRegions &&
-    selectedDisciplineOption.regionKeys &&
-    selectedDisciplineOption.regionKeys.length > 0
   const effectiveDisciplineKey =
-    showRegionSelect && disciplineKey === selectedDisciplineOption?.key ? null : disciplineKey
-  const regionKeys = selectedDisciplineOption?.regionKeys ?? []
-  const keyPrefix = selectedDisciplineOption?.keyPrefix ?? ''
-  const currentRegionKey =
-    keyPrefix && disciplineKey?.startsWith(keyPrefix + '.')
-      ? disciplineKey.slice((keyPrefix + '.').length)
-      : ''
-  const revisions =
-    drawingId && effectiveDisciplineKey
-      ? getRevisionsForDiscipline(data, drawingId, effectiveDisciplineKey)
-      : []
-  const latestRevision = revisions.length > 0 ? getLatestRevision(revisions) : null
+    showRegionSelect && disciplineKey === selectedDisciplineSelectValue ? null : disciplineKey
 
   return (
     <div
@@ -68,7 +60,7 @@ export function ContextBar({
               Space
             </span>
             <span className="text-sm font-semibold leading-none text-neutral-800">
-              {drawing ? drawing.name : '—'}
+              {drawingName ?? '—'}
             </span>
           </div>
         </div>
@@ -81,9 +73,9 @@ export function ContextBar({
             <span className="mb-0.5 text-[10px] font-bold uppercase leading-none tracking-wider text-neutral-400">
               Discipline
             </span>
-            {drawing && disciplineOptions.length > 0 ? (
+            {drawingName && disciplineOptions.length > 0 ? (
               <select
-                value={selectedDisciplineOption?.key ?? disciplineKey ?? ''}
+                value={selectedDisciplineSelectValue}
                 onChange={(e) => {
                   const v = e.target.value
                   onDisciplineChange(v || null)
@@ -102,7 +94,7 @@ export function ContextBar({
             ) : (
               <span className="text-sm font-medium text-neutral-500">—</span>
             )}
-            {drawing && disciplineOptions.length > 0 && (
+            {drawingName && disciplineOptions.length > 0 && (
               <ChevronDown className="pointer-events-none absolute right-0 bottom-0 h-4 w-4 text-neutral-400" />
             )}
           </div>
@@ -166,13 +158,7 @@ export function ContextBar({
                 ))}
               </select>
             ) : (
-              <span className="text-sm font-medium text-neutral-500">
-                {showRegionSelect && !currentRegionKey
-                  ? '영역(A/B)을 선택하면 리비전이 표시됩니다'
-                  : effectiveDisciplineKey
-                    ? '리비전을 선택하세요'
-                    : '—'}
-              </span>
+              <span className="text-sm font-medium text-neutral-500">{revisionEmptyMessage}</span>
             )}
             {effectiveDisciplineKey && revisions.length > 0 && (
               <ChevronDown className="pointer-events-none absolute right-0 bottom-0 h-4 w-4 text-neutral-400" />
