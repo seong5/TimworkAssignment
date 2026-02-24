@@ -1,10 +1,16 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
+import { MainPage } from '@/pages/MainPage'
+import { DrawingExplorerPage } from '@/pages/DrawingExplorerPage'
 
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-xl font-semibold">TimworkAssignment</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/drawing/:slug" element={<DrawingExplorerPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

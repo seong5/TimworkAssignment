@@ -2,3 +2,9 @@
   height: 100vh;
   width: 100%;
 }
+
+/* 브라우저 기본 검색창 × 버튼 제거 SearchBar에서 커스텀 사용 */
+input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
