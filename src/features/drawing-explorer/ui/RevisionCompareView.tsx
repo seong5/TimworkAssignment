@@ -31,9 +31,11 @@ function ComparePanel({
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm sm:gap-3">
-      <div className="shrink-0 border-b border-neutral-100 px-3 py-1.5 sm:px-4 sm:py-2">
+      <div className="flex shrink-0 flex-row items-center gap-2 border-b border-neutral-100 px-3 py-1.5 sm:px-4 sm:py-2">
         <p className="text-xs font-semibold text-neutral-800 sm:text-sm">{label}</p>
-        {date != null && date !== '' && <p className="text-[10px] text-neutral-500 sm:text-xs">{date}</p>}
+        {date != null && date !== '' && (
+          <span className="text-[10px] text-neutral-500 sm:text-xs">{date}</span>
+        )}
       </div>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className="flex min-h-0 flex-1 items-start justify-start overflow-auto p-1.5 sm:p-2">
