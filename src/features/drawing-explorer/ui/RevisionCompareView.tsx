@@ -54,15 +54,15 @@ function ComparePanel({
         <div className="shrink-0 space-y-2 border-t border-neutral-100 px-4 py-3">
           {description != null && description !== '' && (
             <div>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+              <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                 설명
               </span>
-              <p className="mt-0.5 text-sm text-neutral-700">{description}</p>
+              <p className="text-sm text-neutral-700">{description}</p>
             </div>
           )}
           {Array.isArray(changes) && changes.length > 0 && (
             <div>
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+              <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                 변경 사항
               </span>
               <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-sm text-neutral-700">
