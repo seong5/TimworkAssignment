@@ -1,10 +1,6 @@
-import { useRef, useState, type RefObject } from 'react'
+import { useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon, Layers } from 'lucide-react'
-import { useClickOutside } from '@/shared/hooks/useClickOutside'
-import type {
-  DrawingImageEntry,
-  DrawingDisciplineGroup,
-} from '@/shared/lib/normalizedDrawings'
+import type { DrawingImageEntry, DrawingDisciplineGroup } from '@/shared/lib/normalizedDrawings'
 
 export type { DrawingImageEntry, DrawingDisciplineGroup }
 
@@ -51,15 +47,12 @@ function RevisionList({
 export interface SpaceTreeProps {
   rootDrawing: { id: string; name: string } | null
   childDrawings: { id: string; name: string }[]
-  /** 도면 id → 공종별 그룹 배열 (도면 → 공종 → 리비전 3단계) */
   disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]>
   selectedDrawingId: string | null
   onSelectDrawing: (id: string) => void
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
-  ignoreClickOutsideRef?: RefObject<HTMLElement | null>
 }
 
-/** drawingId + disciplineKey 조합으로 확장 상태 식별 */
 function disciplineNodeKey(drawingId: string, disciplineKey: string) {
   return `${drawingId}:${disciplineKey}`
 }
@@ -71,29 +64,25 @@ export function SpaceTree({
   selectedDrawingId,
   onSelectDrawing,
   onSelectImage,
-  ignoreClickOutsideRef,
 }: SpaceTreeProps) {
   const [expandedDrawingId, setExpandedDrawingId] = useState<string | null>(null)
-  const [expandedDisciplineKey, setExpandedDisciplineKey] = useState<string | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  useClickOutside(
-    containerRef,
-    () => {
-      setExpandedDrawingId(null)
-      setExpandedDisciplineKey(null)
-    },
-    { ignoreRef: ignoreClickOutsideRef },
-  )
+  /** 여러 공종을 동시에 펼쳐 둘 수 있음 */
+  const [expandedDisciplineKeys, setExpandedDisciplineKeys] = useState<Set<string>>(new Set())
 
   const handleDrawingClick = (id: string) => {
     onSelectDrawing(id)
     setExpandedDrawingId((prev) => (prev === id ? null : id))
-    setExpandedDisciplineKey(null)
+    setExpandedDisciplineKeys(new Set())
   }
 
   const handleDisciplineClick = (drawingId: string, disciplineKey: string) => {
     const key = disciplineNodeKey(drawingId, disciplineKey)
-    setExpandedDisciplineKey((prev) => (prev === key ? null : key))
+    setExpandedDisciplineKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
   }
 
   const renderDisciplineLevel = (drawingId: string) => {
@@ -102,7 +91,7 @@ export function SpaceTree({
       <div className="ml-4 flex flex-col gap-0.5 border-l border-gray-200 pl-2">
         {groups.map((group) => {
           const nodeKey = disciplineNodeKey(drawingId, group.disciplineKey)
-          const isExpanded = expandedDisciplineKey === nodeKey
+          const isExpanded = expandedDisciplineKeys.has(nodeKey)
           return (
             <div key={group.disciplineKey} className="flex flex-col gap-0.5">
               <button
@@ -135,7 +124,7 @@ export function SpaceTree({
   }
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-0.5 p-2">
+    <div className="flex flex-col gap-0.5 p-2">
       <nav className="flex flex-col gap-0.5" aria-label="공간(건물) 트리">
         {rootDrawing && (
           <div className="flex flex-col gap-0.5">

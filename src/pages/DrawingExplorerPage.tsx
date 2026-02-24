@@ -1,13 +1,11 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { useProjectData } from '@/shared/hooks/useProjectData'
 import {
   SpaceTree,
-  ContextBar,
   Breadcrumb,
   DrawingViewer,
   RevisionCompareView,
-  type SelectionState,
 } from '@/features/drawing-explorer'
 import {
   getImageForSelection,
@@ -21,7 +19,6 @@ import {
   getBreadcrumbIds,
   getDrawingIdsInOrder,
   getChildDrawingIds,
-  getDisciplineOptionsForDrawing,
   getImageEntriesGroupedByDiscipline,
 } from '@/shared/lib/normalizedDrawings'
 import type { DrawingDisciplineGroup } from '@/shared/lib/normalizedDrawings'
@@ -33,7 +30,11 @@ export function DrawingExplorerPage() {
   const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
 
   const { data, loading, error } = useProjectData()
-  const [selection, setSelection] = useState<SelectionState>({
+  const [selection, setSelection] = useState<{
+    drawingId: string | null
+    disciplineKey: string | null
+    revisionVersion: string | null
+  }>({
     drawingId: null,
     disciplineKey: null,
     revisionVersion: null,
@@ -41,7 +42,6 @@ export function DrawingExplorerPage() {
   const [compareMode, setCompareMode] = useState(false)
   const [compareLeft, setCompareLeft] = useState<string | null>(null)
   const [compareRight, setCompareRight] = useState<string | null>(null)
-  const mainContentRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     setSelection({ drawingId: null, disciplineKey: null, revisionVersion: null })
@@ -91,15 +91,6 @@ export function DrawingExplorerPage() {
       disciplineKey: null,
       revisionVersion: null,
     }))
-  }, [])
-
-  const handleDisciplineChange = useCallback((key: string | null) => {
-    setCompareMode(false)
-    setSelection((prev) => ({ ...prev, disciplineKey: key, revisionVersion: null }))
-  }, [])
-
-  const handleRevisionChange = useCallback((version: string | null) => {
-    setSelection((prev) => ({ ...prev, revisionVersion: version }))
   }, [])
 
   const currentRevisions = useMemo(() => {
@@ -211,74 +202,6 @@ export function DrawingExplorerPage() {
     }
   }, [data, space, allowedDrawingIds, selection.drawingId])
 
-  // —— ContextBar: 공종/리비전 옵션 및 파생 상태 전부 페이지에서 계산
-  const contextBarProps = useMemo((): Omit<
-    import('@/features/drawing-explorer').ContextBarProps,
-    'onDisciplineChange' | 'onRevisionChange'
-  > => {
-    if (!data || !selection.drawingId) {
-      return {
-        drawingName: null,
-        disciplineOptions: [],
-        selectedDisciplineSelectValue: '',
-        disciplineKey: selection.disciplineKey,
-        revisions: [],
-        revisionVersion: selection.revisionVersion,
-        latestRevision: null,
-        showRegionSelect: false,
-        regionKeys: [],
-        keyPrefix: '',
-        currentRegionKey: '',
-        revisionEmptyMessage: '—',
-      }
-    }
-    const drawingName = data.drawings[selection.drawingId].name
-    const disciplineOptions = getDisciplineOptionsForDrawing(data, selection.drawingId)
-    const selectedDisciplineOption = disciplineOptions.find(
-      (o) =>
-        o.key === selection.disciplineKey ||
-        (o.keyPrefix && selection.disciplineKey?.startsWith(o.keyPrefix + '.')),
-    )
-    const showRegionSelect = !!(
-      selectedDisciplineOption?.hasRegions && selectedDisciplineOption.regionKeys?.length
-    )
-    const effectiveDisciplineKey =
-      showRegionSelect && selection.disciplineKey === selectedDisciplineOption?.key
-        ? null
-        : selection.disciplineKey
-    const regionKeys = selectedDisciplineOption?.regionKeys ?? []
-    const keyPrefix = selectedDisciplineOption?.keyPrefix ?? ''
-    const currentRegionKey =
-      keyPrefix && selection.disciplineKey?.startsWith(keyPrefix + '.')
-        ? selection.disciplineKey.slice((keyPrefix + '.').length)
-        : ''
-    const revisions = effectiveDisciplineKey
-      ? getRevisionsForDiscipline(data, selection.drawingId, effectiveDisciplineKey)
-      : []
-    const latestRevision = getLatestRevision(revisions) ?? null
-    const selectedDisciplineSelectValue =
-      selectedDisciplineOption?.key ?? selection.disciplineKey ?? ''
-    let revisionEmptyMessage = '—'
-    if (showRegionSelect && !currentRegionKey)
-      revisionEmptyMessage = '영역(A/B)을 선택하면 리비전이 표시됩니다'
-    else if (effectiveDisciplineKey) revisionEmptyMessage = '리비전을 선택하세요'
-
-    return {
-      drawingName,
-      disciplineOptions,
-      selectedDisciplineSelectValue,
-      disciplineKey: selection.disciplineKey,
-      revisions,
-      revisionVersion: selection.revisionVersion,
-      latestRevision,
-      showRegionSelect,
-      regionKeys,
-      keyPrefix,
-      currentRegionKey,
-      revisionEmptyMessage,
-    }
-  }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
-
   if (!slug || !space) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50">
@@ -332,13 +255,6 @@ export function DrawingExplorerPage() {
           <h1 className="text-[30px] font-bold text-gray-900">
             {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
           </h1>
-        </div>
-        <div className="mt-2">
-          <ContextBar
-            {...contextBarProps}
-            onDisciplineChange={handleDisciplineChange}
-            onRevisionChange={handleRevisionChange}
-          />
         </div>
         {canCompare && (
           <div className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50/80 px-4 py-2">
@@ -414,12 +330,11 @@ export function DrawingExplorerPage() {
               selectedDrawingId={selection.drawingId}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}
-              ignoreClickOutsideRef={mainContentRef}
             />
           </div>
         </aside>
 
-        <main ref={mainContentRef} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
             compareMode && selection.disciplineKey ? (
               <RevisionCompareView
