@@ -19,11 +19,11 @@ export function SpaceListWidget() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b text-center border-gray-200 bg-white px-4 py-4">
-        <h1 className="text-[40px] font-bold text-gray-900">
+      <header className="border-b border-gray-200 bg-white px-3 py-3 text-center sm:px-4 sm:py-4">
+        <h1 className="text-xl font-bold text-gray-900 sm:text-3xl md:text-4xl lg:text-[40px]">
           {loading ? '…' : (project?.name ?? '도면 탐색')}
         </h1>
-        <p className="mt-1 text-[20px] text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 sm:text-base md:text-lg lg:text-[20px]">
           {loading
             ? '…'
             : project
@@ -32,8 +32,8 @@ export function SpaceListWidget() {
         </p>
       </header>
 
-      <main className="mx-auto max-w-4xl px-4 py-8">
-        <div className="mb-6">
+      <main className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
+        <div className="mb-4 sm:mb-6">
           <SearchBar
             id="space-search"
             value={searchQuery}
@@ -43,12 +43,12 @@ export function SpaceListWidget() {
           />
         </div>
 
-        <h2 className="mb-6 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:mb-6 sm:text-sm">
           {loading ? '…' : project ? `${project.name} 도면 목록` : '공간 목록'}
         </h2>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
           {filteredSpaces.length === 0 ? (
-            <li className="col-span-full rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
+            <li className="col-span-full rounded-xl border border-gray-200 bg-white p-6 text-center text-sm text-gray-500 sm:p-8 sm:text-base">
               검색 결과가 없습니다. 다른 검색어를 입력해 보세요.
             </li>
           ) : (
@@ -56,14 +56,14 @@ export function SpaceListWidget() {
               <li key={space.id}>
                 <Link
                   to={`/drawing/${space.slug}`}
-                  className="group flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md"
+                  className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md sm:p-6"
                 >
-                  <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-colors group-hover:bg-indigo-200">
-                    <Building2 className="h-6 w-6" />
+                  <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-colors group-hover:bg-indigo-200 sm:mb-3 sm:h-12 sm:w-12">
+                    <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
                   </span>
-                  <span className="text-lg font-semibold text-gray-900">{space.displayName}</span>
-                  <span className="mt-1 flex items-center gap-1 text-sm text-gray-500">
-                    <MapPin className="h-4 w-4" />
+                  <span className="text-base font-semibold text-gray-900 sm:text-lg">{space.displayName}</span>
+                  <span className="mt-1 flex items-center gap-1 text-xs text-gray-500 sm:text-sm">
+                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     도면 보기
                   </span>
                 </Link>
