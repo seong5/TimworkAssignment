@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react'
-import type { Project } from '@/shared/types/metadata'
-
-const COMMON_URL = '/data/metadata-common.json'
+import type { ProjectInfo } from '@/entities/project'
+import { fetchProject } from '@/shared/api/projectData'
 
 export function useProjectInfo(): {
-  project: Project | null
+  project: ProjectInfo | null
   loading: boolean
   error: Error | null
 } {
-  const [project, setProject] = useState<Project | null>(null)
+  const [project, setProject] = useState<ProjectInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    fetch(COMMON_URL)
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+    fetchProject()
       .then((data) => setProject(data.project))
       .catch(setError)
       .finally(() => setLoading(false))

@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useState, useCallback, useEffect, useMemo } from 'react'
-import { useMetadata } from '@/shared/hooks/useMetadata'
+import { useProjectData } from '@/shared/hooks/useProjectData'
 import {
   SpaceTree,
   ContextBar,
@@ -9,22 +9,23 @@ import {
   type SelectionState,
 } from '@/features/drawing-explorer'
 import {
-  getImageFilenameForSelection,
+  getImageForSelection,
   getDisciplineLabel,
   getLatestRevision,
   getRevisionChanges,
   getRevisionDate,
   getRevisionsForDiscipline,
   getRootChildIds,
-} from '@/shared/lib/drawings'
-import { SPACE_LIST } from '@/shared/lib/drawings'
+  getDefaultDrawingIdForSlug,
+} from '@/shared/lib/normalizedDrawings'
+import { SPACE_LIST } from '@/shared/lib/normalizedDrawings'
 
 export function DrawingExplorerPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
 
-  const { data: metadata, loading, error } = useMetadata(space?.id ?? null)
+  const { data, loading, error } = useProjectData()
   const [selection, setSelection] = useState<SelectionState>({
     drawingId: null,
     disciplineKey: null,
@@ -36,40 +37,38 @@ export function DrawingExplorerPage() {
   }, [slug])
 
   useEffect(() => {
-    if (!metadata || selection.drawingId !== null) return
-    const rootChildIds = getRootChildIds(metadata)
-    const defaultDrawingId = rootChildIds[0] ?? Object.keys(metadata.drawings)[0]
+    if (!data || selection.drawingId !== null) return
+    const defaultBySlug = slug ? getDefaultDrawingIdForSlug(slug) : null
+    const rootChildIds = getRootChildIds(data)
+    const defaultDrawingId = defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
     if (defaultDrawingId) {
       setSelection((prev) => ({ ...prev, drawingId: defaultDrawingId }))
     }
-  }, [metadata, selection.drawingId])
+  }, [data, slug, selection.drawingId])
 
   // 공종/영역 선택 시 기본값을 최신 리비전으로
   useEffect(() => {
-    if (!metadata || !selection.drawingId || !selection.disciplineKey || selection.revisionVersion !== null)
-      return
-    const revisions = getRevisionsForDiscipline(
-      selection.drawingId,
-      selection.disciplineKey,
-      metadata,
+    if (
+      !data ||
+      !selection.drawingId ||
+      !selection.disciplineKey ||
+      selection.revisionVersion !== null
     )
+      return
+    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
     const latest = getLatestRevision(revisions)
     if (latest) {
       setSelection((prev) => ({ ...prev, revisionVersion: latest.version }))
     }
-  }, [metadata, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
+  }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
   const isCurrentLatestRevision = useMemo(() => {
-    if (!metadata || !selection.drawingId || !selection.disciplineKey || !selection.revisionVersion)
+    if (!data || !selection.drawingId || !selection.disciplineKey || !selection.revisionVersion)
       return false
-    const revisions = getRevisionsForDiscipline(
-      selection.drawingId,
-      selection.disciplineKey,
-      metadata,
-    )
+    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
     const latest = getLatestRevision(revisions)
     return latest?.version === selection.revisionVersion
-  }, [metadata, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
+  }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
   const handleSelectDrawing = useCallback((drawingId: string) => {
     setSelection((prev) => ({
@@ -118,7 +117,7 @@ export function DrawingExplorerPage() {
     )
   }
 
-  if (error || !metadata) {
+  if (error || !data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50">
         <p className="text-red-600">데이터를 불러올 수 없습니다. {error?.message}</p>
@@ -146,14 +145,12 @@ export function DrawingExplorerPage() {
           </button>
           <span className="text-gray-300">|</span>
           <h1 className="text-[30px] font-bold text-gray-900">
-            {selection.drawingId
-              ? metadata.drawings[selection.drawingId].name
-              : metadata.project.name}
+            {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
           </h1>
         </div>
         <div className="mt-2">
           <ContextBar
-            metadata={metadata}
+            data={data}
             selection={selection}
             onDisciplineChange={handleDisciplineChange}
             onRevisionChange={handleRevisionChange}
@@ -168,7 +165,7 @@ export function DrawingExplorerPage() {
               공간(건물)
             </h2>
             <SpaceTree
-              metadata={metadata}
+              data={data}
               selectedDrawingId={selection.drawingId}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}
@@ -181,23 +178,23 @@ export function DrawingExplorerPage() {
             <>
               <div className="shrink-0 p-2">
                 <Breadcrumb
-                  metadata={metadata}
+                  data={data}
                   drawingId={selection.drawingId}
                   onSelectDrawing={handleSelectDrawing}
                   disciplineLabel={getDisciplineLabel(
-                    metadata,
+                    data,
                     selection.drawingId,
                     selection.disciplineKey,
                   )}
                   revisionVersion={selection.revisionVersion}
                   revisionDate={getRevisionDate(
-                    metadata,
+                    data,
                     selection.drawingId,
                     selection.disciplineKey,
                     selection.revisionVersion,
                   )}
                   revisionChanges={getRevisionChanges(
-                    metadata,
+                    data,
                     selection.drawingId,
                     selection.disciplineKey,
                     selection.revisionVersion,
@@ -215,8 +212,8 @@ export function DrawingExplorerPage() {
                 )}
               </div>
               <DrawingViewer
-                imageFilename={getImageFilenameForSelection(metadata, selection)}
-                alt={metadata.drawings[selection.drawingId].name}
+                imageFilename={getImageForSelection(data, selection)}
+                alt={data.drawings[selection.drawingId].name}
               />
             </>
           ) : (

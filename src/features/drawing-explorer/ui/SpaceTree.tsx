@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon } from 'lucide-react'
-import type { Metadata } from '@/shared/types/metadata'
-import type { DrawingImageEntry } from '@/shared/lib/drawings'
-import { getDrawingIdsInOrder, getImageEntriesForDrawing } from '@/shared/lib/drawings'
+import type { NormalizedProjectData } from '@/entities/project'
+import type { DrawingImageEntry } from '@/shared/lib/normalizedDrawings'
+import { getDrawingIdsInOrder, getImageEntriesForDrawing } from '@/shared/lib/normalizedDrawings'
 import { useClickOutside } from '@/shared/hooks/useClickOutside'
 
 interface SpaceTreeProps {
-  metadata: Metadata
+  data: NormalizedProjectData
   selectedDrawingId: string | null
   onSelectDrawing: (id: string) => void
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
@@ -53,7 +53,7 @@ function ImageDropdown({
 }
 
 export function SpaceTree({
-  metadata,
+  data,
   selectedDrawingId,
   onSelectDrawing,
   onSelectImage,
@@ -62,10 +62,10 @@ export function SpaceTree({
   const containerRef = useRef<HTMLDivElement>(null)
   useClickOutside(containerRef, () => setExpandedDrawingId(null))
 
-  const ids = getDrawingIdsInOrder(metadata)
+  const ids = getDrawingIdsInOrder(data)
   const rootId = ids[0]
-  const root = rootId ? metadata.drawings[rootId] : null
-  const childIds = ids.filter((id) => metadata.drawings[id].parent === rootId)
+  const root = rootId ? data.drawings[rootId] : null
+  const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
 
   const handleRowClick = (id: string) => {
     onSelectDrawing(id)
@@ -95,7 +95,7 @@ export function SpaceTree({
             </button>
             {expandedDrawingId === root.id &&
               (() => {
-                const entries = getImageEntriesForDrawing(metadata, root.id)
+                const entries = getImageEntriesForDrawing(data, root.id)
                 return entries.length > 0 ? (
                   <ImageDropdown
                     drawingId={root.id}
@@ -108,10 +108,10 @@ export function SpaceTree({
         )}
         <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-2">
           {childIds.map((id) => {
-            const drawing = metadata.drawings[id]
+            const drawing = data.drawings[id]
             const isSelected = selectedDrawingId === id
             const isExpanded = expandedDrawingId === id
-            const entries = isExpanded ? getImageEntriesForDrawing(metadata, id) : []
+            const entries = isExpanded ? getImageEntriesForDrawing(data, id) : []
             return (
               <div key={id} className="flex flex-col gap-0.5">
                 <button

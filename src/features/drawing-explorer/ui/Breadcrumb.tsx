@@ -1,6 +1,6 @@
 import { ChevronRight, Home, MapPin, Map, Layers, GitCommit } from 'lucide-react'
-import type { Metadata } from '@/shared/types/metadata'
-import { getBreadcrumbIds } from '@/shared/lib/drawings'
+import type { NormalizedProjectData } from '@/entities/project'
+import { getBreadcrumbIds } from '@/shared/lib/normalizedDrawings'
 
 type CrumbType = 'space' | 'discipline' | 'revision'
 
@@ -11,7 +11,7 @@ interface CrumbItem {
 }
 
 interface BreadcrumbProps {
-  metadata: Metadata
+  data: NormalizedProjectData
   drawingId: string | null
   onSelectDrawing: (id: string) => void
   disciplineLabel?: string | null
@@ -21,7 +21,7 @@ interface BreadcrumbProps {
 }
 
 export function Breadcrumb({
-  metadata,
+  data,
   drawingId,
   onSelectDrawing,
   disciplineLabel = null,
@@ -29,10 +29,10 @@ export function Breadcrumb({
   revisionDate = null,
   revisionChanges = [],
 }: BreadcrumbProps) {
-  const pathIds = drawingId ? getBreadcrumbIds(metadata, drawingId) : []
+  const pathIds = drawingId ? getBreadcrumbIds(data, drawingId) : []
   const spaceCrumbs: CrumbItem[] = pathIds.map((id) => ({
     id,
-    name: metadata.drawings[id]?.name ?? id,
+    name: data.drawings[id]?.name ?? id,
     type: 'space' as const,
   }))
 
@@ -45,7 +45,7 @@ export function Breadcrumb({
       type: 'revision',
     })
 
-  const drawingName = drawingId ? metadata.drawings[drawingId]?.name : null
+  const drawingName = drawingId ? data.drawings[drawingId]?.name : null
   const disciplineShort = disciplineLabel ? disciplineLabel.split(' > ')[0] : null
 
   return (

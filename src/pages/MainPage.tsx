@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Building2, MapPin } from 'lucide-react'
 import { SearchBar } from '@/shared/components'
 import { useProjectInfo } from '@/shared/hooks/useProjectInfo'
-import { SPACE_LIST } from '@/shared/lib/drawings'
+import { SPACE_LIST } from '@/shared/lib/normalizedDrawings'
 
 export function MainPage() {
   const { project, loading } = useProjectInfo()

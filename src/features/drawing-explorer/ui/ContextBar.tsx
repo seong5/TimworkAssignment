@@ -1,11 +1,11 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
-import type { Metadata } from '@/shared/types/metadata'
+import type { NormalizedProjectData } from '@/entities/project'
 import type { DisciplineOption } from '@/shared/types/metadata'
 import {
-  getDisciplineOptions,
+  getDisciplineOptionsForDrawing,
   getRevisionsForDiscipline,
   getLatestRevision,
-} from '@/shared/lib/drawings'
+} from '@/shared/lib/normalizedDrawings'
 
 export interface SelectionState {
   drawingId: string | null
@@ -14,21 +14,23 @@ export interface SelectionState {
 }
 
 interface ContextBarProps {
-  metadata: Metadata
+  data: NormalizedProjectData
   selection: SelectionState
   onDisciplineChange: (key: string | null) => void
   onRevisionChange: (version: string | null) => void
 }
 
 export function ContextBar({
-  metadata,
+  data,
   selection,
   onDisciplineChange,
   onRevisionChange,
 }: ContextBarProps) {
   const { drawingId, disciplineKey, revisionVersion } = selection
-  const drawing = drawingId ? metadata.drawings[drawingId] : null
-  const disciplineOptions: DisciplineOption[] = drawing ? getDisciplineOptions(drawing) : []
+  const drawing = drawingId ? data.drawings[drawingId] : null
+  const disciplineOptions: DisciplineOption[] = drawingId
+    ? getDisciplineOptionsForDrawing(data, drawingId)
+    : []
   const selectedDisciplineOption = disciplineOptions.find(
     (o) => o.key === disciplineKey || (o.keyPrefix && disciplineKey?.startsWith(o.keyPrefix + '.')),
   )
@@ -46,7 +48,7 @@ export function ContextBar({
       : ''
   const revisions =
     drawingId && effectiveDisciplineKey
-      ? getRevisionsForDiscipline(drawingId, effectiveDisciplineKey, metadata)
+      ? getRevisionsForDiscipline(data, drawingId, effectiveDisciplineKey)
       : []
   const latestRevision = revisions.length > 0 ? getLatestRevision(revisions) : null
 
