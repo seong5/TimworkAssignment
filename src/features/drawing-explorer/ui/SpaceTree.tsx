@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type RefObject } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon } from 'lucide-react'
 import { useClickOutside } from '@/shared/hooks/useClickOutside'
 import type { DrawingImageEntry } from '@/shared/lib/normalizedDrawings'
@@ -52,6 +52,7 @@ export interface SpaceTreeProps {
   selectedDrawingId: string | null
   onSelectDrawing: (id: string) => void
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
+  ignoreClickOutsideRef?: RefObject<HTMLElement | null>
 }
 
 export function SpaceTree({
@@ -61,10 +62,13 @@ export function SpaceTree({
   selectedDrawingId,
   onSelectDrawing,
   onSelectImage,
+  ignoreClickOutsideRef,
 }: SpaceTreeProps) {
   const [expandedDrawingId, setExpandedDrawingId] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  useClickOutside(containerRef, () => setExpandedDrawingId(null))
+  useClickOutside(containerRef, () => setExpandedDrawingId(null), {
+    ignoreRef: ignoreClickOutsideRef,
+  })
 
   const handleRowClick = (id: string) => {
     onSelectDrawing(id)

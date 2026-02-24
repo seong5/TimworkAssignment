@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useProjectData } from '@/shared/hooks/useProjectData'
 import {
   SpaceTree,
@@ -41,6 +41,7 @@ export function DrawingExplorerPage() {
   const [compareMode, setCompareMode] = useState(false)
   const [compareLeft, setCompareLeft] = useState<string | null>(null)
   const [compareRight, setCompareRight] = useState<string | null>(null)
+  const mainContentRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     setSelection({ drawingId: null, disciplineKey: null, revisionVersion: null })
@@ -413,11 +414,12 @@ export function DrawingExplorerPage() {
               selectedDrawingId={selection.drawingId}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}
+              ignoreClickOutsideRef={mainContentRef}
             />
           </div>
         </aside>
 
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <main ref={mainContentRef} className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
             compareMode && selection.disciplineKey ? (
               <RevisionCompareView
