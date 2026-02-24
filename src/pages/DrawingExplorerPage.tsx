@@ -8,7 +8,6 @@ import {
   DrawingViewer,
   RevisionCompareView,
   type SelectionState,
-  type DrawingImageEntry,
 } from '@/features/drawing-explorer'
 import {
   getImageForSelection,
@@ -23,8 +22,9 @@ import {
   getDrawingIdsInOrder,
   getChildDrawingIds,
   getDisciplineOptionsForDrawing,
-  getImageEntriesForDrawing,
+  getImageEntriesGroupedByDiscipline,
 } from '@/shared/lib/normalizedDrawings'
+import type { DrawingDisciplineGroup } from '@/shared/lib/normalizedDrawings'
 import { SPACE_LIST } from '@/shared/lib/normalizedDrawings'
 
 export function DrawingExplorerPage() {
@@ -142,13 +142,13 @@ export function DrawingExplorerPage() {
     [data],
   )
 
-  // —— SpaceTree: slug가 있으면 해당 구역(101동 등)만, 없으면 전체
-  const { rootDrawing, childDrawings, entriesByDrawingId, allowedDrawingIds } = useMemo(() => {
+  // —— SpaceTree: slug가 있으면 해당 구역(101동 등)만, 없으면 전체. 공종(discipline) 단위로 세분화
+  const { rootDrawing, childDrawings, disciplinesByDrawingId, allowedDrawingIds } = useMemo(() => {
     if (!data) {
       return {
         rootDrawing: null as { id: string; name: string } | null,
         childDrawings: [] as { id: string; name: string }[],
-        entriesByDrawingId: {} as Record<string, DrawingImageEntry[]>,
+        disciplinesByDrawingId: {} as Record<string, DrawingDisciplineGroup[]>,
         allowedDrawingIds: [] as string[],
       }
     }
@@ -164,14 +164,14 @@ export function DrawingExplorerPage() {
         name: data.drawings[id].name,
       }))
       const allDrawingIds = [rootId, ...childIds]
-      const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
+      const disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]> = {}
       for (const id of allDrawingIds) {
-        entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
+        disciplinesByDrawingId[id] = getImageEntriesGroupedByDiscipline(data, id)
       }
       return {
         rootDrawing,
         childDrawings,
-        entriesByDrawingId,
+        disciplinesByDrawingId,
         allowedDrawingIds: allDrawingIds,
       }
     }
@@ -186,14 +186,14 @@ export function DrawingExplorerPage() {
       name: data.drawings[id].name,
     }))
     const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
-    const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
+    const disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]> = {}
     for (const id of allDrawingIds) {
-      entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
+      disciplinesByDrawingId[id] = getImageEntriesGroupedByDiscipline(data, id)
     }
     return {
       rootDrawing,
       childDrawings,
-      entriesByDrawingId,
+      disciplinesByDrawingId,
       allowedDrawingIds: allDrawingIds,
     }
   }, [data, space])
@@ -410,7 +410,7 @@ export function DrawingExplorerPage() {
             <SpaceTree
               rootDrawing={rootDrawing}
               childDrawings={childDrawings}
-              entriesByDrawingId={entriesByDrawingId}
+              disciplinesByDrawingId={disciplinesByDrawingId}
               selectedDrawingId={selection.drawingId}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}

@@ -176,6 +176,33 @@ export function getImageEntriesForDrawing(
   return entries
 }
 
+/** 도면별 이미지 항목을 공종(discipline) 단위로 묶은 구조 */
+export interface DrawingDisciplineGroup {
+  disciplineKey: string
+  label: string
+  entries: DrawingImageEntry[]
+}
+
+export function getImageEntriesGroupedByDiscipline(
+  data: NormalizedProjectData,
+  drawingId: string,
+): DrawingDisciplineGroup[] {
+  const entries = getImageEntriesForDrawing(data, drawingId)
+  const byKey = new Map<string, DrawingImageEntry[]>()
+  for (const e of entries) {
+    const list = byKey.get(e.disciplineKey) ?? []
+    list.push(e)
+    byKey.set(e.disciplineKey, list)
+  }
+  const result: DrawingDisciplineGroup[] = []
+  for (const [disciplineKey, list] of byKey.entries()) {
+    const dispEntry = getEntry(data, drawingId, disciplineKey)
+    const label = dispEntry?.displayName ?? disciplineKey
+    result.push({ disciplineKey, label, entries: list })
+  }
+  return result.sort((a, b) => a.label.localeCompare(b.label))
+}
+
 export function getImageForSelection(
   data: NormalizedProjectData,
   selection: {
