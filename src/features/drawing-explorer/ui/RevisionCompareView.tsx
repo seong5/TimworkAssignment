@@ -1,6 +1,5 @@
-import type { NormalizedProjectData } from '@/entities/project'
-import type { NormalizedRevision } from '@/entities/project'
-import { getImageForRevision, getRevisionsForDiscipline } from '@/shared/lib/normalizedDrawings'
+import type { NormalizedProjectData, NormalizedRevision } from '@/entities/project'
+import { getImageForRevision, getRevisionsForDiscipline } from '@/entities/project'
 
 const DRAWINGS_BASE = '/data/drawings/'
 

@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Building2, MapPin } from 'lucide-react'
-import { SearchBar } from '@/shared/components'
-import { useProjectInfo } from '@/shared/hooks/useProjectInfo'
-import { SPACE_LIST } from '@/shared/lib/normalizedDrawings'
+import { SearchBar } from '@/shared/ui'
+import { useProjectInfo } from '@/entities/project'
+import { SPACE_LIST } from '@/entities/project'
 
 export function MainPage() {
   const { project, loading } = useProjectInfo()

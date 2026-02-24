@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import type { ProjectInfo } from '@/entities/project'
-import { fetchProject } from '@/shared/api/projectData'
+import type { ProjectInfo } from '../types'
+import { fetchProject } from '../api/projectData'
 
 export function useProjectInfo(): {
   project: ProjectInfo | null

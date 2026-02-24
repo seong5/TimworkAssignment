@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon, Layers } from 'lucide-react'
-import type { DrawingImageEntry, DrawingDisciplineGroup } from '@/shared/lib/normalizedDrawings'
+import type { DrawingImageEntry, DrawingDisciplineGroup } from '@/entities/project'
 
 export type { DrawingImageEntry, DrawingDisciplineGroup }
 

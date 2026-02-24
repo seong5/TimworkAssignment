@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import type { NormalizedProjectData } from '@/entities/project'
-import { fetchProjectData } from '@/shared/api/projectData'
+import type { NormalizedProjectData } from '../types'
+import { fetchProjectData } from '../api/projectData'
 
 export function useProjectData(): {
   data: NormalizedProjectData | null

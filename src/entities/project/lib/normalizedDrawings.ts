@@ -4,7 +4,7 @@ import type {
   DisciplineRevisionEntry,
   NormalizedRevision,
   DisciplineOption,
-} from '@/entities/project'
+} from '../types'
 
 export const DRAWING_PART_LABELS: Record<string, string> = {
   '01': '101동',

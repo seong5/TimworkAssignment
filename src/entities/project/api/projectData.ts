@@ -1,4 +1,4 @@
-import type { NormalizedProjectData } from '@/entities/project'
+import type { NormalizedProjectData } from '../types'
 
 const DATA_BASE = '/data'
 
