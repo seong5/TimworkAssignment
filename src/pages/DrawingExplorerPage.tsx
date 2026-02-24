@@ -256,65 +256,6 @@ export function DrawingExplorerPage() {
             {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
           </h1>
         </div>
-        {canCompare && (
-          <div className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50/80 px-4 py-2">
-            {!compareMode ? (
-              <button
-                type="button"
-                onClick={handleEnterCompare}
-                className="flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
-              >
-                리비전 비교
-              </button>
-            ) : (
-              <>
-                <span className="text-xs font-semibold text-neutral-500">
-                  기준(왼쪽)
-                </span>
-                <select
-                  value={compareLeft ?? ''}
-                  onChange={(e) =>
-                    setCompareLeft(e.target.value || null)
-                  }
-                  className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
-                  aria-label="비교 기준 리비전"
-                >
-                  <option value="">기본</option>
-                  {currentRevisions.map((r) => (
-                    <option key={r.version} value={r.version}>
-                      {r.version} ({r.date})
-                    </option>
-                  ))}
-                </select>
-                <span className="text-xs font-semibold text-neutral-500">
-                  비교(오른쪽)
-                </span>
-                <select
-                  value={compareRight ?? ''}
-                  onChange={(e) =>
-                    setCompareRight(e.target.value || null)
-                  }
-                  className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
-                  aria-label="비교 대상 리비전"
-                >
-                  <option value="">기본</option>
-                  {currentRevisions.map((r) => (
-                    <option key={r.version} value={r.version}>
-                      {r.version} ({r.date})
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={() => setCompareMode(false)}
-                  className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-                >
-                  단일 보기로
-                </button>
-              </>
-            )}
-          </div>
-        )}
       </header>
 
       <div className="flex flex-1 overflow-hidden">
@@ -337,14 +278,53 @@ export function DrawingExplorerPage() {
         <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
             compareMode && selection.disciplineKey ? (
-              <RevisionCompareView
-                data={data}
-                drawingId={selection.drawingId}
-                disciplineKey={selection.disciplineKey}
-                leftVersion={compareLeft}
-                rightVersion={compareRight}
-                drawingName={data.drawings[selection.drawingId].name}
-              />
+              <>
+                <div className="shrink-0 flex flex-wrap items-center gap-2 border-b border-neutral-200 bg-neutral-50/80 px-4 py-2">
+                  <span className="text-xs font-semibold text-neutral-500">기준(왼쪽)</span>
+                  <select
+                    value={compareLeft ?? ''}
+                    onChange={(e) => setCompareLeft(e.target.value || null)}
+                    className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
+                    aria-label="비교 기준 리비전"
+                  >
+                    <option value="">기본</option>
+                    {currentRevisions.map((r) => (
+                      <option key={r.version} value={r.version}>
+                        {r.version} ({r.date})
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-xs font-semibold text-neutral-500">비교(오른쪽)</span>
+                  <select
+                    value={compareRight ?? ''}
+                    onChange={(e) => setCompareRight(e.target.value || null)}
+                    className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
+                    aria-label="비교 대상 리비전"
+                  >
+                    <option value="">기본</option>
+                    {currentRevisions.map((r) => (
+                      <option key={r.version} value={r.version}>
+                        {r.version} ({r.date})
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setCompareMode(false)}
+                    className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                  >
+                    단일 보기로
+                  </button>
+                </div>
+                <RevisionCompareView
+                  data={data}
+                  drawingId={selection.drawingId}
+                  disciplineKey={selection.disciplineKey}
+                  leftVersion={compareLeft}
+                  rightVersion={compareRight}
+                  drawingName={data.drawings[selection.drawingId].name}
+                />
+              </>
             ) : (
               <>
                 <div className="shrink-0 p-2">
@@ -372,13 +352,73 @@ export function DrawingExplorerPage() {
                       selection.revisionVersion,
                     )}
                     trailing={
-                      isCurrentLatestRevision ? (
-                        <span
-                          className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700"
-                          title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
-                        >
-                          ★ 최신 도면
-                        </span>
+                      (isCurrentLatestRevision || canCompare) ? (
+                        <div className="flex items-center gap-2">
+                          {isCurrentLatestRevision && (
+                            <span
+                              className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                              title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
+                            >
+                              ★ 최신 도면
+                            </span>
+                          )}
+                          {canCompare &&
+                            (!compareMode ? (
+                              <button
+                                type="button"
+                                onClick={handleEnterCompare}
+                                className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+                              >
+                                리비전 비교
+                              </button>
+                            ) : (
+                              <>
+                                <span className="text-xs font-semibold text-neutral-500">
+                                  기준(왼쪽)
+                                </span>
+                                <select
+                                  value={compareLeft ?? ''}
+                                  onChange={(e) =>
+                                    setCompareLeft(e.target.value || null)
+                                  }
+                                  className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
+                                  aria-label="비교 기준 리비전"
+                                >
+                                  <option value="">기본</option>
+                                  {currentRevisions.map((r) => (
+                                    <option key={r.version} value={r.version}>
+                                      {r.version} ({r.date})
+                                    </option>
+                                  ))}
+                                </select>
+                                <span className="text-xs font-semibold text-neutral-500">
+                                  비교(오른쪽)
+                                </span>
+                                <select
+                                  value={compareRight ?? ''}
+                                  onChange={(e) =>
+                                    setCompareRight(e.target.value || null)
+                                  }
+                                  className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
+                                  aria-label="비교 대상 리비전"
+                                >
+                                  <option value="">기본</option>
+                                  {currentRevisions.map((r) => (
+                                    <option key={r.version} value={r.version}>
+                                      {r.version} ({r.date})
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  type="button"
+                                  onClick={() => setCompareMode(false)}
+                                  className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                                >
+                                  단일 보기로
+                                </button>
+                              </>
+                            ))}
+                        </div>
                       ) : undefined
                     }
                   />
