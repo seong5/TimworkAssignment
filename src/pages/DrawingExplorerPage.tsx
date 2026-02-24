@@ -6,6 +6,7 @@ import {
   ContextBar,
   Breadcrumb,
   DrawingViewer,
+  RevisionCompareView,
   type SelectionState,
   type DrawingImageEntry,
 } from '@/features/drawing-explorer'
@@ -37,6 +38,9 @@ export function DrawingExplorerPage() {
     disciplineKey: null,
     revisionVersion: null,
   })
+  const [compareMode, setCompareMode] = useState(false)
+  const [compareLeft, setCompareLeft] = useState<string | null>(null)
+  const [compareRight, setCompareRight] = useState<string | null>(null)
 
   useEffect(() => {
     setSelection({ drawingId: null, disciplineKey: null, revisionVersion: null })
@@ -46,8 +50,7 @@ export function DrawingExplorerPage() {
     if (!data || selection.drawingId !== null) return
     const defaultBySlug = slug ? getDefaultDrawingIdForSlug(slug) : null
     const rootChildIds = getRootChildIds(data)
-    const defaultDrawingId =
-      defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
+    const defaultDrawingId = defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
     if (defaultDrawingId) {
       setSelection((prev) => ({ ...prev, drawingId: defaultDrawingId }))
     }
@@ -62,11 +65,7 @@ export function DrawingExplorerPage() {
       selection.revisionVersion !== null
     )
       return
-    const revisions = getRevisionsForDiscipline(
-      data,
-      selection.drawingId,
-      selection.disciplineKey,
-    )
+    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
     const latest = getLatestRevision(revisions)
     if (latest) {
       setSelection((prev) => ({ ...prev, revisionVersion: latest.version }))
@@ -77,18 +76,14 @@ export function DrawingExplorerPage() {
   /** 현재 선택이 "최신"인가. 리비전 0개 공종에서 기본 이미지(revisionVersion null)도 최신으로 간주한다. */
   const isCurrentLatestRevision = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return false
-    const revisions = getRevisionsForDiscipline(
-      data,
-      selection.drawingId,
-      selection.disciplineKey,
-    )
-    if (revisions.length === 0)
-      return selection.revisionVersion === null
+    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
+    if (revisions.length === 0) return selection.revisionVersion === null
     const latest = getLatestRevision(revisions)
     return latest?.version === selection.revisionVersion
   }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
   const handleSelectDrawing = useCallback((drawingId: string) => {
+    setCompareMode(false)
     setSelection((prev) => ({
       ...prev,
       drawingId,
@@ -98,12 +93,35 @@ export function DrawingExplorerPage() {
   }, [])
 
   const handleDisciplineChange = useCallback((key: string | null) => {
+    setCompareMode(false)
     setSelection((prev) => ({ ...prev, disciplineKey: key, revisionVersion: null }))
   }, [])
 
   const handleRevisionChange = useCallback((version: string | null) => {
     setSelection((prev) => ({ ...prev, revisionVersion: version }))
   }, [])
+
+  const currentRevisions = useMemo(() => {
+    if (!data || !selection.drawingId || !selection.disciplineKey) return []
+    return getRevisionsForDiscipline(
+      data,
+      selection.drawingId,
+      selection.disciplineKey,
+    )
+  }, [data, selection.drawingId, selection.disciplineKey])
+
+  const canCompare =
+    !!selection.drawingId &&
+    !!selection.disciplineKey &&
+    currentRevisions.length >= 1
+
+  const handleEnterCompare = useCallback(() => {
+    setCompareMode(true)
+    const revs = currentRevisions
+    const latest = getLatestRevision(revs)
+    setCompareLeft(null)
+    setCompareRight(latest?.version ?? revs[0]?.version ?? null)
+  }, [currentRevisions])
 
   const handleSelectImage = useCallback(
     (drawingId: string, disciplineKey: string, revisionVersion: string | null) => {
@@ -119,58 +137,32 @@ export function DrawingExplorerPage() {
   )
   const drawingNames = useMemo(
     () =>
-      data
-        ? Object.fromEntries(
-            Object.entries(data.drawings).map(([id, d]) => [id, d.name]),
-          )
-        : {},
+      data ? Object.fromEntries(Object.entries(data.drawings).map(([id, d]) => [id, d.name])) : {},
     [data],
   )
 
   // —— SpaceTree: slug가 있으면 해당 구역(101동 등)만, 없으면 전체
-  const { rootDrawing, childDrawings, entriesByDrawingId, allowedDrawingIds } =
-    useMemo(() => {
-      if (!data) {
-        return {
-          rootDrawing: null as { id: string; name: string } | null,
-          childDrawings: [] as { id: string; name: string }[],
-          entriesByDrawingId: {} as Record<string, DrawingImageEntry[]>,
-          allowedDrawingIds: [] as string[],
-        }
+  const { rootDrawing, childDrawings, entriesByDrawingId, allowedDrawingIds } = useMemo(() => {
+    if (!data) {
+      return {
+        rootDrawing: null as { id: string; name: string } | null,
+        childDrawings: [] as { id: string; name: string }[],
+        entriesByDrawingId: {} as Record<string, DrawingImageEntry[]>,
+        allowedDrawingIds: [] as string[],
       }
-      if (space) {
-        const rootId = space.id
-        const childIds = getChildDrawingIds(data, rootId)
-        const rootDrawing: { id: string; name: string } = {
-          id: rootId,
-          name: data.drawings[rootId].name,
-        }
-        const childDrawings = childIds.map((id) => ({
-          id,
-          name: data.drawings[id].name,
-        }))
-        const allDrawingIds = [rootId, ...childIds]
-        const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
-        for (const id of allDrawingIds) {
-          entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
-        }
-        return {
-          rootDrawing,
-          childDrawings,
-          entriesByDrawingId,
-          allowedDrawingIds: allDrawingIds,
-        }
+    }
+    if (space) {
+      const rootId = space.id
+      const childIds = getChildDrawingIds(data, rootId)
+      const rootDrawing: { id: string; name: string } = {
+        id: rootId,
+        name: data.drawings[rootId].name,
       }
-      const ids = getDrawingIdsInOrder(data)
-      const rootId = ids[0] ?? null
-      const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
-      const rootDrawing: { id: string; name: string } | null =
-        rootId ? { id: rootId, name: data.drawings[rootId].name } : null
       const childDrawings = childIds.map((id) => ({
         id,
         name: data.drawings[id].name,
       }))
-      const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
+      const allDrawingIds = [rootId, ...childIds]
       const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
       for (const id of allDrawingIds) {
         entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
@@ -181,15 +173,34 @@ export function DrawingExplorerPage() {
         entriesByDrawingId,
         allowedDrawingIds: allDrawingIds,
       }
-    }, [data, space])
+    }
+    const ids = getDrawingIdsInOrder(data)
+    const rootId = ids[0] ?? null
+    const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
+    const rootDrawing: { id: string; name: string } | null = rootId
+      ? { id: rootId, name: data.drawings[rootId].name }
+      : null
+    const childDrawings = childIds.map((id) => ({
+      id,
+      name: data.drawings[id].name,
+    }))
+    const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
+    const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
+    for (const id of allDrawingIds) {
+      entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
+    }
+    return {
+      rootDrawing,
+      childDrawings,
+      entriesByDrawingId,
+      allowedDrawingIds: allDrawingIds,
+    }
+  }, [data, space])
 
   // slug(구역) 진입 시 선택이 해당 구역 도면이 아니면 구역 루트로 맞춤
   useEffect(() => {
     if (!data || !space || allowedDrawingIds.length === 0) return
-    if (
-      selection.drawingId !== null &&
-      !allowedDrawingIds.includes(selection.drawingId)
-    ) {
+    if (selection.drawingId !== null && !allowedDrawingIds.includes(selection.drawingId)) {
       setSelection((prev) => ({
         ...prev,
         drawingId: space.id,
@@ -227,11 +238,9 @@ export function DrawingExplorerPage() {
         o.key === selection.disciplineKey ||
         (o.keyPrefix && selection.disciplineKey?.startsWith(o.keyPrefix + '.')),
     )
-    const showRegionSelect =
-      !!(
-        selectedDisciplineOption?.hasRegions &&
-        selectedDisciplineOption.regionKeys?.length
-      )
+    const showRegionSelect = !!(
+      selectedDisciplineOption?.hasRegions && selectedDisciplineOption.regionKeys?.length
+    )
     const effectiveDisciplineKey =
       showRegionSelect && selection.disciplineKey === selectedDisciplineOption?.key
         ? null
@@ -320,9 +329,7 @@ export function DrawingExplorerPage() {
           </button>
           <span className="text-gray-300">|</span>
           <h1 className="text-[30px] font-bold text-gray-900">
-            {selection.drawingId
-              ? data.drawings[selection.drawingId].name
-              : data.project.name}
+            {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
           </h1>
         </div>
         <div className="mt-2">
@@ -332,6 +339,65 @@ export function DrawingExplorerPage() {
             onRevisionChange={handleRevisionChange}
           />
         </div>
+        {canCompare && (
+          <div className="mt-2 flex flex-wrap items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50/80 px-4 py-2">
+            {!compareMode ? (
+              <button
+                type="button"
+                onClick={handleEnterCompare}
+                className="flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                리비전 비교
+              </button>
+            ) : (
+              <>
+                <span className="text-xs font-semibold text-neutral-500">
+                  기준(왼쪽)
+                </span>
+                <select
+                  value={compareLeft ?? ''}
+                  onChange={(e) =>
+                    setCompareLeft(e.target.value || null)
+                  }
+                  className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
+                  aria-label="비교 기준 리비전"
+                >
+                  <option value="">기본</option>
+                  {currentRevisions.map((r) => (
+                    <option key={r.version} value={r.version}>
+                      {r.version} ({r.date})
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs font-semibold text-neutral-500">
+                  비교(오른쪽)
+                </span>
+                <select
+                  value={compareRight ?? ''}
+                  onChange={(e) =>
+                    setCompareRight(e.target.value || null)
+                  }
+                  className="rounded-md border border-neutral-200 bg-white px-2 py-1 text-sm"
+                  aria-label="비교 대상 리비전"
+                >
+                  <option value="">기본</option>
+                  {currentRevisions.map((r) => (
+                    <option key={r.version} value={r.version}>
+                      {r.version} ({r.date})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setCompareMode(false)}
+                  className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  단일 보기로
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </header>
 
       <div className="flex flex-1 overflow-hidden">
@@ -353,48 +419,59 @@ export function DrawingExplorerPage() {
 
         <main className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
-            <>
-              <div className="shrink-0 p-2">
-                <Breadcrumb
-                  pathIds={breadcrumbPathIds}
-                  drawingNames={drawingNames}
-                  drawingId={selection.drawingId}
-                  onSelectDrawing={handleSelectDrawing}
-                  disciplineLabel={getDisciplineLabel(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                  )}
-                  revisionVersion={selection.revisionVersion}
-                  revisionDate={getRevisionDate(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                    selection.revisionVersion,
-                  )}
-                  revisionChanges={getRevisionChanges(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                    selection.revisionVersion,
-                  )}
-                />
-                {isCurrentLatestRevision && (
-                  <div className="mt-2 flex items-center justify-start">
-                    <span
-                      className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700"
-                      title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
-                    >
-                      ★ 최신 도면
-                    </span>
-                  </div>
-                )}
-              </div>
-              <DrawingViewer
-                imageFilename={getImageForSelection(data, selection)}
-                alt={data.drawings[selection.drawingId].name}
+            compareMode && selection.disciplineKey ? (
+              <RevisionCompareView
+                data={data}
+                drawingId={selection.drawingId}
+                disciplineKey={selection.disciplineKey}
+                leftVersion={compareLeft}
+                rightVersion={compareRight}
+                drawingName={data.drawings[selection.drawingId].name}
               />
-            </>
+            ) : (
+              <>
+                <div className="shrink-0 p-2">
+                  <Breadcrumb
+                    pathIds={breadcrumbPathIds}
+                    drawingNames={drawingNames}
+                    drawingId={selection.drawingId}
+                    onSelectDrawing={handleSelectDrawing}
+                    disciplineLabel={getDisciplineLabel(
+                      data,
+                      selection.drawingId,
+                      selection.disciplineKey,
+                    )}
+                    revisionVersion={selection.revisionVersion}
+                    revisionDate={getRevisionDate(
+                      data,
+                      selection.drawingId,
+                      selection.disciplineKey,
+                      selection.revisionVersion,
+                    )}
+                    revisionChanges={getRevisionChanges(
+                      data,
+                      selection.drawingId,
+                      selection.disciplineKey,
+                      selection.revisionVersion,
+                    )}
+                  />
+                  {isCurrentLatestRevision && (
+                    <div className="mt-2 flex items-center justify-start">
+                      <span
+                        className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                        title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
+                      >
+                        ★ 최신 도면
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <DrawingViewer
+                  imageFilename={getImageForSelection(data, selection)}
+                  alt={data.drawings[selection.drawingId].name}
+                />
+              </>
+            )
           ) : (
             <div className="flex flex-1 items-center justify-center p-4">
               <p className="text-gray-500">

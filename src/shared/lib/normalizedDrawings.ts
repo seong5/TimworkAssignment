@@ -25,13 +25,8 @@ export function getRootChildIds(data: NormalizedProjectData): string[] {
 }
 
 /** 특정 부모의 자식 도면 id 목록 (order 순) */
-export function getChildDrawingIds(
-  data: NormalizedProjectData,
-  parentId: string,
-): string[] {
-  return getDrawingIdsInOrder(data).filter(
-    (id) => data.drawings[id].parent === parentId,
-  )
+export function getChildDrawingIds(data: NormalizedProjectData, parentId: string): string[] {
+  return getDrawingIdsInOrder(data).filter((id) => data.drawings[id].parent === parentId)
 }
 
 export function getBreadcrumbIds(data: NormalizedProjectData, drawingId: string): string[] {
@@ -237,6 +232,24 @@ export function getRevisionDate(
   const revisions = getRevisionsForDiscipline(data, drawingId, disciplineKey)
   const rev = revisions.find((r) => r.version === revisionVersion)
   return rev?.date ?? null
+}
+
+export function getImageForRevision(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string | null,
+  version: string | null,
+): string | null {
+  if (!drawingId || !disciplineKey) return null
+  const entry = getEntry(data, drawingId, disciplineKey)
+  if (!entry) return null
+  if (version) {
+    const rev = entry.revisions.find((r) => r.version === version)
+    return rev?.image ?? null
+  }
+  if (entry.image) return entry.image
+  const latest = getLatestRevision(entry.revisions)
+  return latest?.image ?? null
 }
 
 export const SPACE_LIST: {
