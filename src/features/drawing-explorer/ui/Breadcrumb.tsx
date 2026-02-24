@@ -128,11 +128,13 @@ export function Breadcrumb({
                   <span className="text-[11px] text-indigo-600 sm:text-[11px] lg:text-base xl:text-[20px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-base landscape:xl:text-[20px]">
                     {' '}
                     · {disciplineShort}
-                    {revisionVersion && (
+                    {revisionVersion ? (
                       <span>
                         {' '}
                         {revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion}
                       </span>
+                    ) : (
+                      <span> (기본)</span>
                     )}
                   </span>
                 </>

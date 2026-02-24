@@ -60,21 +60,6 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
     }
   }, [data, slug, selection.drawingId])
 
-  useEffect(() => {
-    if (
-      !data ||
-      !selection.drawingId ||
-      !selection.disciplineKey ||
-      selection.revisionVersion !== null
-    )
-      return
-    const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
-    const latest = getLatestRevision(revisions)
-    if (latest) {
-      setSelection((prev) => ({ ...prev, revisionVersion: latest.version }))
-    }
-  }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
-
   const isCurrentLatestRevision = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return false
     const revisions = getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
