@@ -3,8 +3,8 @@ import type {
   DrawingNode,
   DisciplineRevisionEntry,
   NormalizedRevision,
+  DisciplineOption,
 } from '@/entities/project'
-import type { DisciplineOption } from '@/shared/types/metadata'
 
 export const DRAWING_PART_LABELS: Record<string, string> = {
   '01': '101동',
@@ -22,6 +22,16 @@ export function getDrawingIdsInOrder(data: NormalizedProjectData): string[] {
 
 export function getRootChildIds(data: NormalizedProjectData): string[] {
   return getDrawingIdsInOrder(data).filter((id) => data.drawings[id].parent === '00')
+}
+
+/** 특정 부모의 자식 도면 id 목록 (order 순) */
+export function getChildDrawingIds(
+  data: NormalizedProjectData,
+  parentId: string,
+): string[] {
+  return getDrawingIdsInOrder(data).filter(
+    (id) => data.drawings[id].parent === parentId,
+  )
 }
 
 export function getBreadcrumbIds(data: NormalizedProjectData, drawingId: string): string[] {
@@ -102,7 +112,20 @@ export function getRevisionsForDiscipline(
 }
 
 export function getLatestRevision(revisions: NormalizedRevision[]): NormalizedRevision | undefined {
-  return [...revisions].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0]
+  if (revisions.length === 0) return undefined
+  const parsed = (r: NormalizedRevision): number => {
+    const s = r.date?.trim() ?? ''
+    if (!s) return 0
+    const iso = s.slice(0, 10)
+    const t = Date.parse(iso)
+    return Number.isNaN(t) ? 0 : t
+  }
+  return [...revisions].sort((a, b) => {
+    const ta = parsed(a)
+    const tb = parsed(b)
+    if (tb !== ta) return tb - ta
+    return (b.version || '').localeCompare(a.version || '')
+  })[0]
 }
 
 export interface DrawingImageEntry {
@@ -123,14 +146,24 @@ export function getImageEntriesForDrawing(
 
   const entries: DrawingImageEntry[] = []
   for (const [disciplineKey, entry] of Object.entries(byDrawing)) {
+    const labelPrefix = entry.displayName ?? disciplineKey
     if (entry.revisions.length > 0) {
       const latest = getLatestRevision(entry.revisions)
+      if (entry.image) {
+        entries.push({
+          image: entry.image,
+          disciplineKey,
+          revisionVersion: null,
+          label: `${labelPrefix} (기본)`,
+          isLatest: false,
+        })
+      }
       for (const r of entry.revisions) {
         entries.push({
           image: r.image,
           disciplineKey,
           revisionVersion: r.version,
-          label: `${entry.displayName ?? disciplineKey} ${r.version}`,
+          label: `${labelPrefix} ${r.version}`,
           date: r.date,
           isLatest: latest?.version === r.version,
         })
@@ -140,7 +173,8 @@ export function getImageEntriesForDrawing(
         image: entry.image,
         disciplineKey,
         revisionVersion: null,
-        label: `${entry.displayName ?? disciplineKey} (기본)`,
+        label: `${labelPrefix} (기본)`,
+        isLatest: true,
       })
     }
   }
@@ -165,9 +199,10 @@ export function getImageForSelection(
     const rev = entry.revisions.find((r) => r.version === revisionVersion)
     return rev?.image ?? null
   }
+  // revisionVersion null = "(기본)" 선택. 기본 이미지가 있으면 우선, 없으면 최신 리비전
+  if (entry.image) return entry.image
   const latest = getLatestRevision(entry.revisions)
-  if (latest?.image) return latest.image
-  return entry.image ?? null
+  return latest?.image ?? null
 }
 
 export function getDisciplineLabel(

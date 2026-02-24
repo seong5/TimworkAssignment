@@ -56,7 +56,7 @@ export function MainPage() {
             filteredSpaces.map((space) => (
               <li key={space.id}>
                 <Link
-                  to={`/space/${space.slug}`}
+                  to={`/drawing/${space.slug}`}
                   className="group flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md"
                 >
                   <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-colors group-hover:bg-indigo-200">

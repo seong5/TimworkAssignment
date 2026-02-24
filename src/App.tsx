@@ -8,7 +8,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainPage />} />
-        <Route path="/space/:slug" element={<DrawingExplorerPage />} />
+        <Route path="/drawing/:slug" element={<DrawingExplorerPage />} />
       </Routes>
     </BrowserRouter>
   )

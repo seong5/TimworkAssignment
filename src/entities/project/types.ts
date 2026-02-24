@@ -57,3 +57,12 @@ export interface NormalizedProjectData {
   drawings: Record<string, DrawingNode>
   disciplineRevisions: DisciplineRevisionsMap
 }
+
+export interface DisciplineOption {
+  key: string
+  label: string
+  revisions: NormalizedRevision[]
+  hasRegions?: boolean
+  regionKeys?: string[]
+  keyPrefix?: string
+}

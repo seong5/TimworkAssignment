@@ -20,6 +20,7 @@ import {
   getDefaultDrawingIdForSlug,
   getBreadcrumbIds,
   getDrawingIdsInOrder,
+  getChildDrawingIds,
   getDisciplineOptionsForDrawing,
   getImageEntriesForDrawing,
 } from '@/shared/lib/normalizedDrawings'
@@ -52,6 +53,7 @@ export function DrawingExplorerPage() {
     }
   }, [data, slug, selection.drawingId])
 
+  // 공종 변경 시 해당 공종의 최신 리비전으로 설정 (정책: 항상 최신으로 초기화)
   useEffect(() => {
     if (
       !data ||
@@ -69,16 +71,19 @@ export function DrawingExplorerPage() {
     if (latest) {
       setSelection((prev) => ({ ...prev, revisionVersion: latest.version }))
     }
+    // 리비전이 0개인 공종(기본 이미지만 있음)은 revisionVersion null 유지 = 최신으로 간주
   }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
+  /** 현재 선택이 "최신"인가. 리비전 0개 공종에서 기본 이미지(revisionVersion null)도 최신으로 간주한다. */
   const isCurrentLatestRevision = useMemo(() => {
-    if (!data || !selection.drawingId || !selection.disciplineKey || !selection.revisionVersion)
-      return false
+    if (!data || !selection.drawingId || !selection.disciplineKey) return false
     const revisions = getRevisionsForDiscipline(
       data,
       selection.drawingId,
       selection.disciplineKey,
     )
+    if (revisions.length === 0)
+      return selection.revisionVersion === null
     const latest = getLatestRevision(revisions)
     return latest?.version === selection.revisionVersion
   }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
@@ -122,31 +127,77 @@ export function DrawingExplorerPage() {
     [data],
   )
 
-  // —— SpaceTree: rootDrawing, childDrawings, entriesByDrawingId
-  const { rootDrawing, childDrawings, entriesByDrawingId } = useMemo(() => {
-    if (!data) {
-      return {
-        rootDrawing: null as { id: string; name: string } | null,
-        childDrawings: [] as { id: string; name: string }[],
-        entriesByDrawingId: {} as Record<string, DrawingImageEntry[]>,
+  // —— SpaceTree: slug가 있으면 해당 구역(101동 등)만, 없으면 전체
+  const { rootDrawing, childDrawings, entriesByDrawingId, allowedDrawingIds } =
+    useMemo(() => {
+      if (!data) {
+        return {
+          rootDrawing: null as { id: string; name: string } | null,
+          childDrawings: [] as { id: string; name: string }[],
+          entriesByDrawingId: {} as Record<string, DrawingImageEntry[]>,
+          allowedDrawingIds: [] as string[],
+        }
       }
+      if (space) {
+        const rootId = space.id
+        const childIds = getChildDrawingIds(data, rootId)
+        const rootDrawing: { id: string; name: string } = {
+          id: rootId,
+          name: data.drawings[rootId].name,
+        }
+        const childDrawings = childIds.map((id) => ({
+          id,
+          name: data.drawings[id].name,
+        }))
+        const allDrawingIds = [rootId, ...childIds]
+        const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
+        for (const id of allDrawingIds) {
+          entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
+        }
+        return {
+          rootDrawing,
+          childDrawings,
+          entriesByDrawingId,
+          allowedDrawingIds: allDrawingIds,
+        }
+      }
+      const ids = getDrawingIdsInOrder(data)
+      const rootId = ids[0] ?? null
+      const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
+      const rootDrawing: { id: string; name: string } | null =
+        rootId ? { id: rootId, name: data.drawings[rootId].name } : null
+      const childDrawings = childIds.map((id) => ({
+        id,
+        name: data.drawings[id].name,
+      }))
+      const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
+      const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
+      for (const id of allDrawingIds) {
+        entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
+      }
+      return {
+        rootDrawing,
+        childDrawings,
+        entriesByDrawingId,
+        allowedDrawingIds: allDrawingIds,
+      }
+    }, [data, space])
+
+  // slug(구역) 진입 시 선택이 해당 구역 도면이 아니면 구역 루트로 맞춤
+  useEffect(() => {
+    if (!data || !space || allowedDrawingIds.length === 0) return
+    if (
+      selection.drawingId !== null &&
+      !allowedDrawingIds.includes(selection.drawingId)
+    ) {
+      setSelection((prev) => ({
+        ...prev,
+        drawingId: space.id,
+        disciplineKey: null,
+        revisionVersion: null,
+      }))
     }
-    const ids = getDrawingIdsInOrder(data)
-    const rootId = ids[0] ?? null
-    const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
-    const rootDrawing: { id: string; name: string } | null =
-      rootId ? { id: rootId, name: data.drawings[rootId].name } : null
-    const childDrawings = childIds.map((id) => ({
-      id,
-      name: data.drawings[id].name,
-    }))
-    const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
-    const entriesByDrawingId: Record<string, DrawingImageEntry[]> = {}
-    for (const id of allDrawingIds) {
-      entriesByDrawingId[id] = getImageEntriesForDrawing(data, id)
-    }
-    return { rootDrawing, childDrawings, entriesByDrawingId }
-  }, [data])
+  }, [data, space, allowedDrawingIds, selection.drawingId])
 
   // —— ContextBar: 공종/리비전 옵션 및 파생 상태 전부 페이지에서 계산
   const contextBarProps = useMemo((): Omit<

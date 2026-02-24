@@ -1,6 +1,5 @@
 import { Map, Layers, GitCommit, ChevronRight, ChevronDown } from 'lucide-react'
-import type { DisciplineOption } from '@/shared/types/metadata'
-import type { NormalizedRevision } from '@/entities/project'
+import type { DisciplineOption, NormalizedRevision } from '@/entities/project'
 
 export interface SelectionState {
   drawingId: string | null

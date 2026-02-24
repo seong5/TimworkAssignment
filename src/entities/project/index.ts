@@ -8,4 +8,5 @@ export type {
   DisciplineRevisionEntry,
   DisciplineRevisionsMap,
   NormalizedProjectData,
+  DisciplineOption,
 } from './types'
