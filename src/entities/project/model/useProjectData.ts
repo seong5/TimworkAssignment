@@ -1,24 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { NormalizedProjectData } from '../types'
-import { fetchProjectData } from '../api/projectData'
+import { useProjectStore } from './projectStore'
 
 export function useProjectData(): {
   data: NormalizedProjectData | null
   loading: boolean
   error: Error | null
 } {
-  const [data, setData] = useState<NormalizedProjectData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  const data = useProjectStore((s) => s.data)
+  const loading = useProjectStore((s) => s.loading)
+  const error = useProjectStore((s) => s.error)
+  const loadProjectData = useProjectStore((s) => s.loadProjectData)
 
   useEffect(() => {
-    setLoading(true)
-    setError(null)
-    fetchProjectData()
-      .then(setData)
-      .catch(setError)
-      .finally(() => setLoading(false))
-  }, [])
+    void loadProjectData()
+  }, [loadProjectData])
 
   return { data, loading, error }
 }

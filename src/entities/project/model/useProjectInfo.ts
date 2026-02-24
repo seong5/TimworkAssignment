@@ -1,22 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { ProjectInfo } from '../types'
-import { fetchProject } from '../api/projectData'
+import { useProjectStore } from './projectStore'
 
 export function useProjectInfo(): {
   project: ProjectInfo | null
   loading: boolean
   error: Error | null
 } {
-  const [project, setProject] = useState<ProjectInfo | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
+  const project = useProjectStore((s) => s.project)
+  const loading = useProjectStore((s) => s.loading)
+  const error = useProjectStore((s) => s.error)
+  const loadProject = useProjectStore((s) => s.loadProject)
 
   useEffect(() => {
-    fetchProject()
-      .then((data) => setProject(data.project))
-      .catch(setError)
-      .finally(() => setLoading(false))
-  }, [])
+    void loadProject()
+  }, [loadProject])
 
   return { project, loading, error }
 }
