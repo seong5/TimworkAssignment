@@ -31,6 +31,8 @@ export {
   SPACE_LIST,
   getDefaultDrawingIdForSlug,
   getRecentDrawingUpdates,
+  getImageTransformForRevision,
+  getOverlayableDisciplines,
 } from './lib/normalizedDrawings'
 export type {
   DrawingImageEntry,

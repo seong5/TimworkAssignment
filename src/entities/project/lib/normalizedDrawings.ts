@@ -4,6 +4,7 @@ import type {
   DisciplineRevisionEntry,
   NormalizedRevision,
   DisciplineOption,
+  ImageTransform,
 } from '../types'
 
 export const DRAWING_PART_LABELS: Record<string, string> = {
@@ -277,6 +278,53 @@ export function getImageForRevision(
   if (entry.image) return entry.image
   const latest = getLatestRevision(entry.revisions)
   return latest?.image ?? null
+}
+
+export function getImageTransformForRevision(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string,
+  version: string | null,
+): ImageTransform | null {
+  const entry = getEntry(data, drawingId, disciplineKey)
+  if (!entry) return null
+  if (version) {
+    const rev = entry.revisions.find((r) => r.version === version)
+    const t = rev?.imageTransform ?? entry.imageTransform
+    if (!t) return null
+    return t
+  }
+  const t = entry.imageTransform
+  if (!t) return null
+  return t
+}
+
+/** 겹쳐보기 가능한 공종 목록 (지역 키 제외, relativeTo 기준 정렬) */
+export function getOverlayableDisciplines(
+  data: NormalizedProjectData,
+  drawingId: string,
+): { key: string; label: string; hasImage: boolean }[] {
+  const byDrawing = data.disciplineRevisions[drawingId]
+  if (!byDrawing) return []
+
+  const result: { key: string; label: string; hasImage: boolean }[] = []
+  const prefixKeys = new Set<string>()
+  for (const k of Object.keys(byDrawing)) {
+    const dot = k.indexOf('.')
+    if (dot > 0) prefixKeys.add(k.slice(0, dot))
+  }
+
+  for (const [key, entry] of Object.entries(byDrawing)) {
+    if (key.includes('.')) continue
+    const hasImage = !!(entry.image || (entry.revisions.length > 0 && getLatestRevision(entry.revisions)))
+    if (!hasImage) continue
+    result.push({
+      key,
+      label: entry.displayName ?? key,
+      hasImage,
+    })
+  }
+  return result.sort((a, b) => a.label.localeCompare(b.label))
 }
 
 export const SPACE_LIST: {

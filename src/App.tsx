@@ -5,6 +5,7 @@ import './App.css'
 import { MainPage } from '@/pages/MainPage'
 import { DrawingExplorerPage } from '@/pages/DrawingExplorerPage'
 import { RevisionComparePage } from '@/pages/RevisionComparePage'
+import { DisciplineOverlayPage } from '@/pages/DisciplineOverlayPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/" element={<MainPage />} />
         <Route path="/drawing/:slug" element={<DrawingExplorerPage />} />
         <Route path="/drawing/:slug/compare" element={<RevisionComparePage />} />
+        <Route path="/drawing/:slug/overlay" element={<DisciplineOverlayPage />} />
       </Routes>
     </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />

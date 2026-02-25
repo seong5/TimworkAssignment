@@ -15,6 +15,7 @@ import {
   getDrawingIdsInOrder,
   getChildDrawingIds,
   getImageEntriesGroupedByDiscipline,
+  getOverlayableDisciplines,
   SPACE_LIST,
   type DrawingDisciplineGroup,
 } from '@/entities/project'
@@ -88,6 +89,18 @@ export function DrawingExplorerWidget({
 
   const canCompare =
     !!selection.drawingId && !!selection.disciplineKey && currentRevisions.length >= 1
+
+  const overlayableCount = useMemo(() => {
+    if (!data || !selection.drawingId) return 0
+    return getOverlayableDisciplines(data, selection.drawingId).length
+  }, [data, selection.drawingId])
+
+  const canOverlay = !!selection.drawingId && overlayableCount >= 2
+
+  const handleEnterOverlay = useCallback(() => {
+    if (!slug || !selection.drawingId) return
+    navigate(`/drawing/${slug}/overlay?drawing=${encodeURIComponent(selection.drawingId)}`)
+  }, [navigate, slug, selection.drawingId])
 
   const handleEnterCompare = useCallback(() => {
     if (!slug || !selection.drawingId || !selection.disciplineKey) return
@@ -285,7 +298,7 @@ export function DrawingExplorerWidget({
                     selection.revisionVersion,
                   )}
                   trailing={
-                    isCurrentLatestRevision || canCompare ? (
+                    isCurrentLatestRevision || canCompare || canOverlay ? (
                       <div className="flex flex-wrap items-center gap-2">
                         {isCurrentLatestRevision && (
                           <span
@@ -294,6 +307,15 @@ export function DrawingExplorerWidget({
                           >
                             ★ 최신 도면
                           </span>
+                        )}
+                        {canOverlay && (
+                          <button
+                            type="button"
+                            onClick={handleEnterOverlay}
+                            className="rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1.5 text-[10px] font-medium text-indigo-700 hover:bg-indigo-100 sm:text-[15px]"
+                          >
+                            공종 겹쳐보기
+                          </button>
                         )}
                         {canCompare && (
                           <button
