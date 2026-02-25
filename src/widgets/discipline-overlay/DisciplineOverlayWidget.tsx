@@ -57,9 +57,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
 
   const updateLayer = (disciplineKey: string, patch: Partial<OverlayLayer>) => {
     setLayers((prev) =>
-      prev.map((l) =>
-        l.disciplineKey === disciplineKey ? { ...l, ...patch } : l,
-      ),
+      prev.map((l) => (l.disciplineKey === disciplineKey ? { ...l, ...patch } : l)),
     )
   }
 
@@ -127,9 +125,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
   if (!drawingId || !data.drawings[drawingId]) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-gray-600 sm:text-base">
-          도면을 선택해 주세요.
-        </p>
+        <p className="text-center text-sm text-gray-600 sm:text-base">도면을 선택해 주세요.</p>
         <button
           type="button"
           onClick={handleBackToDrawing}
@@ -156,15 +152,15 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
             ← 뒤로가기
           </button>
           <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
-          <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:text-xl">
-            {drawingName}
+          <h1 className="min-w-0 truncate text-lg font-bold text-gray-900 sm:text-xl">
+            공종 겹쳐보기 · {drawingName}
           </h1>
           <button
             type="button"
             onClick={handleBackToDrawing}
             className="shrink-0 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
           >
-            단일 보기로
+            단일로 보기
           </button>
         </div>
       </header>
