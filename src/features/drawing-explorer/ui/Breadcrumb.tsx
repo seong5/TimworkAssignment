@@ -75,15 +75,26 @@ export function Breadcrumb({
                     className="flex items-center gap-0.5 sm:gap-0.5 lg:gap-1.5 landscape:gap-1 landscape:sm:gap-1.5"
                   >
                     {!isFirst && (
-                      <ChevronRight className="h-3 w-3 shrink-0 text-neutral-300 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" aria-hidden />
+                      <ChevronRight
+                        className="h-3 w-3 shrink-0 text-neutral-300 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4"
+                        aria-hidden
+                      />
                     )}
 
                     {isLast ? (
                       <div className="flex items-center gap-0.5 rounded-md border border-neutral-200 bg-white px-1.5 py-0.5 text-[10px] font-bold text-indigo-600 shadow-sm sm:px-1.5 sm:py-0.5 sm:text-[11px] lg:gap-1.5 lg:rounded-lg lg:px-2.5 lg:py-1.5 lg:text-sm landscape:gap-1 landscape:rounded-lg landscape:px-2 landscape:py-1 landscape:text-xs landscape:sm:gap-1.5 landscape:sm:px-2.5 landscape:sm:py-1.5 landscape:sm:text-sm">
-                        {isSpace && <Map className="h-3 w-3 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />}
-                        {isDiscipline && <Layers className="h-3 w-3 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />}
-                        {isRevision && <GitCommit className="h-3 w-3 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />}
-                        <span className="truncate max-w-[100px] sm:max-w-[140px] lg:max-w-none landscape:max-w-[140px] landscape:sm:max-w-[200px] landscape:lg:max-w-none">{item.name}</span>
+                        {isSpace && (
+                          <Map className="h-3 w-3 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />
+                        )}
+                        {isDiscipline && (
+                          <Layers className="h-3 w-3 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />
+                        )}
+                        {isRevision && (
+                          <GitCommit className="h-3 w-3 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />
+                        )}
+                        <span className="truncate max-w-[100px] sm:max-w-[140px] lg:max-w-none landscape:max-w-[140px] landscape:sm:max-w-[200px] landscape:lg:max-w-none">
+                          {item.name}
+                        </span>
                       </div>
                     ) : isSpace ? (
                       <button
@@ -94,7 +105,9 @@ export function Breadcrumb({
                         {isFirst && (
                           <Home className="h-3 w-3 shrink-0 text-neutral-400 transition-colors group-hover:text-neutral-600 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />
                         )}
-                        <span className="truncate max-w-[80px] sm:max-w-[100px] lg:max-w-none landscape:max-w-[120px] landscape:sm:max-w-[160px] landscape:lg:max-w-none">{item.name}</span>
+                        <span className="truncate max-w-[80px] sm:max-w-[100px] lg:max-w-none landscape:max-w-[120px] landscape:sm:max-w-[160px] landscape:lg:max-w-none">
+                          {item.name}
+                        </span>
                       </button>
                     ) : (
                       <span className="flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-medium text-neutral-600 sm:gap-0.5 sm:px-1.5 sm:py-0.5 sm:text-[11px] lg:gap-1.5 lg:rounded-lg lg:px-2.5 lg:py-1.5 lg:text-sm landscape:gap-1 landscape:rounded-lg landscape:px-2 landscape:py-1 landscape:text-xs landscape:sm:gap-1.5 landscape:sm:px-2.5 landscape:sm:py-1.5 landscape:sm:text-sm">
@@ -104,7 +117,9 @@ export function Breadcrumb({
                         {isRevision && (
                           <GitCommit className="h-3 w-3 shrink-0 text-neutral-400 sm:h-3 sm:w-3 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />
                         )}
-                        <span className="truncate max-w-[100px] sm:max-w-[120px] lg:max-w-none landscape:max-w-[140px] landscape:sm:max-w-[180px] landscape:lg:max-w-none">{item.name}</span>
+                        <span className="truncate max-w-[100px] sm:max-w-[120px] lg:max-w-none landscape:max-w-[140px] landscape:sm:max-w-[180px] landscape:lg:max-w-none">
+                          {item.name}
+                        </span>
                       </span>
                     )}
                   </li>

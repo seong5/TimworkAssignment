@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useProjectData } from '@/entities/project'
 import {
   SpaceTree,
@@ -23,6 +23,7 @@ import {
   SPACE_LIST,
   type DrawingDisciplineGroup,
 } from '@/entities/project'
+import { useDrawingExplorerStore } from '@/features/drawing-explorer/model/drawingExplorerStore'
 
 export interface DrawingExplorerWidgetProps {
   slug: string | undefined
@@ -33,22 +34,22 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
   const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
 
   const { data, loading, error } = useProjectData()
-  const [selection, setSelection] = useState<{
-    drawingId: string | null
-    disciplineKey: string | null
-    revisionVersion: string | null
-  }>({
-    drawingId: null,
-    disciplineKey: null,
-    revisionVersion: null,
-  })
-  const [compareMode, setCompareMode] = useState(false)
-  const [compareLeft, setCompareLeft] = useState<string | null>(null)
-  const [compareRight, setCompareRight] = useState<string | null>(null)
+  const {
+    selection,
+    compareMode,
+    compareLeft,
+    compareRight,
+    setSelection,
+    resetSelection,
+    setDrawingId,
+    setCompareMode,
+    setCompareLeft,
+    setCompareRight,
+  } = useDrawingExplorerStore()
 
   useEffect(() => {
-    setSelection({ drawingId: null, disciplineKey: null, revisionVersion: null })
-  }, [slug])
+    resetSelection()
+  }, [resetSelection, slug])
 
   useEffect(() => {
     if (!data || selection.drawingId !== null) return
@@ -56,9 +57,9 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
     const rootChildIds = getRootChildIds(data)
     const defaultDrawingId = defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
     if (defaultDrawingId) {
-      setSelection((prev) => ({ ...prev, drawingId: defaultDrawingId }))
+      setDrawingId(defaultDrawingId)
     }
-  }, [data, slug, selection.drawingId])
+  }, [data, slug, selection.drawingId, setDrawingId])
 
   const isCurrentLatestRevision = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return false
@@ -68,15 +69,13 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
     return latest?.version === selection.revisionVersion
   }, [data, selection.drawingId, selection.disciplineKey, selection.revisionVersion])
 
-  const handleSelectDrawing = useCallback((drawingId: string) => {
-    setCompareMode(false)
-    setSelection((prev) => ({
-      ...prev,
-      drawingId,
-      disciplineKey: null,
-      revisionVersion: null,
-    }))
-  }, [])
+  const handleSelectDrawing = useCallback(
+    (drawingId: string) => {
+      setCompareMode(false)
+      setDrawingId(drawingId)
+    },
+    [setCompareMode, setDrawingId],
+  )
 
   const currentRevisions = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return []
@@ -98,13 +97,13 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
     const latest = getLatestRevision(revs)
     setCompareLeft(null)
     setCompareRight(latest?.version ?? revs[0]?.version ?? null)
-  }, [currentRevisions])
+  }, [currentRevisions, setCompareLeft, setCompareMode, setCompareRight])
 
   const handleSelectImage = useCallback(
     (drawingId: string, disciplineKey: string, revisionVersion: string | null) => {
       setSelection({ drawingId, disciplineKey, revisionVersion })
     },
-    [],
+    [setSelection],
   )
 
   const breadcrumbPathIds = useMemo(
@@ -175,14 +174,9 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
   useEffect(() => {
     if (!data || !space || allowedDrawingIds.length === 0) return
     if (selection.drawingId !== null && !allowedDrawingIds.includes(selection.drawingId)) {
-      setSelection((prev) => ({
-        ...prev,
-        drawingId: space.id,
-        disciplineKey: null,
-        revisionVersion: null,
-      }))
+      setDrawingId(space.id)
     }
-  }, [data, space, allowedDrawingIds, selection.drawingId])
+  }, [allowedDrawingIds, data, selection.drawingId, setDrawingId, space])
 
   if (!slug || !space) {
     return (
