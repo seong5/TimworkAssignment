@@ -382,6 +382,7 @@ export function DrawingExplorerWidget({
               childDrawings={childDrawings}
               disciplinesByDrawingId={disciplinesByDrawingId}
               selectedDrawingId={selection.drawingId}
+              selectedDisciplineKey={selection.disciplineKey}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}
             />
@@ -563,6 +564,7 @@ export function DrawingExplorerWidget({
                 childDrawings={childDrawings}
                 disciplinesByDrawingId={disciplinesByDrawingId}
                 selectedDrawingId={selection.drawingId}
+                selectedDisciplineKey={selection.disciplineKey}
                 onSelectDrawing={handleSelectDrawing}
                 onSelectImage={handleSelectImage}
               />

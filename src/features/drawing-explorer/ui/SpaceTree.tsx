@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon, Layers } from 'lucide-react'
 import type { DrawingImageEntry, DrawingDisciplineGroup } from '@/entities/project'
 
@@ -51,6 +51,7 @@ export interface SpaceTreeProps {
   childDrawings: { id: string; name: string }[]
   disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]>
   selectedDrawingId: string | null
+  selectedDisciplineKey?: string | null
   onSelectDrawing: (id: string) => void
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
 }
@@ -64,12 +65,23 @@ export function SpaceTree({
   childDrawings,
   disciplinesByDrawingId,
   selectedDrawingId,
+  selectedDisciplineKey = null,
   onSelectDrawing,
   onSelectImage,
 }: SpaceTreeProps) {
   const [expandedDrawingId, setExpandedDrawingId] = useState<string | null>(null)
   /** 여러 공종을 동시에 펼쳐 둘 수 있음 */
   const [expandedDisciplineKeys, setExpandedDisciplineKeys] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (selectedDrawingId) {
+      setExpandedDrawingId(selectedDrawingId)
+      if (selectedDisciplineKey) {
+        const nodeKey = disciplineNodeKey(selectedDrawingId, selectedDisciplineKey)
+        setExpandedDisciplineKeys((prev) => new Set(prev).add(nodeKey))
+      }
+    }
+  }, [selectedDrawingId, selectedDisciplineKey])
 
   const handleDrawingClick = (id: string) => {
     onSelectDrawing(id)
