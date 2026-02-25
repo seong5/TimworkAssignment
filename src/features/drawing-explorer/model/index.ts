@@ -18,3 +18,9 @@ export {
   createInitialOverlayLayers,
   type OverlayableDiscipline,
 } from './lib/createInitialOverlayLayers'
+export { getDefaultCompareRight } from './lib/getDefaultCompareVersions'
+export {
+  useCompareVersions,
+  type UseCompareVersionsParams,
+  type UseCompareVersionsResult,
+} from './useCompareVersions'

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import { useProjectData } from '@/entities/project'
-import { getRevisionsForDiscipline, getLatestRevision, SPACE_LIST } from '@/entities/project'
+import { getRevisionsForDiscipline, SPACE_LIST } from '@/entities/project'
 import { RevisionCompareView } from '@/features/drawing-explorer'
+import { useCompareVersions } from '@/features/drawing-explorer/model'
 
 export interface RevisionCompareWidgetProps {
   slug: string | undefined
@@ -28,24 +29,11 @@ export function RevisionCompareWidget({
     return getRevisionsForDiscipline(data, drawingId, disciplineKey)
   }, [data, drawingId, disciplineKey])
 
-  const defaultRight = useMemo(() => {
-    const latest = getLatestRevision(currentRevisions)
-    return latest?.version ?? currentRevisions[0]?.version ?? null
-  }, [currentRevisions])
-
-  const [compareLeft, setCompareLeft] = useState<string | null>(
-    initialLeft === undefined ? null : initialLeft || null,
-  )
-  const [compareRight, setCompareRight] = useState<string | null>(() => {
-    if (initialRight !== undefined) return initialRight || null
-    return null
+  const { compareLeft, setCompareLeft, compareRight, setCompareRight } = useCompareVersions({
+    revisions: currentRevisions,
+    initialLeft,
+    initialRight,
   })
-
-  useEffect(() => {
-    if (initialRight === undefined && compareRight === null && defaultRight) {
-      setCompareRight(defaultRight)
-    }
-  }, [defaultRight, initialRight, compareRight])
 
   const handleBackToDrawing = () => {
     navigate(`/drawing/${slug}`)
