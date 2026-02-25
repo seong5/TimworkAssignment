@@ -372,23 +372,6 @@ export function DrawingExplorerWidget({
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <aside className="hidden w-50 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block sm:w-60">
-          <div className="py-2">
-            <h2 className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-              {space.displayName}
-            </h2>
-            <SpaceTree
-              rootDrawing={rootDrawing}
-              childDrawings={childDrawings}
-              disciplinesByDrawingId={disciplinesByDrawingId}
-              selectedDrawingId={selection.drawingId}
-              selectedDisciplineKey={selection.disciplineKey}
-              onSelectDrawing={handleSelectDrawing}
-              onSelectImage={handleSelectImage}
-            />
-          </div>
-        </aside>
-
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
             <>
@@ -571,6 +554,23 @@ export function DrawingExplorerWidget({
             </div>
           </section>
         </main>
+
+        <aside className="hidden w-50 shrink-0 overflow-y-auto border-l border-gray-200 bg-white lg:block sm:w-60">
+          <div className="py-2">
+            <h2 className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+              {space.displayName}
+            </h2>
+            <SpaceTree
+              rootDrawing={rootDrawing}
+              childDrawings={childDrawings}
+              disciplinesByDrawingId={disciplinesByDrawingId}
+              selectedDrawingId={selection.drawingId}
+              selectedDisciplineKey={selection.disciplineKey}
+              onSelectDrawing={handleSelectDrawing}
+              onSelectImage={handleSelectImage}
+            />
+          </div>
+        </aside>
       </div>
     </div>
   )
