@@ -293,3 +293,93 @@ export function getDefaultDrawingIdForSlug(slug: string): string | null {
   const space = SPACE_LIST.find((s) => s.slug === slug)
   return space?.id ?? null
 }
+
+export interface RecentDrawingUpdate {
+  drawingId: string
+  drawingName: string
+  disciplineKey: string
+  disciplineLabel: string
+  revisionVersion: string
+  previousRevisionVersion: string | null
+  date: string
+  slug: string
+  spaceDisplayName: string
+  changes: string[]
+}
+
+function getSlugForDrawingId(data: NormalizedProjectData, drawingId: string): string {
+  let id: string | null = drawingId
+  while (id) {
+    const space = SPACE_LIST.find((s) => s.id === id)
+    if (space) return space.slug
+    const drawing: DrawingNode | undefined = data.drawings[id]
+    id = drawing?.parent ?? null
+  }
+  return SPACE_LIST[0]?.slug ?? '101building'
+}
+
+/**
+ * 모든 도면이 이미 존재한다고 가정하고,
+ * 현재 날짜와 가장 가까운 리비전 날짜를 가진 도면 하나를 '업데이트된 도면'으로 반환
+ */
+export function getRecentDrawingUpdates(
+  data: NormalizedProjectData,
+  _limit = 12,
+): RecentDrawingUpdate[] {
+  const items: (RecentDrawingUpdate & { dateTs: number })[] = []
+  const today = new Date()
+  const todayStart = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+
+  for (const [drawingId, byDiscipline] of Object.entries(data.disciplineRevisions)) {
+    const drawing = data.drawings[drawingId]
+    const drawingName = drawing?.name ?? drawingId
+
+    const slug = getSlugForDrawingId(data, drawingId)
+    const space = SPACE_LIST.find((s) => s.id === drawingId) ?? SPACE_LIST.find((s) => s.slug === slug)
+    const spaceDisplayName = space?.displayName ?? drawingName
+
+    for (const [disciplineKey, entry] of Object.entries(byDiscipline)) {
+      if (entry.revisions.length === 0) continue
+
+      const latest = getLatestRevision(entry.revisions)
+      if (!latest) continue
+
+      const dateStr = latest.date?.trim() ?? ''
+      const dateTs = dateStr ? Date.parse(dateStr.slice(0, 10)) : 0
+      if (Number.isNaN(dateTs)) continue
+
+      const revsByDate = [...entry.revisions].sort((a, b) => {
+        const ta = (a.date?.trim() ?? '').slice(0, 10) ? Date.parse((a.date ?? '').slice(0, 10)) : 0
+        const tb = (b.date?.trim() ?? '').slice(0, 10) ? Date.parse((b.date ?? '').slice(0, 10)) : 0
+        return (Number.isNaN(tb) ? 0 : tb) - (Number.isNaN(ta) ? 0 : ta)
+      })
+      const latestIdx = revsByDate.findIndex((r) => r.version === latest.version)
+      const prevRev = latestIdx >= 0 && latestIdx + 1 < revsByDate.length ? revsByDate[latestIdx + 1] : null
+      const previousRevisionVersion = prevRev?.version ?? null
+
+      items.push({
+        drawingId,
+        drawingName,
+        disciplineKey,
+        disciplineLabel: entry.displayName ?? disciplineKey,
+        revisionVersion: latest.version,
+        previousRevisionVersion,
+        date: dateStr,
+        dateTs,
+        slug,
+        spaceDisplayName,
+        changes: Array.isArray(latest.changes) ? latest.changes : [],
+      })
+    }
+  }
+
+  if (items.length === 0) return []
+
+  const closest = items.reduce((acc, cur) => {
+    const accDiff = Math.abs(acc.dateTs - todayStart)
+    const curDiff = Math.abs(cur.dateTs - todayStart)
+    return curDiff < accDiff ? cur : acc
+  })
+
+  return [closest].map(({ dateTs, ...rest }) => rest)
+}

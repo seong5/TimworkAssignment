@@ -30,8 +30,13 @@ export {
   getRevisionDate,
   SPACE_LIST,
   getDefaultDrawingIdForSlug,
+  getRecentDrawingUpdates,
 } from './lib/normalizedDrawings'
-export type { DrawingImageEntry, DrawingDisciplineGroup } from './lib/normalizedDrawings'
+export type {
+  DrawingImageEntry,
+  DrawingDisciplineGroup,
+  RecentDrawingUpdate,
+} from './lib/normalizedDrawings'
 
 export { useProjectData } from './model/useProjectData'
 export { useProjectInfo } from './model/useProjectInfo'

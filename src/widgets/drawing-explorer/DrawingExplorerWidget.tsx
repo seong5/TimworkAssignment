@@ -22,9 +22,17 @@ import { useDrawingExplorerStore } from '@/features/drawing-explorer/model/drawi
 
 export interface DrawingExplorerWidgetProps {
   slug: string | undefined
+  initialDrawingId?: string
+  initialDisciplineKey?: string
+  initialRevisionVersion?: string
 }
 
-export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
+export function DrawingExplorerWidget({
+  slug,
+  initialDrawingId,
+  initialDisciplineKey,
+  initialRevisionVersion,
+}: DrawingExplorerWidgetProps) {
   const navigate = useNavigate()
   const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
 
@@ -32,8 +40,23 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
   const { selection, setSelection, resetSelection, setDrawingId } = useDrawingExplorerStore()
 
   useEffect(() => {
-    resetSelection()
-  }, [resetSelection, slug])
+    if (initialDrawingId && initialDisciplineKey) {
+      setSelection({
+        drawingId: initialDrawingId,
+        disciplineKey: initialDisciplineKey,
+        revisionVersion: initialRevisionVersion ?? null,
+      })
+    } else {
+      resetSelection()
+    }
+  }, [
+    slug,
+    initialDrawingId,
+    initialDisciplineKey,
+    initialRevisionVersion,
+    setSelection,
+    resetSelection,
+  ])
 
   useEffect(() => {
     if (!data || selection.drawingId !== null) return
