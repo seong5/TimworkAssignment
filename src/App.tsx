@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import { MainPage } from '@/pages/MainPage'
 import { DrawingExplorerPage } from '@/pages/DrawingExplorerPage'
+import { RevisionComparePage } from '@/pages/RevisionComparePage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +21,7 @@ function App() {
         <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/drawing/:slug" element={<DrawingExplorerPage />} />
+        <Route path="/drawing/:slug/compare" element={<RevisionComparePage />} />
       </Routes>
     </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
