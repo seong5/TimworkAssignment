@@ -573,6 +573,7 @@ export function DrawingExplorerWidget({
               disciplinesByDrawingId={disciplinesByDrawingId}
               selectedDrawingId={selection.drawingId}
               selectedDisciplineKey={selection.disciplineKey}
+              selectedRevisionVersion={selection.revisionVersion}
               onSelectDrawing={handleSelectDrawing}
               onSelectImage={handleSelectImage}
             />

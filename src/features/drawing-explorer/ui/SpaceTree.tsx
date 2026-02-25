@@ -6,22 +6,34 @@ export type { DrawingImageEntry, DrawingDisciplineGroup }
 
 function RevisionList({
   drawingId,
+  disciplineKey,
   entries,
+  selectedDisciplineKey,
+  selectedRevisionVersion,
   onSelectImage,
 }: {
   drawingId: string
+  disciplineKey: string
   entries: DrawingImageEntry[]
+  selectedDisciplineKey?: string | null
+  selectedRevisionVersion?: string | null
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
 }) {
   return (
     <div className="ml-4 mt-0.5 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80 py-1 shadow-sm sm:ml-6">
       <ul className="flex flex-col gap-0.5 py-1">
-        {entries.map((entry, idx) => (
+        {entries.map((entry, idx) => {
+          const isSelected =
+            selectedDisciplineKey === disciplineKey &&
+            (selectedRevisionVersion ?? null) === (entry.revisionVersion ?? null)
+          return (
           <li key={`${entry.disciplineKey}-${entry.revisionVersion ?? 'base'}-${idx}`}>
             <button
               type="button"
               onClick={() => onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)}
-              className="flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-xs transition-colors hover:bg-gray-200 sm:gap-2 sm:px-3 sm:text-sm"
+              className={`flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:text-sm ${
+                isSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-200'
+              }`}
             >
               <ImageIcon className="h-3 w-3 shrink-0 text-gray-400 sm:h-3.5 sm:w-3.5" />
               <span className="min-w-0 flex-1 truncate">
@@ -40,7 +52,7 @@ function RevisionList({
               )}
             </button>
           </li>
-        ))}
+        )})}
       </ul>
     </div>
   )
@@ -52,6 +64,7 @@ export interface SpaceTreeProps {
   disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]>
   selectedDrawingId: string | null
   selectedDisciplineKey?: string | null
+  selectedRevisionVersion?: string | null
   onSelectDrawing: (id: string) => void
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
 }
@@ -66,6 +79,7 @@ export function SpaceTree({
   disciplinesByDrawingId,
   selectedDrawingId,
   selectedDisciplineKey = null,
+  selectedRevisionVersion = null,
   onSelectDrawing,
   onSelectImage,
 }: SpaceTreeProps) {
@@ -106,12 +120,16 @@ export function SpaceTree({
         {groups.map((group) => {
           const nodeKey = disciplineNodeKey(drawingId, group.disciplineKey)
           const isExpanded = expandedDisciplineKeys.has(nodeKey)
+          const isDisciplineSelected =
+            selectedDrawingId === drawingId && selectedDisciplineKey === group.disciplineKey
           return (
             <div key={group.disciplineKey} className="flex flex-col gap-0.5">
               <button
                 type="button"
                 onClick={() => handleDisciplineClick(drawingId, group.disciplineKey)}
-                className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-gray-100 sm:gap-2 sm:px-2.5 sm:text-sm"
+                className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-2.5 sm:text-sm ${
+                  isDisciplineSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-100'
+                }`}
               >
                 <span className="shrink-0 text-gray-500" aria-hidden>
                   {isExpanded ? (
@@ -126,7 +144,10 @@ export function SpaceTree({
               {isExpanded && group.entries.length > 0 && (
                 <RevisionList
                   drawingId={drawingId}
+                  disciplineKey={group.disciplineKey}
                   entries={group.entries}
+                  selectedDisciplineKey={selectedDisciplineKey}
+                  selectedRevisionVersion={selectedRevisionVersion}
                   onSelectImage={onSelectImage}
                 />
               )}
@@ -147,7 +168,7 @@ export function SpaceTree({
               onClick={() => handleDrawingClick(rootDrawing.id)}
               className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
                 selectedDrawingId === rootDrawing.id
-                  ? 'bg-blue-100 text-blue-800'
+                  ? 'bg-blue-200 text-blue-900 font-semibold'
                   : 'hover:bg-gray-100'
               }`}
             >
@@ -176,7 +197,7 @@ export function SpaceTree({
                   type="button"
                   onClick={() => handleDrawingClick(id)}
                   className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
-                    isSelected ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100'
+                    isSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-100'
                   }`}
                 >
                   <span className="shrink-0 text-gray-500" aria-hidden>
