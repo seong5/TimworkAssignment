@@ -28,15 +28,15 @@ export function DisciplineOverlayView({
 
   if (visibleLayers.length === 0) {
     return (
-      <div className="flex min-h-48 flex-1 items-center justify-center rounded-xl border border-dashed border-neutral-200 bg-neutral-50 p-8 text-sm text-neutral-500">
+      <div className="flex min-h-32 flex-1 items-center justify-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-4 text-center text-xs text-neutral-500 sm:min-h-48 sm:rounded-xl sm:p-8 sm:text-sm">
         공종을 선택해 겹쳐보세요.
       </div>
     )
   }
 
   return (
-    <div className="relative min-h-0 flex-1 overflow-auto p-2 sm:p-4">
-      <div className="relative aspect-[4/3] w-full min-w-[280px] max-w-4xl">
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-auto p-1.5 sm:p-3 md:p-4">
+      <div className="relative mx-auto aspect-[4/3] w-full min-w-0 max-w-4xl shrink-0">
         {visibleLayers.map((layer) => {
           const imageFilename = getImageForRevision(
             data,

@@ -165,8 +165,8 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
         </div>
       </header>
 
-      <main className="flex min-h-0 flex-1 overflow-hidden">
-        <div className="min-w-0 flex-1 flex-col overflow-hidden">
+      <main className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <DisciplineOverlayView
             data={data}
             drawingId={drawingId}
@@ -174,7 +174,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
             layers={layers}
           />
         </div>
-        <aside className="flex w-64 shrink-0 flex-col overflow-y-auto border-l border-gray-200 bg-white sm:w-72">
+        <aside className="flex max-h-56 shrink-0 flex-col overflow-y-auto border-t border-gray-200 bg-white md:max-h-none md:w-64 md:border-l md:border-t-0 lg:w-72">
           <OverlayLayerTree
             drawingName={drawingName}
             groups={groups}
