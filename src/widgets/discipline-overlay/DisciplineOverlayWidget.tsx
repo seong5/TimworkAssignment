@@ -43,14 +43,13 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
     const initial: OverlayLayer[] = overlayableDisciplines.map((d) => {
       const revs = data ? getRevisionsForDiscipline(data, drawingId!, d.key) : []
       const latest = getLatestRevision(revs)
-      const isArchOrMEP =
-        d.key === '건축' || d.key === '배관설비' || d.key === '공조설비' || d.key === '설비'
+      const isArch = d.key === '건축'
       return {
         disciplineKey: d.key,
         disciplineLabel: d.label,
         revisionVersion: latest?.version ?? null,
-        opacity: isArchOrMEP ? 0.8 : 0.6,
-        visible: isArchOrMEP,
+        opacity: isArch ? 0.8 : 0.6,
+        visible: isArch,
       }
     })
     setLayers(initial)
@@ -158,7 +157,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
           </button>
           <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
           <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:text-xl">
-            공종 겹쳐보기 · {drawingName}
+            {drawingName}
           </h1>
           <button
             type="button"

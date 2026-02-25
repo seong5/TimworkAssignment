@@ -109,7 +109,7 @@ export function OverlayLayerTree({
     <div className="flex flex-col gap-0.5 p-1.5 sm:p-2">
       <div className="flex items-center justify-between gap-2 px-2 pb-2">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-          {drawingName} · 레이어
+          {drawingName}
         </h2>
         {onReset && (
           <button
