@@ -136,11 +136,11 @@ export function Breadcrumb({
             <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
               현재 보고 있는 도면
             </span>
-            <p className="text-[11px] font-medium leading-snug text-neutral-800 sm:text-[11px] lg:text-base xl:text-[20px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-base landscape:xl:text-[20px]">
+            <p className="text-[10px] font-medium leading-snug text-neutral-800 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
               {disciplineShort ? (
                 <>
                   <span>"{drawingName}"</span>
-                  <span className="text-[11px] text-indigo-600 sm:text-[11px] lg:text-base xl:text-[20px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-base landscape:xl:text-[20px]">
+                  <span className="text-[10px] text-indigo-600 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
                     {' '}
                     · {disciplineShort}
                     {revisionVersion ? (

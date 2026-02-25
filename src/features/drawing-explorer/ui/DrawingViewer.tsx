@@ -11,7 +11,7 @@ export function DrawingViewer({ imageFilename, alt = '도면' }: DrawingViewerPr
   const src = DRAWINGS_BASE + imageFilename
 
   return (
-    <div className="flex items-start justify-start overflow-auto p-2 sm:p-4">
+    <div className="flex items-start justify-start overflow-auto p-2">
       <img
         src={src}
         alt={alt}
