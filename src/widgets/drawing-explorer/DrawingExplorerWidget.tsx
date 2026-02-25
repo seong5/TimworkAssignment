@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Search } from 'lucide-react'
 import { useProjectData } from '@/entities/project'
 import { SpaceTree, Breadcrumb, DrawingViewer } from '@/features/drawing-explorer'
 import {
@@ -39,6 +40,9 @@ export function DrawingExplorerWidget({
 
   const { data, loading, error } = useProjectData()
   const { selection, setSelection, resetSelection, setDrawingId } = useDrawingExplorerStore()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const searchContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (initialDrawingId && initialDisciplineKey) {
@@ -80,6 +84,61 @@ export function DrawingExplorerWidget({
   const handleSelectDrawing = useCallback(
     (drawingId: string) => setDrawingId(drawingId),
     [setDrawingId],
+  )
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsSearchOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const handleSelectFromSearch = useCallback(
+    (
+      payload:
+        | { type: 'drawing'; drawingId: string; matchLabels: string[] }
+        | { type: 'entry'; drawingId: string; disciplineKey: string; revisionVersion: string | null },
+    ) => {
+      if (!data) return
+      let drawingId: string
+      let disciplineKey: string | null
+      let revisionVersion: string | null
+      if (payload.type === 'entry') {
+        drawingId = payload.drawingId
+        disciplineKey = payload.disciplineKey
+        revisionVersion = payload.revisionVersion
+      } else {
+        drawingId = payload.drawingId
+        const byDiscipline = data.disciplineRevisions[drawingId]
+        disciplineKey = null
+        if (payload.matchLabels.length > 0 && byDiscipline) {
+          const firstMatch = payload.matchLabels[0]
+          const found = Object.entries(byDiscipline).find(
+            ([key, entry]) => (entry?.displayName ?? key) === firstMatch,
+          )
+          if (found) disciplineKey = found[0]
+        }
+        if (!disciplineKey && byDiscipline) {
+          const overlayable = getOverlayableDisciplines(data, drawingId)
+          disciplineKey = overlayable[0]?.key ?? Object.keys(byDiscipline)[0] ?? null
+        }
+        revisionVersion = disciplineKey
+          ? (getLatestRevision(getRevisionsForDiscipline(data, drawingId, disciplineKey))?.version ??
+            null)
+          : null
+      }
+      setSelection({
+        drawingId,
+        disciplineKey,
+        revisionVersion,
+      })
+      setSearchQuery('')
+      setIsSearchOpen(false)
+    },
+    [data, setSelection],
   )
 
   const currentRevisions = useMemo(() => {
@@ -187,6 +246,58 @@ export function DrawingExplorerWidget({
     }
   }, [data, space])
 
+  const filteredSearchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q || !data) return []
+    type DrawingResult = { type: 'drawing'; drawingId: string; name: string; matchLabels: string[] }
+    type EntryResult = {
+      type: 'entry'
+      drawingId: string
+      disciplineKey: string
+      revisionVersion: string | null
+      drawingName: string
+      entryLabel: string
+    }
+    const drawingResults: DrawingResult[] = []
+    const entryResults: EntryResult[] = []
+    for (const id of allowedDrawingIds) {
+      const name = data.drawings[id]?.name ?? id
+      const matchLabels: string[] = []
+      if (name.toLowerCase().includes(q)) {
+        drawingResults.push({ type: 'drawing', drawingId: id, name, matchLabels })
+        continue
+      }
+      const byDiscipline = data.disciplineRevisions[id]
+      if (byDiscipline) {
+        const matchingDisciplineKeys: string[] = []
+        for (const [key, entry] of Object.entries(byDiscipline)) {
+          const label = (entry?.displayName ?? key).toLowerCase()
+          if (label.includes(q)) {
+            matchingDisciplineKeys.push(key)
+          }
+        }
+        if (matchingDisciplineKeys.length > 0) {
+          const groups = getImageEntriesGroupedByDiscipline(data, id)
+          for (const group of groups) {
+            if (!matchingDisciplineKeys.includes(group.disciplineKey)) continue
+            for (const entry of group.entries) {
+              entryResults.push({
+                type: 'entry',
+                drawingId: id,
+                disciplineKey: group.disciplineKey,
+                revisionVersion: entry.revisionVersion,
+                drawingName: name,
+                entryLabel: entry.label,
+              })
+            }
+          }
+        }
+      }
+    }
+    if (entryResults.length > 0) return entryResults
+    return drawingResults
+  }, [allowedDrawingIds, data, searchQuery])
+
   useEffect(() => {
     if (!data || !space || allowedDrawingIds.length === 0) return
     if (selection.drawingId !== null && !allowedDrawingIds.includes(selection.drawingId)) {
@@ -234,22 +345,111 @@ export function DrawingExplorerWidget({
     )
   }
 
+  const showSearchDropdown = isSearchOpen && searchQuery.trim().length > 0
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="shrink-0 text-[10px] text-gray-500 hover:text-gray-700 sm:text-[15px]"
-            aria-label="도면 목록으로"
-          >
-            ← 도면 목록
-          </button>
-          <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
-          <h1 className="min-w-0 truncate text-lg font-bold text-gray-900 sm:text-xl md:text-2xl lg:text-[30px]">
-            {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
-          </h1>
+        <div className="flex min-w-0 flex-col gap-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="shrink-0 text-[10px] text-gray-500 hover:text-gray-700 sm:text-[15px]"
+              aria-label="도면 목록으로"
+            >
+              ← 도면 목록
+            </button>
+            <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
+            <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:text-xl md:text-2xl lg:text-[30px]">
+              {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
+            </h1>
+          </div>
+          <div ref={searchContainerRef} className="relative">
+            <label htmlFor="drawing-search" className="sr-only">
+              도면 검색
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 sm:h-5 sm:w-5" />
+              <input
+                id="drawing-search"
+                type="search"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  setIsSearchOpen(true)
+                }}
+                onFocus={() => setIsSearchOpen(true)}
+                placeholder="도면명 또는 공종으로 검색"
+                className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:py-2 sm:text-base"
+                aria-label="도면 검색"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('')
+                    setIsSearchOpen(false)
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:text-gray-600"
+                  aria-label="검색어 지우기"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            {showSearchDropdown && (
+              <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-60 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                {filteredSearchResults.length === 0 ? (
+                  <p className="px-3 py-4 text-center text-sm text-gray-500">검색 결과가 없습니다.</p>
+                ) : (
+                  <ul className="py-1">
+                    {filteredSearchResults.map((item, idx) =>
+                      item.type === 'entry' ? (
+                        <li key={`${item.drawingId}-${item.disciplineKey}-${item.revisionVersion ?? 'base'}-${idx}`}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleSelectFromSearch({
+                                type: 'entry',
+                                drawingId: item.drawingId,
+                                disciplineKey: item.disciplineKey,
+                                revisionVersion: item.revisionVersion,
+                              })
+                            }
+                            className="flex w-full items-center px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-indigo-50 hover:text-indigo-900"
+                          >
+                            <span className="min-w-0 truncate">{item.entryLabel}</span>
+                          </button>
+                        </li>
+                      ) : (
+                        <li key={item.drawingId}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleSelectFromSearch({
+                                type: 'drawing',
+                                drawingId: item.drawingId,
+                                matchLabels: item.matchLabels,
+                              })
+                            }
+                            className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-indigo-50 hover:text-indigo-900"
+                          >
+                            <span className="min-w-0 truncate">{item.name}</span>
+                            {item.matchLabels.length > 0 && (
+                              <span className="text-xs text-neutral-500">
+                                {item.matchLabels.join(', ')}
+                              </span>
+                            )}
+                          </button>
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
