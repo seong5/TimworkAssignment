@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { FileText, ArrowRightCircle, GitCompare, Layers } from 'lucide-react'
+import { FileText, ArrowRightCircle, GitCompare } from 'lucide-react'
 import { useProjectData } from '@/entities/project'
-import { getRecentDrawingUpdates, getOverlayableDisciplines } from '@/entities/project'
+import { getRecentDrawingUpdates } from '@/entities/project'
 
 export function RecentDrawingsWidget() {
   const { data, loading, error } = useProjectData()
@@ -53,8 +53,6 @@ export function RecentDrawingsWidget() {
           if (item.previousRevisionVersion) {
             compareParams.set('left', item.previousRevisionVersion)
           }
-          const canOverlay =
-            data && getOverlayableDisciplines(data, item.drawingId).length >= 2
 
           return (
             <article
@@ -105,16 +103,6 @@ export function RecentDrawingsWidget() {
                   <GitCompare className="h-3.5 w-3.5" />
                   비교
                 </Link>
-                {canOverlay && (
-                  <Link
-                    to={`/drawing/${item.slug}/overlay?drawing=${encodeURIComponent(item.drawingId)}`}
-                    className="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
-                    title="설비·건축 등 공종 겹쳐보기"
-                  >
-                    <Layers className="h-3.5 w-3.5" />
-                    겹쳐보기
-                  </Link>
-                )}
               </div>
             </article>
           )

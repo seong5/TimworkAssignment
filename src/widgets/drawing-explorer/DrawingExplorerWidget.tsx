@@ -65,6 +65,7 @@ export function DrawingExplorerWidget({
   ])
 
   useEffect(() => {
+    if (initialDrawingId && initialDisciplineKey) return
     if (!data || selection.drawingId !== null) return
     const defaultBySlug = slug ? getDefaultDrawingIdForSlug(slug) : null
     const rootChildIds = getRootChildIds(data)
@@ -72,7 +73,7 @@ export function DrawingExplorerWidget({
     if (defaultDrawingId) {
       setDrawingId(defaultDrawingId)
     }
-  }, [data, slug, selection.drawingId, setDrawingId])
+  }, [data, slug, selection.drawingId, initialDrawingId, initialDisciplineKey, setDrawingId])
 
   const isCurrentLatestRevision = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return false
