@@ -3,8 +3,6 @@ import { useState, useMemo, useEffect } from 'react'
 import { useProjectData } from '@/entities/project'
 import {
   getOverlayableDisciplines,
-  getRevisionsForDiscipline,
-  getLatestRevision,
   getImageEntriesGroupedByDiscipline,
   SPACE_LIST,
 } from '@/entities/project'
@@ -13,6 +11,7 @@ import {
   OverlayLayerTree,
   type OverlayLayer,
 } from '@/features/drawing-explorer'
+import { createInitialOverlayLayers } from '@/features/drawing-explorer/model'
 
 export interface DisciplineOverlayWidgetProps {
   slug: string | undefined
@@ -39,20 +38,8 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
   const [layers, setLayers] = useState<OverlayLayer[]>([])
 
   useEffect(() => {
-    if (!overlayableDisciplines.length) return
-    const initial: OverlayLayer[] = overlayableDisciplines.map((d) => {
-      const revs = data ? getRevisionsForDiscipline(data, drawingId!, d.key) : []
-      const latest = getLatestRevision(revs)
-      const isArch = d.key === '건축'
-      return {
-        disciplineKey: d.key,
-        disciplineLabel: d.label,
-        revisionVersion: latest?.version ?? null,
-        opacity: isArch ? 0.8 : 0.6,
-        visible: isArch,
-      }
-    })
-    setLayers(initial)
+    if (!overlayableDisciplines.length || !drawingId) return
+    setLayers(createInitialOverlayLayers(data ?? null, drawingId, overlayableDisciplines))
   }, [overlayableDisciplines, drawingId, data])
 
   const updateLayer = (disciplineKey: string, patch: Partial<OverlayLayer>) => {
@@ -63,19 +50,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
 
   const handleReset = () => {
     if (!overlayableDisciplines.length || !data || !drawingId) return
-    const initial: OverlayLayer[] = overlayableDisciplines.map((d) => {
-      const revs = getRevisionsForDiscipline(data, drawingId, d.key)
-      const latest = getLatestRevision(revs)
-      const isArch = d.key === '건축'
-      return {
-        disciplineKey: d.key,
-        disciplineLabel: d.label,
-        revisionVersion: latest?.version ?? null,
-        opacity: isArch ? 0.8 : 0.6,
-        visible: isArch,
-      }
-    })
-    setLayers(initial)
+    setLayers(createInitialOverlayLayers(data, drawingId, overlayableDisciplines))
   }
 
   const handleBackToDrawing = () => {

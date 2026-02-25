@@ -14,3 +14,7 @@ export {
   type DrawingTreeData,
   type SpaceItem,
 } from './lib/buildDrawingTreeData'
+export {
+  createInitialOverlayLayers,
+  type OverlayableDiscipline,
+} from './lib/createInitialOverlayLayers'
