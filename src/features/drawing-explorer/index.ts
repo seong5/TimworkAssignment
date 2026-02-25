@@ -12,3 +12,7 @@ export {
   type DisciplineOverlayViewProps,
   type OverlayLayer,
 } from './ui/DisciplineOverlayView'
+export {
+  OverlayLayerTree,
+  type OverlayLayerTreeProps,
+} from './ui/OverlayLayerTree'
