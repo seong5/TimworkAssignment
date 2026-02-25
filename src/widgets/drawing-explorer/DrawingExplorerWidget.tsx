@@ -11,17 +11,16 @@ import {
   getRevisionDescription,
   getRevisionDate,
   getRevisionsForDiscipline,
-  getRootChildIds,
-  getDefaultDrawingIdForSlug,
   getBreadcrumbIds,
-  getDrawingIdsInOrder,
-  getChildDrawingIds,
-  getImageEntriesGroupedByDiscipline,
   getOverlayableDisciplines,
   SPACE_LIST,
-  type DrawingDisciplineGroup,
 } from '@/entities/project'
-import { useDrawingExplorerStore } from '@/features/drawing-explorer/model/drawingExplorerStore'
+import {
+  useDrawingExplorerStore,
+  useDrawingExplorerInit,
+  useDrawingTreeData,
+  useDrawingSearch,
+} from '@/features/drawing-explorer/model'
 
 export interface DrawingExplorerWidgetProps {
   slug: string | undefined
@@ -40,40 +39,35 @@ export function DrawingExplorerWidget({
   const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
 
   const { data, loading, error } = useProjectData()
-  const { selection, setSelection, resetSelection, setDrawingId } = useDrawingExplorerStore()
+  const { selection, setSelection, setDrawingId } = useDrawingExplorerStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const searchContainerRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    if (initialDrawingId && initialDisciplineKey) {
-      setSelection({
-        drawingId: initialDrawingId,
-        disciplineKey: initialDisciplineKey,
-        revisionVersion: initialRevisionVersion ?? null,
-      })
-    } else {
-      resetSelection()
-    }
-  }, [
+  const clearSearchAndClose = useCallback(() => {
+    setSearchQuery('')
+    setIsSearchOpen(false)
+  }, [])
+
+  const { rootDrawing, childDrawings, disciplinesByDrawingId, allowedDrawingIds } =
+    useDrawingTreeData(data, space ?? null)
+
+  useDrawingExplorerInit({
     slug,
     initialDrawingId,
     initialDisciplineKey,
     initialRevisionVersion,
-    setSelection,
-    resetSelection,
-  ])
+    data,
+    allowedDrawingIds,
+    spaceId: space?.id ?? null,
+  })
 
-  useEffect(() => {
-    if (initialDrawingId && initialDisciplineKey) return
-    if (!data || selection.drawingId !== null) return
-    const defaultBySlug = slug ? getDefaultDrawingIdForSlug(slug) : null
-    const rootChildIds = getRootChildIds(data)
-    const defaultDrawingId = defaultBySlug ?? rootChildIds[0] ?? Object.keys(data.drawings)[0]
-    if (defaultDrawingId) {
-      setDrawingId(defaultDrawingId)
-    }
-  }, [data, slug, selection.drawingId, initialDrawingId, initialDisciplineKey, setDrawingId])
+  const { filteredSearchResults, handleSelectFromSearch } = useDrawingSearch(
+    data,
+    allowedDrawingIds,
+    searchQuery,
+    clearSearchAndClose,
+  )
 
   const isCurrentLatestRevision = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return false
@@ -97,56 +91,6 @@ export function DrawingExplorerWidget({
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  const handleSelectFromSearch = useCallback(
-    (
-      payload:
-        | { type: 'drawing'; drawingId: string; matchLabels: string[] }
-        | {
-            type: 'entry'
-            drawingId: string
-            disciplineKey: string
-            revisionVersion: string | null
-          },
-    ) => {
-      if (!data) return
-      let drawingId: string
-      let disciplineKey: string | null
-      let revisionVersion: string | null
-      if (payload.type === 'entry') {
-        drawingId = payload.drawingId
-        disciplineKey = payload.disciplineKey
-        revisionVersion = payload.revisionVersion
-      } else {
-        drawingId = payload.drawingId
-        const byDiscipline = data.disciplineRevisions[drawingId]
-        disciplineKey = null
-        if (payload.matchLabels.length > 0 && byDiscipline) {
-          const firstMatch = payload.matchLabels[0]
-          const found = Object.entries(byDiscipline).find(
-            ([key, entry]) => (entry?.displayName ?? key) === firstMatch,
-          )
-          if (found) disciplineKey = found[0]
-        }
-        if (!disciplineKey && byDiscipline) {
-          const overlayable = getOverlayableDisciplines(data, drawingId)
-          disciplineKey = overlayable[0]?.key ?? Object.keys(byDiscipline)[0] ?? null
-        }
-        revisionVersion = disciplineKey
-          ? (getLatestRevision(getRevisionsForDiscipline(data, drawingId, disciplineKey))
-              ?.version ?? null)
-          : null
-      }
-      setSelection({
-        drawingId,
-        disciplineKey,
-        revisionVersion,
-      })
-      setSearchQuery('')
-      setIsSearchOpen(false)
-    },
-    [data, setSelection],
-  )
 
   const currentRevisions = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return []
@@ -197,120 +141,6 @@ export function DrawingExplorerWidget({
       data ? Object.fromEntries(Object.entries(data.drawings).map(([id, d]) => [id, d.name])) : {},
     [data],
   )
-
-  const { rootDrawing, childDrawings, disciplinesByDrawingId, allowedDrawingIds } = useMemo(() => {
-    if (!data) {
-      return {
-        rootDrawing: null as { id: string; name: string } | null,
-        childDrawings: [] as { id: string; name: string }[],
-        disciplinesByDrawingId: {} as Record<string, DrawingDisciplineGroup[]>,
-        allowedDrawingIds: [] as string[],
-      }
-    }
-    if (space) {
-      const rootId = space.id
-      const childIds = getChildDrawingIds(data, rootId)
-      const rootDrawing: { id: string; name: string } = {
-        id: rootId,
-        name: data.drawings[rootId].name,
-      }
-      const childDrawings = childIds.map((id) => ({
-        id,
-        name: data.drawings[id].name,
-      }))
-      const allDrawingIds = [rootId, ...childIds]
-      const disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]> = {}
-      for (const id of allDrawingIds) {
-        disciplinesByDrawingId[id] = getImageEntriesGroupedByDiscipline(data, id)
-      }
-      return {
-        rootDrawing,
-        childDrawings,
-        disciplinesByDrawingId,
-        allowedDrawingIds: allDrawingIds,
-      }
-    }
-    const ids = getDrawingIdsInOrder(data)
-    const rootId = ids[0] ?? null
-    const childIds = ids.filter((id) => data.drawings[id].parent === rootId)
-    const rootDrawing: { id: string; name: string } | null = rootId
-      ? { id: rootId, name: data.drawings[rootId].name }
-      : null
-    const childDrawings = childIds.map((id) => ({
-      id,
-      name: data.drawings[id].name,
-    }))
-    const allDrawingIds = rootId ? [rootId, ...childIds] : childIds
-    const disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]> = {}
-    for (const id of allDrawingIds) {
-      disciplinesByDrawingId[id] = getImageEntriesGroupedByDiscipline(data, id)
-    }
-    return {
-      rootDrawing,
-      childDrawings,
-      disciplinesByDrawingId,
-      allowedDrawingIds: allDrawingIds,
-    }
-  }, [data, space])
-
-  const filteredSearchResults = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase()
-    if (!q || !data) return []
-    type DrawingResult = { type: 'drawing'; drawingId: string; name: string; matchLabels: string[] }
-    type EntryResult = {
-      type: 'entry'
-      drawingId: string
-      disciplineKey: string
-      revisionVersion: string | null
-      drawingName: string
-      entryLabel: string
-    }
-    const drawingResults: DrawingResult[] = []
-    const entryResults: EntryResult[] = []
-    for (const id of allowedDrawingIds) {
-      const name = data.drawings[id]?.name ?? id
-      const matchLabels: string[] = []
-      if (name.toLowerCase().includes(q)) {
-        drawingResults.push({ type: 'drawing', drawingId: id, name, matchLabels })
-        continue
-      }
-      const byDiscipline = data.disciplineRevisions[id]
-      if (byDiscipline) {
-        const matchingDisciplineKeys: string[] = []
-        for (const [key, entry] of Object.entries(byDiscipline)) {
-          const label = (entry?.displayName ?? key).toLowerCase()
-          if (label.includes(q)) {
-            matchingDisciplineKeys.push(key)
-          }
-        }
-        if (matchingDisciplineKeys.length > 0) {
-          const groups = getImageEntriesGroupedByDiscipline(data, id)
-          for (const group of groups) {
-            if (!matchingDisciplineKeys.includes(group.disciplineKey)) continue
-            for (const entry of group.entries) {
-              entryResults.push({
-                type: 'entry',
-                drawingId: id,
-                disciplineKey: group.disciplineKey,
-                revisionVersion: entry.revisionVersion,
-                drawingName: name,
-                entryLabel: entry.label,
-              })
-            }
-          }
-        }
-      }
-    }
-    if (entryResults.length > 0) return entryResults
-    return drawingResults
-  }, [allowedDrawingIds, data, searchQuery])
-
-  useEffect(() => {
-    if (!data || !space || allowedDrawingIds.length === 0) return
-    if (selection.drawingId !== null && !allowedDrawingIds.includes(selection.drawingId)) {
-      setDrawingId(space.id)
-    }
-  }, [allowedDrawingIds, data, selection.drawingId, setDrawingId, space])
 
   if (!slug || !space) {
     return (
@@ -400,10 +230,7 @@ export function DrawingExplorerWidget({
                     {searchQuery && (
                       <button
                         type="button"
-                        onClick={() => {
-                          setSearchQuery('')
-                          setIsSearchOpen(false)
-                        }}
+                        onClick={clearSearchAndClose}
                         className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:text-gray-600"
                         aria-label="검색어 지우기"
                       >
@@ -556,6 +383,7 @@ export function DrawingExplorerWidget({
                 disciplinesByDrawingId={disciplinesByDrawingId}
                 selectedDrawingId={selection.drawingId}
                 selectedDisciplineKey={selection.disciplineKey}
+                selectedRevisionVersion={selection.revisionVersion}
                 onSelectDrawing={handleSelectDrawing}
                 onSelectImage={handleSelectImage}
               />
