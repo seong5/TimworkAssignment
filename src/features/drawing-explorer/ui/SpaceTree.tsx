@@ -26,7 +26,9 @@ function RevisionList({
               <ImageIcon className="h-3 w-3 shrink-0 text-gray-400 sm:h-3.5 sm:w-3.5" />
               <span className="min-w-0 flex-1 truncate">
                 {entry.label}
-                {entry.date && <span className="ml-1 text-neutral-500 sm:ml-1.5">· {entry.date}</span>}
+                {entry.date && (
+                  <span className="ml-1 text-neutral-500 sm:ml-1.5">· {entry.date}</span>
+                )}
               </span>
               {entry.isLatest && (
                 <span
@@ -88,7 +90,7 @@ export function SpaceTree({
   const renderDisciplineLevel = (drawingId: string) => {
     const groups = disciplinesByDrawingId[drawingId] ?? []
     return (
-      <div className="ml-3 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-4 sm:pl-2">
+      <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2">
         {groups.map((group) => {
           const nodeKey = disciplineNodeKey(drawingId, group.disciplineKey)
           const isExpanded = expandedDisciplineKeys.has(nodeKey)

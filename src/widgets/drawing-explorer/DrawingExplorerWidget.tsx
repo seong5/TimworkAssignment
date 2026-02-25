@@ -29,12 +29,7 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
   const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
 
   const { data, loading, error } = useProjectData()
-  const {
-    selection,
-    setSelection,
-    resetSelection,
-    setDrawingId,
-  } = useDrawingExplorerStore()
+  const { selection, setSelection, resetSelection, setDrawingId } = useDrawingExplorerStore()
 
   useEffect(() => {
     resetSelection()
@@ -65,17 +60,11 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
 
   const currentRevisions = useMemo(() => {
     if (!data || !selection.drawingId || !selection.disciplineKey) return []
-    return getRevisionsForDiscipline(
-      data,
-      selection.drawingId,
-      selection.disciplineKey,
-    )
+    return getRevisionsForDiscipline(data, selection.drawingId, selection.disciplineKey)
   }, [data, selection.drawingId, selection.disciplineKey])
 
   const canCompare =
-    !!selection.drawingId &&
-    !!selection.disciplineKey &&
-    currentRevisions.length >= 1
+    !!selection.drawingId && !!selection.disciplineKey && currentRevisions.length >= 1
 
   const handleEnterCompare = useCallback(() => {
     if (!slug || !selection.drawingId || !selection.disciplineKey) return
@@ -195,7 +184,9 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
   if (error || !data) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-red-600 sm:text-base">데이터를 불러올 수 없습니다. {error?.message}</p>
+        <p className="text-center text-sm text-red-600 sm:text-base">
+          데이터를 불러올 수 없습니다. {error?.message}
+        </p>
         <button
           type="button"
           onClick={() => navigate('/')}
@@ -214,7 +205,7 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="shrink-0 text-base text-gray-500 hover:text-gray-700 sm:text-[20px]"
+            className="shrink-0 text-[10px] text-gray-500 hover:text-gray-700 sm:text-[15px]"
             aria-label="도면 목록으로"
           >
             ← 도면 목록
@@ -227,11 +218,10 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* PC 이상: 좌측 사이드바 트리 */}
-        <aside className="hidden w-72 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block xl:w-80">
+        <aside className="hidden w-50 shrink-0 overflow-y-auto border-r border-gray-200 bg-white lg:block sm:w-60">
           <div className="py-2">
             <h2 className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-              공간(건물)
+              {space.displayName}
             </h2>
             <SpaceTree
               rootDrawing={rootDrawing}
@@ -272,7 +262,7 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
                     selection.revisionVersion,
                   )}
                   trailing={
-                    (isCurrentLatestRevision || canCompare) ? (
+                    isCurrentLatestRevision || canCompare ? (
                       <div className="flex flex-wrap items-center gap-2">
                         {isCurrentLatestRevision && (
                           <span
@@ -286,7 +276,7 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
                           <button
                             type="button"
                             onClick={handleEnterCompare}
-                            className="rounded-lg bg-indigo-600 px-2.5 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 sm:px-3 sm:text-sm"
+                            className="rounded-lg bg-indigo-600 px-2.5 py-1.5 text-[10px] font-medium text-white hover:bg-indigo-700 sm:text-[15px]"
                           >
                             리비전 비교
                           </button>
@@ -305,13 +295,12 @@ export function DrawingExplorerWidget({ slug }: DrawingExplorerWidgetProps) {
             <div className="flex flex-1 items-center justify-center p-4 sm:p-6">
               <p className="text-center text-sm text-gray-500 sm:text-base">
                 <span className="lg:hidden">하단 트리에서 </span>
-                공간(도면)을 선택하세요. 상단 브레드크럼과 컨텍스트 바에서 현재 위치와
-                공종·리비전을 확인·선택할 수 있습니다.
+                공간(도면)을 선택하세요. 상단 브레드크럼과 컨텍스트 바에서 현재 위치와 공종·리비전을
+                확인·선택할 수 있습니다.
               </p>
             </div>
           )}
 
-          {/* 모바일/태블릿: 하단 트리 영역 */}
           <section className="border-t border-gray-200 bg-white/90 px-2 py-2 shadow-inner sm:px-3 sm:py-3 lg:hidden">
             <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               공간(건물)
