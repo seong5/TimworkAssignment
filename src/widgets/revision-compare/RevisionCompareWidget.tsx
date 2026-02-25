@@ -3,7 +3,10 @@ import { useMemo } from 'react'
 import { useProjectData } from '@/entities/project'
 import { getRevisionsForDiscipline, SPACE_LIST } from '@/entities/project'
 import { RevisionCompareView } from '@/features/drawing-explorer'
-import { useCompareVersions } from '@/features/drawing-explorer/model'
+import {
+  useCompareVersions,
+  getRevisionComparePanels,
+} from '@/features/drawing-explorer/model'
 
 export interface RevisionCompareWidgetProps {
   slug: string | undefined
@@ -34,6 +37,28 @@ export function RevisionCompareWidget({
     initialLeft,
     initialRight,
   })
+
+  const { leftPanel, rightPanel } = useMemo(() => {
+    if (!data || !drawingId || !disciplineKey) {
+      const empty = {
+        imageFilename: null as string | null,
+        label: '기본',
+        date: null as string | null,
+        description: null as string | null,
+        changes: [] as string[],
+        alt: '',
+      }
+      return { leftPanel: empty, rightPanel: empty }
+    }
+    return getRevisionComparePanels({
+      data,
+      drawingId,
+      disciplineKey,
+      leftVersion: compareLeft,
+      rightVersion: compareRight,
+      drawingName: data.drawings[drawingId]?.name ?? '도면',
+    })
+  }, [data, drawingId, disciplineKey, compareLeft, compareRight])
 
   const handleBackToDrawing = () => {
     navigate(`/drawing/${slug}`)
@@ -171,14 +196,7 @@ export function RevisionCompareWidget({
       </div>
 
       <main className="flex min-h-0 flex-1 overflow-auto">
-        <RevisionCompareView
-          data={data}
-          drawingId={drawingId}
-          disciplineKey={disciplineKey}
-          leftVersion={compareLeft}
-          rightVersion={compareRight}
-          drawingName={drawingName}
-        />
+        <RevisionCompareView leftPanel={leftPanel} rightPanel={rightPanel} />
       </main>
     </div>
   )

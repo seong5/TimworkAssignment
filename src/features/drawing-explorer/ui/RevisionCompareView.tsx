@@ -1,15 +1,10 @@
-import type { NormalizedProjectData, NormalizedRevision } from '@/entities/project'
-import { getImageForRevision, getRevisionsForDiscipline } from '@/entities/project'
+import type { RevisionComparePanel } from '../model/lib/getRevisionComparePanels'
 
 const DRAWINGS_BASE = '/data/drawings/'
 
 export interface RevisionCompareViewProps {
-  data: NormalizedProjectData
-  drawingId: string
-  disciplineKey: string
-  leftVersion: string | null
-  rightVersion: string | null
-  drawingName?: string
+  leftPanel: RevisionComparePanel
+  rightPanel: RevisionComparePanel
 }
 
 function ComparePanel({
@@ -19,14 +14,7 @@ function ComparePanel({
   description,
   changes,
   alt,
-}: {
-  imageFilename: string | null
-  label: string
-  date?: string | null
-  description?: string
-  changes?: string[]
-  alt: string
-}) {
+}: RevisionComparePanel) {
   const src = imageFilename ? DRAWINGS_BASE + imageFilename : null
 
   return (
@@ -79,44 +67,11 @@ function ComparePanel({
   )
 }
 
-export function RevisionCompareView({
-  data,
-  drawingId,
-  disciplineKey,
-  leftVersion,
-  rightVersion,
-  drawingName = '도면',
-}: RevisionCompareViewProps) {
-  const revisions = getRevisionsForDiscipline(data, drawingId, disciplineKey)
-  const leftRev: NormalizedRevision | null =
-    leftVersion === null ? null : (revisions.find((r) => r.version === leftVersion) ?? null)
-  const rightRev: NormalizedRevision | null =
-    rightVersion === null ? null : (revisions.find((r) => r.version === rightVersion) ?? null)
-
-  const leftImage = getImageForRevision(data, drawingId, disciplineKey, leftVersion)
-  const rightImage = getImageForRevision(data, drawingId, disciplineKey, rightVersion)
-
-  const leftLabel = leftVersion == null ? '기본' : leftVersion
-  const rightLabel = rightVersion == null ? '기본' : rightVersion
-
+export function RevisionCompareView({ leftPanel, rightPanel }: RevisionCompareViewProps) {
   return (
     <div className="grid grid-cols-1 gap-3 overflow-auto p-2 sm:gap-4 sm:p-4 lg:grid-cols-2">
-      <ComparePanel
-        imageFilename={leftImage}
-        label={leftLabel}
-        date={leftRev?.date}
-        description={leftRev?.description}
-        changes={leftRev?.changes}
-        alt={`${drawingName} - ${leftLabel}`}
-      />
-      <ComparePanel
-        imageFilename={rightImage}
-        label={rightLabel}
-        date={rightRev?.date}
-        description={rightRev?.description}
-        changes={rightRev?.changes}
-        alt={`${drawingName} - ${rightLabel}`}
-      />
+      <ComparePanel {...leftPanel} />
+      <ComparePanel {...rightPanel} />
     </div>
   )
 }

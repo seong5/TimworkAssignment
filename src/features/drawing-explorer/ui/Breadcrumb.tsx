@@ -1,19 +1,11 @@
 import { ChevronRight, Home, MapPin, Map, Layers, GitCommit } from 'lucide-react'
-
-type CrumbType = 'space' | 'discipline' | 'revision'
-
-interface CrumbItem {
-  id: string
-  name: string
-  type: CrumbType
-}
+import type { CrumbItem } from '../model/lib/buildBreadcrumbPath'
 
 export interface BreadcrumbProps {
-  pathIds: string[]
-  drawingNames: Record<string, string>
-  drawingId: string | null
+  path: CrumbItem[]
+  drawingName: string | null
+  disciplineShort: string | null
   onSelectDrawing: (id: string) => void
-  disciplineLabel?: string | null
   revisionVersion?: string | null
   revisionDate?: string | null
   revisionChanges?: string[]
@@ -22,35 +14,16 @@ export interface BreadcrumbProps {
 }
 
 export function Breadcrumb({
-  pathIds,
-  drawingNames,
-  drawingId,
+  path,
+  drawingName,
+  disciplineShort,
   onSelectDrawing,
-  disciplineLabel = null,
   revisionVersion = null,
   revisionDate = null,
   revisionChanges = [],
   revisionDescription = null,
   trailing,
 }: BreadcrumbProps) {
-  const spaceCrumbs: CrumbItem[] = pathIds.map((id) => ({
-    id,
-    name: drawingNames[id] ?? id,
-    type: 'space' as const,
-  }))
-
-  const path: CrumbItem[] = [...spaceCrumbs]
-  if (disciplineLabel) path.push({ id: 'discipline', name: disciplineLabel, type: 'discipline' })
-  if (revisionVersion)
-    path.push({
-      id: 'revision',
-      name: revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion,
-      type: 'revision',
-    })
-
-  const drawingName = drawingId ? (drawingNames[drawingId] ?? null) : null
-  const disciplineShort = disciplineLabel ? disciplineLabel.split(' > ')[0] : null
-
   return (
     <div className="flex flex-col gap-1 sm:gap-1 lg:gap-1.5 landscape:gap-1.5 landscape:sm:gap-2">
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-1.5 lg:gap-2 landscape:gap-2">

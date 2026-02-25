@@ -20,6 +20,7 @@ import {
   useDrawingExplorerInit,
   useDrawingTreeData,
   useDrawingSearch,
+  buildBreadcrumbPath,
 } from '@/features/drawing-explorer/model'
 
 export interface DrawingExplorerWidgetProps {
@@ -140,6 +141,36 @@ export function DrawingExplorerWidget({
     () =>
       data ? Object.fromEntries(Object.entries(data.drawings).map(([id, d]) => [id, d.name])) : {},
     [data],
+  )
+  const breadcrumbData = useMemo(
+    () =>
+      buildBreadcrumbPath({
+        pathIds: breadcrumbPathIds,
+        drawingNames,
+        drawingId: selection.drawingId,
+        disciplineLabel:
+          data && selection.drawingId
+            ? getDisciplineLabel(data, selection.drawingId, selection.disciplineKey)
+            : null,
+        revisionVersion: selection.revisionVersion,
+        revisionDate:
+          data && selection.drawingId
+            ? getRevisionDate(
+                data,
+                selection.drawingId,
+                selection.disciplineKey,
+                selection.revisionVersion,
+              )
+            : null,
+      }),
+    [
+      breadcrumbPathIds,
+      drawingNames,
+      selection.drawingId,
+      selection.disciplineKey,
+      selection.revisionVersion,
+      data,
+    ],
   )
 
   if (!slug || !space) {
@@ -295,15 +326,10 @@ export function DrawingExplorerWidget({
                   )}
                 </div>
                 <Breadcrumb
-                  pathIds={breadcrumbPathIds}
-                  drawingNames={drawingNames}
-                  drawingId={selection.drawingId}
+                  path={breadcrumbData.path}
+                  drawingName={breadcrumbData.drawingName}
+                  disciplineShort={breadcrumbData.disciplineShort}
                   onSelectDrawing={handleSelectDrawing}
-                  disciplineLabel={getDisciplineLabel(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                  )}
                   revisionVersion={selection.revisionVersion}
                   revisionDate={getRevisionDate(
                     data,

@@ -18,6 +18,19 @@ export {
   createInitialOverlayLayers,
   type OverlayableDiscipline,
 } from './lib/createInitialOverlayLayers'
+export {
+  getRevisionComparePanels,
+  type RevisionComparePanel,
+  type GetRevisionComparePanelsParams,
+  type RevisionComparePanels,
+} from './lib/getRevisionComparePanels'
+export {
+  buildBreadcrumbPath,
+  type CrumbItem,
+  type CrumbType,
+  type BuildBreadcrumbPathParams,
+  type BreadcrumbPathResult,
+} from './lib/buildBreadcrumbPath'
 export { getDefaultCompareRight } from './lib/getDefaultCompareVersions'
 export {
   useCompareVersions,
