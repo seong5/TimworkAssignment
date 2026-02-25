@@ -182,6 +182,8 @@ export interface DrawingDisciplineGroup {
   disciplineKey: string
   label: string
   entries: DrawingImageEntry[]
+  /** 구조.A, 구조.B 등 부모 하위 항목 (라벨은 A, B로 단축) */
+  subGroups?: DrawingDisciplineGroup[]
 }
 
 export function getImageEntriesGroupedByDiscipline(
@@ -195,12 +197,48 @@ export function getImageEntriesGroupedByDiscipline(
     list.push(e)
     byKey.set(e.disciplineKey, list)
   }
-  const result: DrawingDisciplineGroup[] = []
-  for (const [disciplineKey, list] of byKey.entries()) {
-    const dispEntry = getEntry(data, drawingId, disciplineKey)
-    const label = dispEntry?.displayName ?? disciplineKey
-    result.push({ disciplineKey, label, entries: list })
+
+  const byDrawing = data.disciplineRevisions[drawingId]
+  if (!byDrawing) return []
+
+  const allKeys = Object.keys(byDrawing)
+  const regionKeys = allKeys.filter((k) => k.includes('.'))
+  const parentToChildren = new Map<string, string[]>()
+  for (const rk of regionKeys) {
+    const dot = rk.indexOf('.')
+    if (dot <= 0) continue
+    const parent = rk.slice(0, dot)
+    if (!parentToChildren.has(parent)) parentToChildren.set(parent, [])
+    parentToChildren.get(parent)!.push(rk)
   }
+
+  const result: DrawingDisciplineGroup[] = []
+
+  for (const key of allKeys) {
+    if (key.includes('.')) continue
+    const list = byKey.get(key) ?? []
+    const dispEntry = getEntry(data, drawingId, key)
+    const label = dispEntry?.displayName ?? key
+
+    const childKeys = parentToChildren.get(key)
+    let subGroups: DrawingDisciplineGroup[] | undefined
+    if (childKeys && childKeys.length > 0) {
+      subGroups = childKeys
+        .sort((a, b) => a.localeCompare(b))
+        .map((ck) => {
+          const childList = byKey.get(ck) ?? []
+          const childDisp = getEntry(data, drawingId, ck)
+          const fullLabel = childDisp?.displayName ?? ck
+          const shortLabel = fullLabel.includes(' > ') ? fullLabel.split(' > ').pop() ?? fullLabel : ck.split('.').pop() ?? ck
+          return { disciplineKey: ck, label: shortLabel, entries: childList }
+        })
+        .filter((sg) => sg.entries.length > 0)
+      if (subGroups.length === 0) subGroups = undefined
+    }
+
+    result.push({ disciplineKey: key, label, entries: list, subGroups })
+  }
+
   return result.sort((a, b) => a.label.localeCompare(b.label))
 }
 

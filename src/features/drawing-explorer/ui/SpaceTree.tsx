@@ -91,8 +91,18 @@ export function SpaceTree({
     if (selectedDrawingId) {
       setExpandedDrawingId(selectedDrawingId)
       if (selectedDisciplineKey) {
-        const nodeKey = disciplineNodeKey(selectedDrawingId, selectedDisciplineKey)
-        setExpandedDisciplineKeys((prev) => new Set(prev).add(nodeKey))
+        setExpandedDisciplineKeys((prev) => {
+          const next = new Set(prev).add(
+            disciplineNodeKey(selectedDrawingId, selectedDisciplineKey),
+          )
+          const dot = selectedDisciplineKey.indexOf('.')
+          if (dot > 0) {
+            next.add(
+              disciplineNodeKey(selectedDrawingId, selectedDisciplineKey.slice(0, dot)),
+            )
+          }
+          return next
+        })
       }
     }
   }, [selectedDrawingId, selectedDisciplineKey])
@@ -116,12 +126,15 @@ export function SpaceTree({
   const renderDisciplineLevel = (drawingId: string) => {
     const groups = disciplinesByDrawingId[drawingId] ?? []
     return (
-      <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2">
+      <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2 sm:pl-2">
         {groups.map((group) => {
           const nodeKey = disciplineNodeKey(drawingId, group.disciplineKey)
           const isExpanded = expandedDisciplineKeys.has(nodeKey)
           const isDisciplineSelected =
             selectedDrawingId === drawingId && selectedDisciplineKey === group.disciplineKey
+          const hasSubGroups = group.subGroups && group.subGroups.length > 0
+          const hasEntries = group.entries.length > 0
+
           return (
             <div key={group.disciplineKey} className="flex flex-col gap-0.5">
               <button
@@ -141,15 +154,56 @@ export function SpaceTree({
                 <Layers className="h-3 w-3 shrink-0 text-indigo-500 sm:h-3.5 sm:w-3.5" />
                 <span className="min-w-0 flex-1 truncate text-neutral-700">{group.label}</span>
               </button>
-              {isExpanded && group.entries.length > 0 && (
-                <RevisionList
-                  drawingId={drawingId}
-                  disciplineKey={group.disciplineKey}
-                  entries={group.entries}
-                  selectedDisciplineKey={selectedDisciplineKey}
-                  selectedRevisionVersion={selectedRevisionVersion}
-                  onSelectImage={onSelectImage}
-                />
+              {isExpanded && (
+                <>
+                  {hasEntries && (
+                    <RevisionList
+                      drawingId={drawingId}
+                      disciplineKey={group.disciplineKey}
+                      entries={group.entries}
+                      selectedDisciplineKey={selectedDisciplineKey}
+                      selectedRevisionVersion={selectedRevisionVersion}
+                      onSelectImage={onSelectImage}
+                    />
+                  )}
+                  {hasSubGroups &&
+                    group.subGroups!.map((sub) => {
+                      const subNodeKey = disciplineNodeKey(drawingId, sub.disciplineKey)
+                      const isSubExpanded = expandedDisciplineKeys.has(subNodeKey)
+                      const isSubSelected =
+                        selectedDrawingId === drawingId && selectedDisciplineKey === sub.disciplineKey
+                      return (
+                        <div key={sub.disciplineKey} className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2 sm:pl-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDisciplineClick(drawingId, sub.disciplineKey)}
+                            className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-2.5 sm:text-sm ${
+                              isSubSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-100'
+                            }`}
+                          >
+                            <span className="shrink-0 text-gray-500" aria-hidden>
+                              {isSubExpanded ? (
+                                <ChevronDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                              ) : (
+                                <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                              )}
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-neutral-700">{sub.label}</span>
+                          </button>
+                          {isSubExpanded && sub.entries.length > 0 && (
+                            <RevisionList
+                              drawingId={drawingId}
+                              disciplineKey={sub.disciplineKey}
+                              entries={sub.entries}
+                              selectedDisciplineKey={selectedDisciplineKey}
+                              selectedRevisionVersion={selectedRevisionVersion}
+                              onSelectImage={onSelectImage}
+                            />
+                          )}
+                        </div>
+                      )
+                    })}
+                </>
               )}
             </div>
           )
