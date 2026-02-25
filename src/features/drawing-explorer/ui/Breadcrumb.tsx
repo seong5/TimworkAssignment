@@ -17,6 +17,7 @@ export interface BreadcrumbProps {
   revisionVersion?: string | null
   revisionDate?: string | null
   revisionChanges?: string[]
+  revisionDescription?: string | null
   trailing?: React.ReactNode
 }
 
@@ -29,6 +30,7 @@ export function Breadcrumb({
   revisionVersion = null,
   revisionDate = null,
   revisionChanges = [],
+  revisionDescription = null,
   trailing,
 }: BreadcrumbProps) {
   const spaceCrumbs: CrumbItem[] = pathIds.map((id) => ({
@@ -131,45 +133,61 @@ export function Breadcrumb({
         {trailing != null ? <div className="shrink-0">{trailing}</div> : null}
       </div>
       {drawingName && (
-        <div className="rounded-lg border border-neutral-200 bg-white/80 px-2 py-2 shadow-sm sm:px-2.5 sm:py-2.5 lg:rounded-xl lg:px-4 lg:py-4 landscape:px-3 landscape:py-3 landscape:sm:px-4 landscape:sm:py-4">
-          <div className="mb-1.5 sm:mb-1.5 lg:mb-3 landscape:mb-2 landscape:sm:mb-3">
-            <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
-              현재 보고 있는 도면
-            </span>
-            <p className="text-[10px] font-medium leading-snug text-neutral-800 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
-              {disciplineShort ? (
-                <>
-                  <span>"{drawingName}"</span>
-                  <span className="text-[10px] text-indigo-600 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
-                    {' '}
-                    · {disciplineShort}
-                    {revisionVersion ? (
-                      <span>
-                        {' '}
-                        {revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion}
-                      </span>
-                    ) : (
-                      <span> (기본)</span>
-                    )}
-                  </span>
-                </>
-              ) : (
-                <span>"{drawingName}"</span>
-              )}
-            </p>
-          </div>
-          {revisionChanges.length > 0 && (
-            <div>
-              <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:text-[10px] lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
-                변경 사항
+        <div className="overflow-x-auto">
+          <div className="flex min-w-max flex-row gap-4 rounded-lg border border-neutral-200 bg-white/80 px-2 py-2 shadow-sm sm:gap-6 sm:px-2.5 sm:py-2.5 lg:gap-8 lg:rounded-xl lg:px-4 lg:py-4 landscape:gap-4 landscape:px-3 landscape:py-3 landscape:sm:gap-6 landscape:sm:px-4 landscape:sm:py-4">
+            <div className="min-w-0 shrink-0">
+              <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                현재 도면
               </span>
-              <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-[11px] lg:text-sm xl:text-[15px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-sm landscape:xl:text-[15px]">
-                {revisionChanges.map((change, i) => (
-                  <li key={i}>{change}</li>
-                ))}
-              </ul>
+              <p className="text-[10px] font-medium leading-snug text-neutral-800 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
+                {disciplineShort ? (
+                  <>
+                    <span>"{drawingName}"</span>
+                    <span className="text-[10px] text-indigo-600 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
+                      {' '}
+                      · {disciplineShort}
+                      {revisionVersion ? (
+                        <span>
+                          {' '}
+                          {revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion}
+                        </span>
+                      ) : (
+                        <span> (기본)</span>
+                      )}
+                    </span>
+                  </>
+                ) : (
+                  <span>"{drawingName}"</span>
+                )}
+              </p>
             </div>
-          )}
+            {(revisionChanges.length > 0 || (revisionDescription != null && revisionDescription !== '')) && (
+              <>
+                {revisionChanges.length > 0 && (
+                  <div className="min-w-0 shrink-0 border-l border-neutral-200 pl-4 sm:pl-6 landscape:pl-4 landscape:sm:pl-6">
+                    <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                      변경사항
+                    </span>
+                    <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-[11px] lg:text-sm xl:text-[15px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-sm landscape:xl:text-[15px]">
+                      {revisionChanges.map((change, i) => (
+                        <li key={i}>{change}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {revisionDescription != null && revisionDescription !== '' && (
+                  <div className="min-w-0 shrink-0 border-l border-neutral-200 pl-4 sm:pl-6 landscape:pl-4 landscape:sm:pl-6">
+                    <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                      내용
+                    </span>
+                    <p className="mt-0.5 text-[10px] text-neutral-700 sm:text-[11px] lg:text-sm xl:text-[15px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-sm landscape:xl:text-[15px]">
+                      {revisionDescription}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>

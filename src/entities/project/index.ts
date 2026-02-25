@@ -27,6 +27,7 @@ export {
   getImageForSelection,
   getDisciplineLabel,
   getRevisionChanges,
+  getRevisionDescription,
   getRevisionDate,
   SPACE_LIST,
   getDefaultDrawingIdForSlug,

@@ -8,6 +8,7 @@ import {
   getDisciplineLabel,
   getLatestRevision,
   getRevisionChanges,
+  getRevisionDescription,
   getRevisionDate,
   getRevisionsForDiscipline,
   getRootChildIds,
@@ -483,6 +484,12 @@ export function DrawingExplorerWidget({
                     selection.revisionVersion,
                   )}
                   revisionChanges={getRevisionChanges(
+                    data,
+                    selection.drawingId,
+                    selection.disciplineKey,
+                    selection.revisionVersion,
+                  )}
+                  revisionDescription={getRevisionDescription(
                     data,
                     selection.drawingId,
                     selection.disciplineKey,

@@ -250,6 +250,18 @@ export function getRevisionChanges(
   return Array.isArray(rev?.changes) ? rev.changes : []
 }
 
+export function getRevisionDescription(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string | null,
+  revisionVersion: string | null,
+): string | null {
+  if (!drawingId || !disciplineKey || !revisionVersion) return null
+  const revisions = getRevisionsForDiscipline(data, drawingId, disciplineKey)
+  const rev = revisions.find((r) => r.version === revisionVersion)
+  return rev?.description ?? null
+}
+
 export function getRevisionDate(
   data: NormalizedProjectData,
   drawingId: string,
