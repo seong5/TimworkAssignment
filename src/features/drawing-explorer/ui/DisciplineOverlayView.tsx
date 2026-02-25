@@ -35,8 +35,8 @@ export function DisciplineOverlayView({
   }
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-auto p-1.5 sm:p-3 md:p-4">
-      <div className="relative mx-auto aspect-[4/3] w-full min-w-0 max-w-4xl shrink-0">
+    <div className="relative flex flex-col overflow-auto p-1.5 sm:p-3 md:p-4">
+      <div className="relative aspect-[4/3] w-full max-w-4xl shrink-0">
         {visibleLayers.map((layer) => {
           const imageFilename = getImageForRevision(
             data,

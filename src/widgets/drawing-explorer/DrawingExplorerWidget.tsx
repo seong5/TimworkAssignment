@@ -417,9 +417,9 @@ export function DrawingExplorerWidget({
           </section>
         </main>
 
-        <aside className="hidden w-50 shrink-0 overflow-y-auto border-l border-gray-200 bg-white lg:block sm:w-60">
-          <div className="py-2">
-            <h2 className="px-3 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <aside className="hidden w-64 shrink-0 overflow-y-auto border-l border-gray-200 bg-white lg:block lg:w-72">
+          <div className="flex flex-col gap-0.5 p-1.5 sm:p-2">
+            <h2 className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               {space.displayName}
             </h2>
             <SpaceTree
