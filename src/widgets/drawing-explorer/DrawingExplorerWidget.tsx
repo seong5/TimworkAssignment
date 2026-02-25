@@ -386,14 +386,29 @@ export function DrawingExplorerWidget({
               <DrawingViewer
                 imageFilename={getImageForSelection(data, selection)}
                 alt={data.drawings[selection.drawingId].name}
+                emptyPlaceholder={
+                  <div className="flex flex-col items-center gap-4 text-center">
+                    <p className="text-sm text-gray-500 sm:text-base">
+                      상단 검색창에서 공종(건축, 소방 등)으로 검색하거나,
+                    </p>
+                    <p className="text-sm text-gray-500 sm:text-base">
+                      <span className="lg:hidden">하단 트리에서</span>
+                      <span className="hidden lg:inline">우측 트리에서</span>{' '}
+                      공간과 공종을 선택해 도면을 확인하세요.
+                    </p>
+                  </div>
+                }
               />
             </>
           ) : (
-            <div className="flex flex-1 items-center justify-center p-4 sm:p-6">
-              <p className="text-center text-sm text-gray-500 sm:text-base">
-                <span className="lg:hidden">하단 트리에서 </span>
-                공간(도면)을 선택하세요. 상단 브레드크럼과 컨텍스트 바에서 현재 위치와 공종·리비전을
-                확인·선택할 수 있습니다.
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 text-center sm:p-6">
+              <p className="text-sm text-gray-500 sm:text-base">
+                상단 검색창에서 공종(건축, 소방 등)으로 검색하거나,
+              </p>
+              <p className="text-sm text-gray-500 sm:text-base">
+                <span className="lg:hidden">하단 트리에서</span>
+                <span className="hidden lg:inline">우측 트리에서</span>{' '}
+                공간(도면)과 공종을 선택해 보세요.
               </p>
             </div>
           )}
