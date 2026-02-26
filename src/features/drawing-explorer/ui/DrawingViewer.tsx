@@ -1,3 +1,4 @@
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import type { PolygonForRevisionResult } from '@/entities/project'
 import { PolygonImageCanvas } from './PolygonImageCanvas'
 
@@ -26,32 +27,38 @@ export function DrawingViewer({
 
   const src = DRAWINGS_BASE + imageFilename
 
-  if (polygonData && polygonData.verticesInRefSpace.length >= 3) {
-    return (
-      <div className="flex items-start justify-start overflow-auto p-2">
-        <PolygonImageCanvas
-          imageSrc={src}
-          verticesInRefSpace={polygonData.verticesInRefSpace}
-          imageTransform={polygonData.imageTransform}
-          polygonVerticesRaw={polygonData.polygonVerticesRaw}
-          polygonBaseImageSrc={
-            polygonData.polygonBaseImage ? DRAWINGS_BASE + polygonData.polygonBaseImage : undefined
-          }
-          alt={alt}
-          className="max-h-full max-w-full"
-        />
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex flex-1 items-start justify-start overflow-auto p-2">
+  const content =
+    polygonData && polygonData.verticesInRefSpace.length >= 3 ? (
+      <PolygonImageCanvas
+        imageSrc={src}
+        verticesInRefSpace={polygonData.verticesInRefSpace}
+        imageTransform={polygonData.imageTransform}
+        polygonVerticesRaw={polygonData.polygonVerticesRaw}
+        polygonBaseImageSrc={
+          polygonData.polygonBaseImage ? DRAWINGS_BASE + polygonData.polygonBaseImage : undefined
+        }
+        alt={alt}
+        className="max-h-full max-w-full"
+      />
+    ) : (
       <img
         src={src}
         alt={alt}
         className="max-h-full max-w-full object-contain object-left-top"
         loading="lazy"
       />
+    )
+
+  return (
+    <div className="flex flex-1 items-start justify-start overflow-auto p-2">
+      <TransformWrapper initialScale={1} minScale={0.5} maxScale={4}>
+        <TransformComponent
+          wrapperStyle={{ width: '100%', height: '100%', minHeight: '70vh' }}
+          contentStyle={{ width: '100%', height: '100%' }}
+        >
+          {content}
+        </TransformComponent>
+      </TransformWrapper>
     </div>
   )
 }
