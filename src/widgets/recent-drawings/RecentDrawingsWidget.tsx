@@ -4,7 +4,7 @@ import { useProjectData } from '@/entities/project'
 import { getRecentDrawingUpdates } from '@/entities/project'
 
 export function RecentDrawingsWidget() {
-  const { data, loading, error } = useProjectData()
+  const { data, loading, error, refetch } = useProjectData()
 
   const recentUpdates = data ? getRecentDrawingUpdates(data, 6) : []
 
@@ -22,7 +22,25 @@ export function RecentDrawingsWidget() {
   }
 
   if (error || !data) {
-    return null
+    return (
+      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-4">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          최근 변경 도면
+        </h2>
+        <div className="flex flex-col items-center gap-4 py-6">
+          <p className="text-center text-sm text-red-600">
+            데이터를 불러올 수 없습니다. {error?.message}
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+          >
+            다시 시도
+          </button>
+        </div>
+      </section>
+    )
   }
 
   if (recentUpdates.length === 0) {
