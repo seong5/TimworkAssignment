@@ -7,7 +7,7 @@ import { RecentDrawingsWidget } from '@/widgets/recent-drawings'
 import TaLogo from '@/shared/assets/images/Ta-logo.png'
 
 export function SpaceListWidget() {
-  const { project, loading } = useProjectInfo()
+  const { project, loading, error, refetch } = useProjectInfo()
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredSpaces = useMemo(() => {
@@ -32,10 +32,24 @@ export function SpaceListWidget() {
         <p className="mt-2 text-sm text-gray-500 sm:text-base md:text-lg lg:text-[20px]">
           {loading
             ? '…'
-            : project
-              ? `'${project.name}' 프로젝트의 전체 도면을 조회할 수 있습니다.`
-              : '공간을 선택하면 해당 도면을 조회할 수 있습니다.'}
+            : error
+              ? '프로젝트 정보를 불러올 수 없습니다.'
+              : project
+                ? `'${project.name}' 프로젝트의 전체 도면을 조회할 수 있습니다.`
+                : '공간을 선택하면 해당 도면을 조회할 수 있습니다.'}
         </p>
+        {error && (
+          <div className="mt-3 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+            <p className="text-center text-sm text-red-600">{error.message}</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+            >
+              다시 시도
+            </button>
+          </div>
+        )}
       </header>
 
       <main className="mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
