@@ -16,3 +16,8 @@ export {
   OverlayLayerTree,
   type OverlayLayerTreeProps,
 } from './ui/OverlayLayerTree'
+export {
+  DrawingPageHeader,
+  type DrawingPageHeaderProps,
+  type DrawingPageHeaderAction,
+} from './ui/DrawingPageHeader'

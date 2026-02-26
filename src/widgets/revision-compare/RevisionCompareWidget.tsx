@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
 import { useProjectData } from '@/entities/project'
 import { getRevisionsForDiscipline, SPACE_LIST } from '@/entities/project'
-import { RevisionCompareView } from '@/features/drawing-explorer'
+import { RevisionCompareView, DrawingPageHeader } from '@/features/drawing-explorer'
 import {
   useCompareVersions,
   getRevisionComparePanels,
@@ -140,22 +140,12 @@ export function RevisionCompareWidget({
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="shrink-0 text-[10px] text-gray-500 hover:text-gray-700 sm:text-[15px]"
-            aria-label="뒤로가기"
-          >
-            ← 뒤로가기
-          </button>
-          <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
-          <h1 className="min-w-0 truncate text-[10px] font-bold text-gray-900 sm:text-[15px]">
-            리비전 비교 · {drawingName}
-          </h1>
-        </div>
-      </header>
+      <DrawingPageHeader
+        backLabel="뒤로가기"
+        onBack={() => navigate(-1)}
+        title={`리비전 비교 · ${drawingName}`}
+        titleSize="sm"
+      />
 
       <div className="shrink-0 space-y-2 border-b border-neutral-200 bg-neutral-50/80 px-2 py-1.5 sm:space-y-2 sm:px-4 sm:py-2">
         <div className="flex flex-nowrap items-center gap-1 overflow-x-auto">

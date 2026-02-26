@@ -9,6 +9,7 @@ import {
 import {
   DisciplineOverlayView,
   OverlayLayerTree,
+  DrawingPageHeader,
   type OverlayLayer,
 } from '@/features/drawing-explorer'
 import { createInitialOverlayLayers } from '@/features/drawing-explorer/model'
@@ -116,29 +117,19 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="shrink-0 text-sm text-gray-500 hover:text-gray-700 sm:text-base"
-            aria-label="뒤로가기"
-          >
-            ← 뒤로가기
-          </button>
-          <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
-          <h1 className="min-w-0 truncate text-lg font-bold text-gray-900 sm:text-xl">
-            공종 겹쳐보기 · {drawingName}
-          </h1>
-          <button
-            type="button"
-            onClick={handleBackToDrawing}
-            className="shrink-0 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-          >
-            단일로 보기
-          </button>
-        </div>
-      </header>
+      <DrawingPageHeader
+        backLabel="뒤로가기"
+        onBack={() => navigate(-1)}
+        title={`공종 겹쳐보기 · ${drawingName}`}
+        titleSize="md"
+        actions={[
+          {
+            label: '단일로 보기',
+            onClick: handleBackToDrawing,
+            variant: 'neutral',
+          },
+        ]}
+      />
 
       <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
