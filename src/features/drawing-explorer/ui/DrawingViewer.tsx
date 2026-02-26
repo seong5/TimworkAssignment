@@ -51,7 +51,7 @@ export function DrawingViewer({
 
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden p-2">
-      <TransformWrapper initialScale={1} minScale={0.5} maxScale={4}>
+      <TransformWrapper key={imageFilename} initialScale={1} minScale={0.5} maxScale={4}>
         <TransformComponent
           wrapperClass="w-full h-full min-h-0 overflow-hidden"
           wrapperStyle={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
