@@ -160,7 +160,7 @@ export function PolygonImageCanvas({
   }, [img, containerSize, effectiveVertices, imageTransform, opacity])
 
   return (
-    <div ref={containerRef} className={`min-h-[70vh] min-w-full ${className}`}>
+    <div ref={containerRef} className={`h-full min-h-0 w-full min-w-0 ${className}`}>
       <canvas
         ref={canvasRef}
         aria-label={alt}
