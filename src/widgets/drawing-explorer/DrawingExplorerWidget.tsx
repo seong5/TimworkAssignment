@@ -219,19 +219,41 @@ export function DrawingExplorerWidget({
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-3 sm:py-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="shrink-0 text-[10px] text-gray-500 hover:text-gray-700 sm:text-[15px]"
-            aria-label="도면 목록으로"
-          >
-            ← 도면 목록
-          </button>
-          <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
-          <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:text-xl md:text-2xl lg:text-[30px]">
-            {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
-          </h1>
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="shrink-0 text-[10px] text-gray-500 hover:text-gray-700 sm:text-[15px]"
+              aria-label="도면 목록으로"
+            >
+              ← 도면 목록
+            </button>
+            <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
+            <h1 className="min-w-0 flex-1 truncate text-lg font-bold text-gray-900 sm:text-xl md:text-2xl lg:text-[30px]">
+              {selection.drawingId ? data.drawings[selection.drawingId].name : data.project.name}
+            </h1>
+          </div>
+          <nav className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={handleEnterOverlay}
+              disabled={!canOverlay}
+              className="rounded-lg border px-2.5 py-1.5 text-[10px] font-medium transition-colors sm:text-[15px] disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400 sm:border-indigo-200 sm:bg-indigo-50 sm:text-indigo-700 sm:hover:bg-indigo-100 sm:disabled:border-gray-200 sm:disabled:bg-gray-50 sm:disabled:text-gray-400"
+              aria-label="공종 겹쳐보기"
+            >
+              공종 겹쳐보기
+            </button>
+            <button
+              type="button"
+              onClick={handleEnterCompare}
+              disabled={!canCompare}
+              className="rounded-lg border border-indigo-600 bg-indigo-600 px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:text-[15px]"
+              aria-label="리비전 비교"
+            >
+              리비전 비교
+            </button>
+          </nav>
         </div>
       </header>
 
@@ -352,30 +374,6 @@ export function DrawingExplorerWidget({
                       selection.revisionVersion,
                     )}
                     isLatestRevision={isCurrentLatestRevision}
-                    trailing={
-                      canCompare || canOverlay ? (
-                        <div className="flex flex-wrap items-center gap-2">
-                          {canOverlay && (
-                          <button
-                            type="button"
-                            onClick={handleEnterOverlay}
-                            className="rounded-lg border border-indigo-200 bg-indigo-50 px-2.5 py-1.5 text-[10px] font-medium text-indigo-700 hover:bg-indigo-100 sm:text-[15px]"
-                          >
-                            공종 겹쳐보기
-                          </button>
-                        )}
-                        {canCompare && (
-                          <button
-                            type="button"
-                            onClick={handleEnterCompare}
-                            className="rounded-lg bg-indigo-600 px-2.5 py-1.5 text-[10px] font-medium text-white hover:bg-indigo-700 sm:text-[15px]"
-                          >
-                            리비전 비교
-                          </button>
-                        )}
-                      </div>
-                      ) : undefined
-                    }
                   />
                 </div>
               </div>
