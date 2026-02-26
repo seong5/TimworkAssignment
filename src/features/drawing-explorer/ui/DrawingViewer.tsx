@@ -1,5 +1,9 @@
-interface DrawingViewerProps {
+import type { PolygonForRevisionResult } from '@/entities/project'
+import { PolygonImageCanvas } from './PolygonImageCanvas'
+
+export interface DrawingViewerProps {
   imageFilename: string | null
+  polygonData?: PolygonForRevisionResult | null
   alt?: string
   emptyPlaceholder?: React.ReactNode
 }
@@ -8,6 +12,7 @@ const DRAWINGS_BASE = '/data/drawings/'
 
 export function DrawingViewer({
   imageFilename,
+  polygonData,
   alt = '도면',
   emptyPlaceholder,
 }: DrawingViewerProps) {
@@ -21,8 +26,26 @@ export function DrawingViewer({
 
   const src = DRAWINGS_BASE + imageFilename
 
+  if (polygonData && polygonData.verticesInRefSpace.length >= 3) {
+    return (
+      <div className="flex items-start justify-start overflow-auto p-2">
+        <PolygonImageCanvas
+          imageSrc={src}
+          verticesInRefSpace={polygonData.verticesInRefSpace}
+          imageTransform={polygonData.imageTransform}
+          polygonVerticesRaw={polygonData.polygonVerticesRaw}
+          polygonBaseImageSrc={
+            polygonData.polygonBaseImage ? DRAWINGS_BASE + polygonData.polygonBaseImage : undefined
+          }
+          alt={alt}
+          className="max-h-full max-w-full"
+        />
+      </div>
+    )
+  }
+
   return (
-    <div className="flex min-h-0 flex-1 items-start justify-start overflow-auto p-2">
+    <div className="flex flex-1 items-start justify-start overflow-auto p-2">
       <img
         src={src}
         alt={alt}

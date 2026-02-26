@@ -11,6 +11,7 @@ export type {
   DisciplineOption,
 } from './types'
 
+export { getBoundingBox, transformPolygon } from './lib/polygonUtils'
 export {
   DRAWING_PART_LABELS,
   getDrawingPartLabel,
@@ -33,11 +34,13 @@ export {
   getDefaultDrawingIdForSlug,
   getRecentDrawingUpdates,
   getImageTransformForRevision,
+  getPolygonForRevision,
   getOverlayableDisciplines,
 } from './lib/normalizedDrawings'
 export type {
   DrawingImageEntry,
   DrawingDisciplineGroup,
+  PolygonForRevisionResult,
   RecentDrawingUpdate,
 } from './lib/normalizedDrawings'
 

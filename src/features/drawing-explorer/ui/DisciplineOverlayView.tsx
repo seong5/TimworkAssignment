@@ -1,5 +1,7 @@
 import type { NormalizedProjectData } from '@/entities/project'
-import { getImageForRevision } from '@/entities/project'
+import { getImageForRevision, getPolygonForRevision } from '@/entities/project'
+import type { OverlayLayerData } from './OverlayCanvas'
+import { OverlayCanvas } from './OverlayCanvas'
 
 const DRAWINGS_BASE = '/data/drawings/'
 
@@ -28,14 +30,57 @@ export function DisciplineOverlayView({
 
   if (visibleLayers.length === 0) {
     return (
-      <div className="flex min-h-32 flex-1 items-center justify-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-4 text-center text-xs text-neutral-500 sm:min-h-48 sm:rounded-xl sm:p-8 sm:text-sm">
+      <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed border-neutral-200 bg-neutral-50 p-4 text-center text-xs text-neutral-500 sm:rounded-xl sm:p-8 sm:text-sm">
         공종을 선택해 겹쳐보세요.
       </div>
     )
   }
 
+  const overlayLayerData: OverlayLayerData[] = []
+  let allHavePolygon = true
+
+  for (const layer of visibleLayers) {
+    const imageFilename = getImageForRevision(
+      data,
+      drawingId,
+      layer.disciplineKey,
+      layer.revisionVersion,
+    )
+    const polygonData = getPolygonForRevision(
+      data,
+      drawingId,
+      layer.disciplineKey,
+      layer.revisionVersion,
+    )
+    if (!imageFilename) continue
+    if (!polygonData || polygonData.verticesInRefSpace.length < 3) {
+      allHavePolygon = false
+      break
+    }
+    overlayLayerData.push({
+      imageSrc: DRAWINGS_BASE + imageFilename,
+      verticesInRefSpace: polygonData.verticesInRefSpace,
+      imageTransform: polygonData.imageTransform,
+      opacity: layer.opacity,
+    })
+  }
+
+  if (allHavePolygon && overlayLayerData.length > 0) {
+    return (
+      <div className="relative flex flex-col overflow-auto p-1.5 sm:p-3 md:p-4">
+        <div className="relative aspect-[4/3] w-full min-w-0 max-w-4xl shrink-0">
+          <OverlayCanvas
+            layers={overlayLayerData}
+            alt={drawingName}
+            className="absolute inset-0 h-full w-full"
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col overflow-auto p-1.5 sm:p-3 md:p-4">
+    <div className="relative flex flex-1 flex-col overflow-auto p-1.5 sm:p-3 md:p-4">
       <div className="relative aspect-[4/3] w-full min-w-0 max-w-4xl shrink-0">
         {visibleLayers.map((layer) => {
           const imageFilename = getImageForRevision(

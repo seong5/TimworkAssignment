@@ -5,6 +5,7 @@ import { useProjectData } from '@/entities/project'
 import { SpaceTree, Breadcrumb, DrawingViewer } from '@/features/drawing-explorer'
 import {
   getImageForSelection,
+  getPolygonForRevision,
   getDisciplineLabel,
   getLatestRevision,
   getRevisionChanges,
@@ -216,8 +217,8 @@ export function DrawingExplorerWidget({
   const showSearchDropdown = isSearchOpen && searchQuery.trim().length > 0
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
+    <div className="flex h-screen flex-col bg-gray-50">
+      <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-3 sm:py-2">
         <div className="flex min-w-0 items-center gap-2">
           <button
             type="button"
@@ -235,7 +236,7 @@ export function DrawingExplorerWidget({
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
             <>
               <div className="shrink-0 space-y-2 p-2 sm:p-2">
@@ -385,6 +386,16 @@ export function DrawingExplorerWidget({
               </div>
               <DrawingViewer
                 imageFilename={getImageForSelection(data, selection)}
+                polygonData={
+                  selection.disciplineKey
+                    ? getPolygonForRevision(
+                        data,
+                        selection.drawingId,
+                        selection.disciplineKey,
+                        selection.revisionVersion,
+                      )
+                    : null
+                }
                 alt={data.drawings[selection.drawingId].name}
                 emptyPlaceholder={
                   <div className="flex flex-col items-center gap-4 text-center">
@@ -393,8 +404,8 @@ export function DrawingExplorerWidget({
                     </p>
                     <p className="text-sm text-gray-500 sm:text-base">
                       <span className="lg:hidden">하단 트리에서</span>
-                      <span className="hidden lg:inline">우측 트리에서</span>{' '}
-                      공간과 공종을 선택해 도면을 확인하세요.
+                      <span className="hidden lg:inline">우측 트리에서</span> 공간과 공종을 선택해
+                      도면을 확인하세요.
                     </p>
                   </div>
                 }
@@ -407,8 +418,8 @@ export function DrawingExplorerWidget({
               </p>
               <p className="text-sm text-gray-500 sm:text-base">
                 <span className="lg:hidden">하단 트리에서</span>
-                <span className="hidden lg:inline">우측 트리에서</span>{' '}
-                공간(도면)과 공종을 선택해 보세요.
+                <span className="hidden lg:inline">우측 트리에서</span> 공간(도면)과 공종을 선택해
+                보세요.
               </p>
             </div>
           )}

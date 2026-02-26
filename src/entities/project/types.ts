@@ -9,7 +9,6 @@ export interface DisciplineDef {
 }
 
 export interface ImageTransform {
-  relativeTo?: string
   x: number
   y: number
   scale: number
@@ -35,8 +34,9 @@ export interface NormalizedRevision {
   date: string
   description: string
   changes: string[]
+  relativeTo?: string
   imageTransform?: ImageTransform
-  polygon?: { vertices: number[][] }
+  polygon?: { vertices: number[][]; polygonTransform?: ImageTransform }
   polygonTransform?: ImageTransform
 }
 

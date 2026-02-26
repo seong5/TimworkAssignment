@@ -115,7 +115,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
   const drawingName = data.drawings[drawingId].name
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-gray-50">
       <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
         <div className="flex min-w-0 flex-1 items-center gap-2">
           <button
@@ -140,8 +140,8 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
         </div>
       </header>
 
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <DisciplineOverlayView
             data={data}
             drawingId={drawingId}

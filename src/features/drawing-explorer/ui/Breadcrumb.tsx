@@ -107,7 +107,7 @@ export function Breadcrumb({
       </div>
       {drawingName && (
         <div className="overflow-x-auto">
-          <div className="flex min-w-max flex-row gap-4 rounded-lg border border-neutral-200 bg-white/80 px-2 py-2 shadow-sm sm:gap-6 sm:px-2.5 sm:py-2.5 lg:gap-8 lg:rounded-xl lg:px-4 lg:py-4 landscape:gap-4 landscape:px-3 landscape:py-3 landscape:sm:gap-6 landscape:sm:px-4 landscape:sm:py-4">
+          <div className="flex min-w-max flex-row gap-4 rounded-lg border border-neutral-200 bg-white/80 px-2 py-1 shadow-sm sm:gap-6 lg:gap-8 landscape:gap-4 landscape:px-3 landscape:py-3 landscape:sm:gap-6 landscape:sm:px-2 landscape:sm:py-2">
             <div className="min-w-0 shrink-0">
               <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
                 현재 도면
@@ -134,7 +134,8 @@ export function Breadcrumb({
                 )}
               </p>
             </div>
-            {(revisionChanges.length > 0 || (revisionDescription != null && revisionDescription !== '')) && (
+            {(revisionChanges.length > 0 ||
+              (revisionDescription != null && revisionDescription !== '')) && (
               <>
                 {revisionChanges.length > 0 && (
                   <div className="min-w-0 shrink-0 border-l border-neutral-200 pl-4 sm:pl-6 landscape:pl-4 landscape:sm:pl-6">

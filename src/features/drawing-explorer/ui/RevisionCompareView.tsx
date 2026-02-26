@@ -25,8 +25,8 @@ function ComparePanel({
           <span className="text-[10px] text-neutral-500 sm:text-xs">{date}</span>
         )}
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="flex min-h-0 flex-1 items-start justify-start overflow-auto p-1.5 sm:p-2">
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 items-start justify-start overflow-auto p-1.5 sm:p-2">
           {src ? (
             <img
               src={src}

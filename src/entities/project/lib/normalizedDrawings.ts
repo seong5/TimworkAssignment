@@ -6,6 +6,7 @@ import type {
   DisciplineOption,
   ImageTransform,
 } from '../types'
+import { transformPolygon } from './polygonUtils'
 
 export const DRAWING_PART_LABELS: Record<string, string> = {
   '01': '101동',
@@ -344,9 +345,58 @@ export function getImageTransformForRevision(
     if (!t) return null
     return t
   }
-  const t = entry.imageTransform
+  const t = entry.imageTransform ?? getLatestRevision(entry.revisions)?.imageTransform
   if (!t) return null
   return t
+}
+
+export interface PolygonForRevisionResult {
+  verticesInRefSpace: number[][]
+  imageTransform: ImageTransform
+  /** polygon이 정의된 기준 이미지 (픽셀 좌표). relativeTo와 다를 때 스케일링에 사용 */
+  polygonVerticesRaw?: number[][]
+  polygonBaseImage?: string
+}
+
+/** 특정 리비전의 polygon을 기준 좌표계(reference space)에서 반환. 없으면 null */
+export function getPolygonForRevision(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string,
+  version: string | null,
+): PolygonForRevisionResult | null {
+  const entry = getEntry(data, drawingId, disciplineKey)
+  if (!entry) return null
+
+  const imageTransform = getImageTransformForRevision(data, drawingId, disciplineKey, version)
+  if (!imageTransform) return null
+
+  const rev = version ? entry.revisions.find((r) => r.version === version) : null
+  const latestRev = getLatestRevision(entry.revisions)
+  const polygon = rev?.polygon ?? entry.polygon ?? latestRev?.polygon
+  if (!polygon?.vertices?.length) return null
+
+  const polyTransform =
+    rev?.polygonTransform ??
+    rev?.imageTransform ??
+    polygon.polygonTransform ??
+    entry.imageTransform ??
+    latestRev?.polygonTransform ??
+    latestRev?.imageTransform
+  if (!polyTransform) return null
+
+  const verticesInRefSpace = transformPolygon(polygon.vertices, polyTransform)
+  const polygonBaseImage = rev?.relativeTo ?? entry.relativeTo
+  const currentImage = version
+    ? entry.revisions.find((r) => r.version === version)?.image ?? entry.image
+    : entry.image
+
+  const result: PolygonForRevisionResult = { verticesInRefSpace, imageTransform }
+  if (polygonBaseImage && currentImage && polygonBaseImage !== currentImage) {
+    result.polygonVerticesRaw = polygon.vertices
+    result.polygonBaseImage = polygonBaseImage
+  }
+  return result
 }
 
 /** 겹쳐보기 가능한 공종 목록 (지역 키 제외, relativeTo 기준 정렬) */
