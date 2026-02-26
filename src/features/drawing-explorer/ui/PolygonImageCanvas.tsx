@@ -164,7 +164,7 @@ export function PolygonImageCanvas({
       <canvas
         ref={canvasRef}
         aria-label={alt}
-        className="block w-full h-full object-contain object-left-top"
+        className="block w-full h-full object-contain object-center"
       />
     </div>
   )

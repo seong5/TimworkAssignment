@@ -235,12 +235,12 @@ export function DrawingExplorerWidget({
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden pt-2 sm:pt-3">
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {selection.drawingId ? (
             <>
-              <div className="shrink-0 space-y-2 p-2 sm:p-2">
-                <div ref={searchContainerRef} className="relative max-w-xs sm:max-w-sm">
+              <div className="flex shrink-0 flex-col gap-2 p-2 sm:gap-2 sm:p-2">
+                <div ref={searchContainerRef} className="relative max-w-xs shrink-0 sm:max-w-sm">
                   <label htmlFor="drawing-search" className="sr-only">
                     도면 검색
                   </label>
@@ -326,42 +326,36 @@ export function DrawingExplorerWidget({
                     </div>
                   )}
                 </div>
-                <Breadcrumb
-                  path={breadcrumbData.path}
-                  drawingName={breadcrumbData.drawingName}
-                  disciplineShort={breadcrumbData.disciplineShort}
-                  onSelectDrawing={handleSelectDrawing}
-                  revisionVersion={selection.revisionVersion}
-                  revisionDate={getRevisionDate(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                    selection.revisionVersion,
-                  )}
-                  revisionChanges={getRevisionChanges(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                    selection.revisionVersion,
-                  )}
-                  revisionDescription={getRevisionDescription(
-                    data,
-                    selection.drawingId,
-                    selection.disciplineKey,
-                    selection.revisionVersion,
-                  )}
-                  trailing={
-                    isCurrentLatestRevision || canCompare || canOverlay ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        {isCurrentLatestRevision && (
-                          <span
-                            className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 sm:px-2.5 sm:py-1"
-                            title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
-                          >
-                            ★ 최신 도면
-                          </span>
-                        )}
-                        {canOverlay && (
+                <div className="min-w-0">
+                  <Breadcrumb
+                    path={breadcrumbData.path}
+                    drawingName={breadcrumbData.drawingName}
+                    disciplineShort={breadcrumbData.disciplineShort}
+                    onSelectDrawing={handleSelectDrawing}
+                    revisionVersion={selection.revisionVersion}
+                    revisionDate={getRevisionDate(
+                      data,
+                      selection.drawingId,
+                      selection.disciplineKey,
+                      selection.revisionVersion,
+                    )}
+                    revisionChanges={getRevisionChanges(
+                      data,
+                      selection.drawingId,
+                      selection.disciplineKey,
+                      selection.revisionVersion,
+                    )}
+                    revisionDescription={getRevisionDescription(
+                      data,
+                      selection.drawingId,
+                      selection.disciplineKey,
+                      selection.revisionVersion,
+                    )}
+                    isLatestRevision={isCurrentLatestRevision}
+                    trailing={
+                      canCompare || canOverlay ? (
+                        <div className="flex flex-wrap items-center gap-2">
+                          {canOverlay && (
                           <button
                             type="button"
                             onClick={handleEnterOverlay}
@@ -380,9 +374,10 @@ export function DrawingExplorerWidget({
                           </button>
                         )}
                       </div>
-                    ) : undefined
-                  }
-                />
+                      ) : undefined
+                    }
+                  />
+                </div>
               </div>
               <DrawingViewer
                 imageFilename={getImageForSelection(data, selection)}

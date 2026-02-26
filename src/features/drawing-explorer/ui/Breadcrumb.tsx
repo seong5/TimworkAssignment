@@ -10,6 +10,7 @@ export interface BreadcrumbProps {
   revisionDate?: string | null
   revisionChanges?: string[]
   revisionDescription?: string | null
+  isLatestRevision?: boolean
   trailing?: React.ReactNode
 }
 
@@ -22,6 +23,7 @@ export function Breadcrumb({
   revisionDate = null,
   revisionChanges = [],
   revisionDescription = null,
+  isLatestRevision = false,
   trailing,
 }: BreadcrumbProps) {
   return (
@@ -106,19 +108,17 @@ export function Breadcrumb({
         {trailing != null ? <div className="shrink-0">{trailing}</div> : null}
       </div>
       {drawingName && (
-        <div className="overflow-x-auto">
+        <div className="max-w-5xl overflow-x-auto">
           <div className="flex min-w-max flex-row gap-4 rounded-lg border border-neutral-200 bg-white/80 px-2 py-1 shadow-sm sm:gap-6 lg:gap-8 landscape:gap-4 landscape:px-3 landscape:py-3 landscape:sm:gap-6 landscape:sm:px-2 landscape:sm:py-2">
-            <div className="min-w-0 shrink-0">
-              <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
-                현재 도면
-              </span>
-              <p className="text-[10px] font-medium leading-snug text-neutral-800 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
-                {disciplineShort ? (
-                  <>
-                    <span>"{drawingName}"</span>
+            <div className="flex min-w-0 items-start justify-between gap-2 shrink-0">
+              <div>
+                <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                  현재 도면
+                </span>
+                <p className="text-[10px] font-medium leading-snug text-neutral-800 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
+                  {disciplineShort ? (
                     <span className="text-[10px] text-indigo-600 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
-                      {' '}
-                      · {disciplineShort}
+                      {disciplineShort}
                       {revisionVersion ? (
                         <span>
                           {' '}
@@ -128,11 +128,17 @@ export function Breadcrumb({
                         <span> (기본)</span>
                       )}
                     </span>
-                  </>
-                ) : (
-                  <span>"{drawingName}"</span>
-                )}
-              </p>
+                  ) : null}
+                </p>
+              </div>
+              {isLatestRevision && (
+                <span
+                  className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 sm:px-2.5 sm:py-1 sm:text-[10px]"
+                  title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
+                >
+                  ★ 최신 도면
+                </span>
+              )}
             </div>
             {(revisionChanges.length > 0 ||
               (revisionDescription != null && revisionDescription !== '')) && (
