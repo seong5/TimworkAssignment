@@ -4,6 +4,7 @@ import { Building2, MapPin } from 'lucide-react'
 import { SearchBar } from '@/shared/ui'
 import { useProjectInfo, SPACE_LIST } from '@/entities/project'
 import { RecentDrawingsWidget } from '@/widgets/recent-drawings'
+import TaLogo from '@/shared/assets/images/Ta-logo.png'
 
 export function SpaceListWidget() {
   const { project, loading } = useProjectInfo()
@@ -21,10 +22,14 @@ export function SpaceListWidget() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white px-3 py-3 text-center sm:px-4 sm:py-4">
-        <h1 className="text-xl font-bold text-gray-900 sm:text-3xl md:text-4xl lg:text-[40px]">
-          {loading ? '…' : (project?.name ?? '도면 탐색')}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 sm:text-base md:text-lg lg:text-[20px]">
+        <Link to="/" className="inline-block" aria-label="TA 홈">
+          <img
+            src={TaLogo}
+            alt="TA"
+            className="mx-auto h-16 w-16 object-contain sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28"
+          />
+        </Link>
+        <p className="mt-2 text-sm text-gray-500 sm:text-base md:text-lg lg:text-[20px]">
           {loading
             ? '…'
             : project
@@ -34,7 +39,7 @@ export function SpaceListWidget() {
       </header>
 
       <main className="mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-4 sm:mb-6">
           <RecentDrawingsWidget />
         </div>
         <div className="mb-4 sm:mb-6">

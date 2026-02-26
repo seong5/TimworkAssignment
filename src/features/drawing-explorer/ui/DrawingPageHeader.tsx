@@ -33,6 +33,7 @@ export function DrawingPageHeader({
     <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-3 sm:py-2">
       <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
         <div className="flex min-w-0 items-center gap-2">
+          <span className="shrink-0 text-gray-300">|</span>
           <button
             type="button"
             onClick={onBack}
