@@ -525,7 +525,8 @@
           "image": "09_주민공동시설_지상1층 평면도_건축_REV1.jpeg",
           "date": "2024-01-15",
           "description": "초기 설계",
-          "changes": []
+          "changes": [],
+          "polygon": { "vertices": [] }
         },
         {
           "version": "REV2",

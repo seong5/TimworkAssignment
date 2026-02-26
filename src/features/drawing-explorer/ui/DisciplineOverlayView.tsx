@@ -109,9 +109,16 @@ export function DisciplineOverlayView({
       </div>
     )
 
+  const overlayKey = [
+    drawingId,
+    ...visibleLayers
+      .map((l) => `${l.disciplineKey}-${l.revisionVersion ?? 'base'}`)
+      .sort(),
+  ].join('|')
+
   return (
     <div className="flex min-h-0 flex-1 overflow-hidden p-1.5 sm:p-3 md:p-4">
-      <TransformWrapper key={drawingId} initialScale={1} minScale={0.5} maxScale={4}>
+      <TransformWrapper key={overlayKey} initialScale={1} minScale={0.5} maxScale={4}>
         <TransformComponent
           wrapperClass="w-full h-full min-h-0 overflow-hidden"
           wrapperStyle={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
