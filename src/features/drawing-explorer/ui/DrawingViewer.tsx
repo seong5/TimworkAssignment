@@ -50,7 +50,10 @@ export function DrawingViewer({
     )
 
   return (
-    <div className="flex min-h-0 flex-1 p-2 sm:p-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-1 p-2 sm:p-4">
+      <p className="shrink-0 text-[10px] text-gray-500 sm:text-xs">
+        이 구역에서 확대/축소가 가능합니다 (휠로 확대 · 드래그로 이동)
+      </p>
       <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-50">
         <TransformWrapper key={imageFilename} initialScale={1} minScale={0.5} maxScale={4}>
           <TransformComponent
