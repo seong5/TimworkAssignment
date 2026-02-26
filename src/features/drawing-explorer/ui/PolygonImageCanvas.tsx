@@ -47,6 +47,7 @@ export function PolygonImageCanvas({
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [img, setImg] = useState<HTMLImageElement | null>(null)
+  const [imgError, setImgError] = useState(false)
   const [baseImg, setBaseImg] = useState<HTMLImageElement | null>(null)
   const [containerSize, setContainerSize] = useState<{ w: number; h: number } | null>(null)
 
@@ -64,11 +65,20 @@ export function PolygonImageCanvas({
   }, [])
 
   useEffect(() => {
+    setImgError(false)
     const image = new Image()
-    image.onload = () => setImg(image)
+    image.onload = () => {
+      setImg(image)
+      setImgError(false)
+    }
+    image.onerror = () => {
+      setImg(null)
+      setImgError(true)
+    }
     image.src = imageSrc
     return () => {
       image.onload = null
+      image.onerror = null
       image.src = ''
     }
   }, [imageSrc])
@@ -80,9 +90,11 @@ export function PolygonImageCanvas({
     }
     const image = new Image()
     image.onload = () => setBaseImg(image)
+    image.onerror = () => setBaseImg(null)
     image.src = polygonBaseImageSrc
     return () => {
       image.onload = null
+      image.onerror = null
       image.src = ''
       setBaseImg(null)
     }
@@ -158,6 +170,18 @@ export function PolygonImageCanvas({
     ctx.restore()
     ctx.globalAlpha = 1
   }, [img, containerSize, effectiveVertices, imageTransform, opacity])
+
+  if (imgError) {
+    return (
+      <div
+        className={`flex h-full min-h-0 w-full min-w-0 flex-col items-center justify-center gap-2 rounded-lg border border-gray-200 bg-gray-50 p-6 ${className}`}
+        role="img"
+        aria-label={alt}
+      >
+        <p className="text-center text-sm text-gray-500">이미지를 불러올 수 없습니다.</p>
+      </div>
+    )
+  }
 
   return (
     <div ref={containerRef} className={`h-full min-h-0 w-full min-w-0 ${className}`}>
