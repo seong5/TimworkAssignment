@@ -1,3 +1,6 @@
+import { useRef, useCallback } from 'react'
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
+import type { ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch'
 import type { RevisionComparePanel } from '../model/lib/getRevisionComparePanels'
 
 const DRAWINGS_BASE = '/data/drawings/'
@@ -7,15 +10,40 @@ export interface RevisionCompareViewProps {
   rightPanel: RevisionComparePanel
 }
 
-function ComparePanel({
+function ComparePanelContent({
   imageFilename,
   label,
   date,
-  description,
-  changes,
   alt,
-}: RevisionComparePanel) {
+  transformRef,
+  onTransformed,
+  otherRef,
+  syncingRef,
+}: Omit<RevisionComparePanel, 'description' | 'changes'> & {
+  transformRef: React.RefObject<ReactZoomPanPinchContentRef | null>
+  onTransformed: (positionX: number, positionY: number, scale: number) => void
+  otherRef: React.RefObject<ReactZoomPanPinchContentRef | null>
+  syncingRef: React.MutableRefObject<boolean>
+}) {
   const src = imageFilename ? DRAWINGS_BASE + imageFilename : null
+
+  const handleTransformed = useCallback(
+    (_ref: ReactZoomPanPinchContentRef, state: { scale: number; positionX: number; positionY: number }) => {
+      if (syncingRef.current) {
+        syncingRef.current = false
+        return
+      }
+      onTransformed(state.positionX, state.positionY, state.scale)
+      syncingRef.current = true
+      otherRef.current?.setTransform(
+        state.positionX,
+        state.positionY,
+        state.scale,
+        0,
+      )
+    },
+    [onTransformed, otherRef, syncingRef],
+  )
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm sm:gap-3">
@@ -25,40 +53,41 @@ function ComparePanel({
           <span className="text-[10px] text-neutral-500 sm:text-xs">{date}</span>
         )}
       </div>
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex flex-1 items-start justify-start overflow-auto p-1.5 sm:p-2">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="relative flex min-h-0 flex-1 overflow-hidden p-1.5 sm:p-2">
           {src ? (
-            <img
-              src={src}
-              alt={alt}
-              className="max-h-full max-w-full object-contain object-left-top"
-              loading="lazy"
-            />
+            <div className="min-h-0 flex-1 overflow-hidden">
+            <TransformWrapper
+              ref={transformRef}
+              key={imageFilename ?? 'empty'}
+              initialScale={1}
+              minScale={0.5}
+              maxScale={4}
+              onTransformed={handleTransformed}
+            >
+              <TransformComponent
+                wrapperClass="w-full h-full min-h-0 overflow-hidden"
+                wrapperStyle={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
+                contentStyle={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <img
+                  src={src}
+                  alt={alt}
+                  className="max-h-full max-w-full object-contain object-center"
+                  loading="lazy"
+                />
+              </TransformComponent>
+            </TransformWrapper>
+            </div>
           ) : (
             <div className="flex h-24 w-full items-center justify-center rounded-lg bg-neutral-50 text-xs text-neutral-500 sm:h-32 sm:text-sm">
               이미지 없음
-            </div>
-          )}
-        </div>
-        <div className="shrink-0 space-y-1.5 border-t border-neutral-100 px-3 py-2 sm:space-y-2 sm:px-4 sm:py-3">
-          {description != null && description !== '' && (
-            <div>
-              <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                설명
-              </span>
-              <p className="text-xs text-neutral-700 sm:text-sm">{description}</p>
-            </div>
-          )}
-          {Array.isArray(changes) && changes.length > 0 && (
-            <div>
-              <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                변경 사항
-              </span>
-              <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-xs text-neutral-700 sm:text-sm">
-                {changes.map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ul>
             </div>
           )}
         </div>
@@ -68,10 +97,28 @@ function ComparePanel({
 }
 
 export function RevisionCompareView({ leftPanel, rightPanel }: RevisionCompareViewProps) {
+  const leftRef = useRef<ReactZoomPanPinchContentRef | null>(null)
+  const rightRef = useRef<ReactZoomPanPinchContentRef | null>(null)
+  const syncingRef = useRef(false)
+
+  const noop = useCallback(() => {}, [])
+
   return (
     <div className="grid grid-cols-1 gap-3 overflow-auto p-2 sm:gap-4 sm:p-4 lg:grid-cols-2">
-      <ComparePanel {...leftPanel} />
-      <ComparePanel {...rightPanel} />
+      <ComparePanelContent
+        {...leftPanel}
+        transformRef={leftRef}
+        onTransformed={noop}
+        otherRef={rightRef}
+        syncingRef={syncingRef}
+      />
+      <ComparePanelContent
+        {...rightPanel}
+        transformRef={rightRef}
+        onTransformed={noop}
+        otherRef={leftRef}
+        syncingRef={syncingRef}
+      />
     </div>
   )
 }

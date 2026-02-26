@@ -157,42 +157,86 @@ export function RevisionCompareWidget({
         </div>
       </header>
 
-      <div className="shrink-0 flex flex-nowrap items-center gap-1 overflow-x-auto border-b border-neutral-200 bg-neutral-50/80 px-2 py-1.5 sm:gap-2 sm:px-4 sm:py-2">
-        <span className="shrink-0 text-[10px] font-semibold text-neutral-500 sm:text-xs">기준</span>
-        <select
-          value={compareLeft ?? ''}
-          onChange={(e) => setCompareLeft(e.target.value || null)}
-          className="min-w-0 shrink basis-16 rounded border border-neutral-200 bg-white px-1.5 py-0.5 text-[9px] sm:basis-auto sm:rounded-md sm:px-2 sm:py-1 sm:text-[10px]"
-          aria-label="비교 기준 리비전"
-        >
-          <option value="">기본</option>
-          {currentRevisions.map((r) => (
-            <option key={r.version} value={r.version}>
-              {r.version} ({r.date})
-            </option>
-          ))}
-        </select>
-        <span className="shrink-0 text-[10px] font-semibold text-neutral-500 sm:text-xs">비교</span>
-        <select
-          value={compareRight ?? ''}
-          onChange={(e) => setCompareRight(e.target.value || null)}
-          className="min-w-0 shrink basis-16 rounded border border-neutral-200 bg-white px-1.5 py-0.5 text-[9px] sm:basis-auto sm:rounded-md sm:px-2 sm:py-1 sm:text-[10px]"
-          aria-label="비교 대상 리비전"
-        >
-          <option value="">기본</option>
-          {currentRevisions.map((r) => (
-            <option key={r.version} value={r.version}>
-              {r.version} ({r.date})
-            </option>
-          ))}
-        </select>
-        <button
-          type="button"
-          onClick={handleBackToDrawing}
-          className="shrink-0 rounded border border-neutral-200 bg-white px-2 py-0.5 text-[9px] font-medium text-neutral-700 hover:bg-neutral-50 sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-[10px]"
-        >
-          단일 도면으로 보기
-        </button>
+      <div className="shrink-0 space-y-2 border-b border-neutral-200 bg-neutral-50/80 px-2 py-1.5 sm:space-y-2 sm:px-4 sm:py-2">
+        <div className="flex flex-nowrap items-center gap-1 overflow-x-auto">
+          <span className="shrink-0 text-[10px] font-semibold text-neutral-500 sm:text-xs">기준</span>
+          <select
+            value={compareLeft ?? ''}
+            onChange={(e) => setCompareLeft(e.target.value || null)}
+            className="min-w-0 shrink basis-16 rounded border border-neutral-200 bg-white px-1.5 py-0.5 text-[9px] sm:basis-auto sm:rounded-md sm:px-2 sm:py-1 sm:text-[10px]"
+            aria-label="비교 기준 리비전"
+          >
+            <option value="">기본</option>
+            {currentRevisions.map((r) => (
+              <option key={r.version} value={r.version}>
+                {r.version} ({r.date})
+              </option>
+            ))}
+          </select>
+          <span className="shrink-0 text-[10px] font-semibold text-neutral-500 sm:text-xs">비교</span>
+          <select
+            value={compareRight ?? ''}
+            onChange={(e) => setCompareRight(e.target.value || null)}
+            className="min-w-0 shrink basis-16 rounded border border-neutral-200 bg-white px-1.5 py-0.5 text-[9px] sm:basis-auto sm:rounded-md sm:px-2 sm:py-1 sm:text-[10px]"
+            aria-label="비교 대상 리비전"
+          >
+            <option value="">기본</option>
+            {currentRevisions.map((r) => (
+              <option key={r.version} value={r.version}>
+                {r.version} ({r.date})
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleBackToDrawing}
+            className="shrink-0 rounded border border-neutral-200 bg-white px-2 py-0.5 text-[9px] font-medium text-neutral-700 hover:bg-neutral-50 sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-[10px]"
+          >
+            단일 도면으로 보기
+          </button>
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2">
+            <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+              기준 · 설명
+            </span>
+            <p className="min-h-[1.5em] text-[10px] text-neutral-700 sm:text-xs">
+              {leftPanel.description ?? '—'}
+            </p>
+            {leftPanel.changes.length > 0 && (
+              <>
+                <span className="mt-1 mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+                  변경 사항
+                </span>
+                <ul className="list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-xs">
+                  {leftPanel.changes.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+          <div className="rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2">
+            <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+              비교 · 설명
+            </span>
+            <p className="min-h-[1.5em] text-[10px] text-neutral-700 sm:text-xs">
+              {rightPanel.description ?? '—'}
+            </p>
+            {rightPanel.changes.length > 0 && (
+              <>
+                <span className="mt-1 mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+                  변경 사항
+                </span>
+                <ul className="list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-xs">
+                  {rightPanel.changes.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       <main className="flex flex-1 overflow-auto">
