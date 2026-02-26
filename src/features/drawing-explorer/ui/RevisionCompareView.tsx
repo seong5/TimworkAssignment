@@ -53,37 +53,40 @@ function ComparePanelContent({
           <span className="text-[10px] text-neutral-500 sm:text-xs">{date}</span>
         )}
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="relative flex min-h-0 flex-1 overflow-hidden p-1.5 sm:p-2">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden gap-1">
+        <p className="shrink-0 px-1 text-[10px] text-gray-500 sm:text-xs">
+          이 구역에서 확대/축소가 가능합니다 (휠로 확대 · 드래그로 이동)
+        </p>
+        <div className="relative flex min-h-0 flex-1 p-1.5 sm:p-2">
           {src ? (
-            <div className="min-h-0 flex-1 overflow-hidden">
-            <TransformWrapper
-              ref={transformRef}
-              key={imageFilename ?? 'empty'}
-              initialScale={1}
-              minScale={0.5}
-              maxScale={4}
-              onTransformed={handleTransformed}
-            >
-              <TransformComponent
-                wrapperClass="w-full h-full min-h-0 overflow-hidden"
-                wrapperStyle={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
-                contentStyle={{
-                  width: '100%',
-                  height: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
+            <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border-2 border-gray-200 bg-gray-50">
+              <TransformWrapper
+                ref={transformRef}
+                key={imageFilename ?? 'empty'}
+                initialScale={1}
+                minScale={0.5}
+                maxScale={4}
+                onTransformed={handleTransformed}
               >
-                <img
-                  src={src}
-                  alt={alt}
-                  className="max-h-full max-w-full object-contain object-center"
-                  loading="lazy"
-                />
-              </TransformComponent>
-            </TransformWrapper>
+                <TransformComponent
+                  wrapperClass="w-full h-full min-h-0 overflow-hidden"
+                  wrapperStyle={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
+                  contentStyle={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={alt}
+                    className="max-h-full max-w-full object-contain object-center"
+                    loading="lazy"
+                  />
+                </TransformComponent>
+              </TransformWrapper>
             </div>
           ) : (
             <div className="flex h-24 w-full items-center justify-center rounded-lg bg-neutral-50 text-xs text-neutral-500 sm:h-32 sm:text-sm">
