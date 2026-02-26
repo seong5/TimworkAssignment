@@ -38,19 +38,19 @@ export function DrawingViewer({
           polygonData.polygonBaseImage ? DRAWINGS_BASE + polygonData.polygonBaseImage : undefined
         }
         alt={alt}
-        className="max-h-full max-w-full"
+        className="h-full w-full min-h-0 min-w-0"
       />
     ) : (
       <img
         src={src}
         alt={alt}
-        className="max-h-full max-w-full object-contain object-center"
+        className="h-full w-full object-contain object-center"
         loading="lazy"
       />
     )
 
   return (
-    <div className="flex min-h-0 flex-1 overflow-hidden p-6">
+    <div className="flex min-h-0 flex-1 overflow-hidden p-2 sm:p-4">
       <TransformWrapper key={imageFilename} initialScale={1} minScale={0.5} maxScale={4}>
         <TransformComponent
           wrapperClass="w-full h-full min-h-0 overflow-hidden"
@@ -58,12 +58,11 @@ export function DrawingViewer({
           contentStyle={{
             width: '100%',
             height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            minHeight: 0,
+            minWidth: 0,
           }}
         >
-          {content}
+          <div className="h-full w-full min-h-0 min-w-0">{content}</div>
         </TransformComponent>
       </TransformWrapper>
     </div>
