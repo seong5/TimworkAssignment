@@ -43,9 +43,20 @@ export function buildDrawingTreeData(
       id,
       name: data.drawings[id].name,
     }))
-    const allDrawingIds = [rootId, ...childIds]
+    const rootNode = data.drawings[rootId]
+    const parentId = rootNode?.parent ?? null
+    const parentRevisions = parentId ? data.disciplineRevisions[parentId] : null
+    const hasParentWithImage =
+      parentId != null &&
+      parentRevisions != null &&
+      Object.keys(parentRevisions).filter((k) => !k.includes('.')).length > 0
+    const idsForDisciplines =
+      hasParentWithImage && parentId
+        ? [parentId, rootId, ...childIds]
+        : [rootId, ...childIds]
+    const allDrawingIds = idsForDisciplines
     const disciplinesByDrawingId: Record<string, DrawingDisciplineGroup[]> = {}
-    for (const id of allDrawingIds) {
+    for (const id of idsForDisciplines) {
       disciplinesByDrawingId[id] = getImageEntriesGroupedByDiscipline(data, id)
     }
     return {

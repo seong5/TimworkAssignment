@@ -243,6 +243,13 @@ export function getImageEntriesGroupedByDiscipline(
   return result.sort((a, b) => a.label.localeCompare(b.label))
 }
 
+function getFirstDisciplineKey(data: NormalizedProjectData, drawingId: string): string | null {
+  const byDrawing = data.disciplineRevisions[drawingId]
+  if (!byDrawing) return null
+  const keys = Object.keys(byDrawing).filter((k) => !k.includes('.'))
+  return keys[0] ?? null
+}
+
 export function getImageForSelection(
   data: NormalizedProjectData,
   selection: {
@@ -254,7 +261,8 @@ export function getImageForSelection(
   const { drawingId, disciplineKey, revisionVersion } = selection
   if (!drawingId) return null
 
-  const entry = disciplineKey ? getEntry(data, drawingId, disciplineKey) : null
+  const effectiveKey = disciplineKey ?? getFirstDisciplineKey(data, drawingId)
+  const entry = effectiveKey ? getEntry(data, drawingId, effectiveKey) : null
   if (!entry) return null
 
   if (revisionVersion) {
