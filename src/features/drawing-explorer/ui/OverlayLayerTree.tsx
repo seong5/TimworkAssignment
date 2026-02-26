@@ -157,9 +157,12 @@ export function OverlayLayerTree({
                       onChange={(e) => {
                         const checked = e.target.checked
                         onUpdateLayer(group.disciplineKey, { visible: checked })
-                        if (checked) {
-                          setExpandedDisciplineKeys((prev) => new Set(prev).add(group.disciplineKey))
-                        }
+                        setExpandedDisciplineKeys((prev) => {
+                          const next = new Set(prev)
+                          if (checked) next.add(group.disciplineKey)
+                          else next.delete(group.disciplineKey)
+                          return next
+                        })
                       }}
                       className="h-4 w-4 rounded border-neutral-300"
                     />
