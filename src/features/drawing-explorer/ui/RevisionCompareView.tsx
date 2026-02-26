@@ -1,33 +1,49 @@
-import type { NormalizedProjectData, NormalizedRevision } from '@/entities/project'
-import { getImageForRevision, getRevisionsForDiscipline } from '@/entities/project'
+import { useRef, useCallback } from 'react'
+import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
+import type { ReactZoomPanPinchContentRef } from 'react-zoom-pan-pinch'
+import type { RevisionComparePanel } from '../model/lib/getRevisionComparePanels'
 
 const DRAWINGS_BASE = '/data/drawings/'
 
 export interface RevisionCompareViewProps {
-  data: NormalizedProjectData
-  drawingId: string
-  disciplineKey: string
-  leftVersion: string | null
-  rightVersion: string | null
-  drawingName?: string
+  leftPanel: RevisionComparePanel
+  rightPanel: RevisionComparePanel
 }
 
-function ComparePanel({
+function ComparePanelContent({
   imageFilename,
   label,
   date,
-  description,
-  changes,
   alt,
-}: {
-  imageFilename: string | null
-  label: string
-  date?: string | null
-  description?: string
-  changes?: string[]
-  alt: string
+  transformRef,
+  onTransformed,
+  otherRef,
+  syncingRef,
+}: Omit<RevisionComparePanel, 'description' | 'changes'> & {
+  transformRef: React.RefObject<ReactZoomPanPinchContentRef | null>
+  onTransformed: (positionX: number, positionY: number, scale: number) => void
+  otherRef: React.RefObject<ReactZoomPanPinchContentRef | null>
+  syncingRef: React.MutableRefObject<boolean>
 }) {
   const src = imageFilename ? DRAWINGS_BASE + imageFilename : null
+
+  const handleTransformed = useCallback(
+    (_ref: ReactZoomPanPinchContentRef, state: { scale: number; positionX: number; positionY: number }) => {
+      if (syncingRef.current) {
+        syncingRef.current = false
+        return
+      }
+      onTransformed(state.positionX, state.positionY, state.scale)
+      syncingRef.current = true
+      otherRef.current?.setTransform(
+        state.positionX,
+        state.positionY,
+        state.scale,
+        0,
+      )
+    },
+    [onTransformed, otherRef, syncingRef],
+  )
 
   return (
     <div className="flex flex-col gap-2 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm sm:gap-3">
@@ -38,39 +54,40 @@ function ComparePanel({
         )}
       </div>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="flex min-h-0 flex-1 items-start justify-start overflow-auto p-1.5 sm:p-2">
+        <div className="relative flex min-h-0 flex-1 overflow-hidden p-1.5 sm:p-2">
           {src ? (
-            <img
-              src={src}
-              alt={alt}
-              className="max-h-full max-w-full object-contain object-left-top"
-              loading="lazy"
-            />
+            <div className="min-h-0 flex-1 overflow-hidden">
+            <TransformWrapper
+              ref={transformRef}
+              key={imageFilename ?? 'empty'}
+              initialScale={1}
+              minScale={0.5}
+              maxScale={4}
+              onTransformed={handleTransformed}
+            >
+              <TransformComponent
+                wrapperClass="w-full h-full min-h-0 overflow-hidden"
+                wrapperStyle={{ width: '100%', height: '100%', minHeight: 0, overflow: 'hidden' }}
+                contentStyle={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <img
+                  src={src}
+                  alt={alt}
+                  className="max-h-full max-w-full object-contain object-center"
+                  loading="lazy"
+                />
+              </TransformComponent>
+            </TransformWrapper>
+            </div>
           ) : (
             <div className="flex h-24 w-full items-center justify-center rounded-lg bg-neutral-50 text-xs text-neutral-500 sm:h-32 sm:text-sm">
               이미지 없음
-            </div>
-          )}
-        </div>
-        <div className="shrink-0 space-y-1.5 border-t border-neutral-100 px-3 py-2 sm:space-y-2 sm:px-4 sm:py-3">
-          {description != null && description !== '' && (
-            <div>
-              <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                설명
-              </span>
-              <p className="text-xs text-neutral-700 sm:text-sm">{description}</p>
-            </div>
-          )}
-          {Array.isArray(changes) && changes.length > 0 && (
-            <div>
-              <span className="mb-0.5 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                변경 사항
-              </span>
-              <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-xs text-neutral-700 sm:text-sm">
-                {changes.map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ul>
             </div>
           )}
         </div>
@@ -79,43 +96,28 @@ function ComparePanel({
   )
 }
 
-export function RevisionCompareView({
-  data,
-  drawingId,
-  disciplineKey,
-  leftVersion,
-  rightVersion,
-  drawingName = '도면',
-}: RevisionCompareViewProps) {
-  const revisions = getRevisionsForDiscipline(data, drawingId, disciplineKey)
-  const leftRev: NormalizedRevision | null =
-    leftVersion === null ? null : (revisions.find((r) => r.version === leftVersion) ?? null)
-  const rightRev: NormalizedRevision | null =
-    rightVersion === null ? null : (revisions.find((r) => r.version === rightVersion) ?? null)
+export function RevisionCompareView({ leftPanel, rightPanel }: RevisionCompareViewProps) {
+  const leftRef = useRef<ReactZoomPanPinchContentRef | null>(null)
+  const rightRef = useRef<ReactZoomPanPinchContentRef | null>(null)
+  const syncingRef = useRef(false)
 
-  const leftImage = getImageForRevision(data, drawingId, disciplineKey, leftVersion)
-  const rightImage = getImageForRevision(data, drawingId, disciplineKey, rightVersion)
-
-  const leftLabel = leftVersion == null ? '기본' : leftVersion
-  const rightLabel = rightVersion == null ? '기본' : rightVersion
+  const noop = useCallback(() => {}, [])
 
   return (
     <div className="grid grid-cols-1 gap-3 overflow-auto p-2 sm:gap-4 sm:p-4 lg:grid-cols-2">
-      <ComparePanel
-        imageFilename={leftImage}
-        label={leftLabel}
-        date={leftRev?.date}
-        description={leftRev?.description}
-        changes={leftRev?.changes}
-        alt={`${drawingName} - ${leftLabel}`}
+      <ComparePanelContent
+        {...leftPanel}
+        transformRef={leftRef}
+        onTransformed={noop}
+        otherRef={rightRef}
+        syncingRef={syncingRef}
       />
-      <ComparePanel
-        imageFilename={rightImage}
-        label={rightLabel}
-        date={rightRev?.date}
-        description={rightRev?.description}
-        changes={rightRev?.changes}
-        alt={`${drawingName} - ${rightLabel}`}
+      <ComparePanelContent
+        {...rightPanel}
+        transformRef={rightRef}
+        onTransformed={noop}
+        otherRef={leftRef}
+        syncingRef={syncingRef}
       />
     </div>
   )

@@ -4,7 +4,9 @@ import type {
   DisciplineRevisionEntry,
   NormalizedRevision,
   DisciplineOption,
+  ImageTransform,
 } from '../types'
+import { transformPolygon } from './polygonUtils'
 
 export const DRAWING_PART_LABELS: Record<string, string> = {
   '01': '101동',
@@ -181,6 +183,8 @@ export interface DrawingDisciplineGroup {
   disciplineKey: string
   label: string
   entries: DrawingImageEntry[]
+  /** 구조.A, 구조.B 등 부모 하위 항목 (라벨은 A, B로 단축) */
+  subGroups?: DrawingDisciplineGroup[]
 }
 
 export function getImageEntriesGroupedByDiscipline(
@@ -194,12 +198,48 @@ export function getImageEntriesGroupedByDiscipline(
     list.push(e)
     byKey.set(e.disciplineKey, list)
   }
-  const result: DrawingDisciplineGroup[] = []
-  for (const [disciplineKey, list] of byKey.entries()) {
-    const dispEntry = getEntry(data, drawingId, disciplineKey)
-    const label = dispEntry?.displayName ?? disciplineKey
-    result.push({ disciplineKey, label, entries: list })
+
+  const byDrawing = data.disciplineRevisions[drawingId]
+  if (!byDrawing) return []
+
+  const allKeys = Object.keys(byDrawing)
+  const regionKeys = allKeys.filter((k) => k.includes('.'))
+  const parentToChildren = new Map<string, string[]>()
+  for (const rk of regionKeys) {
+    const dot = rk.indexOf('.')
+    if (dot <= 0) continue
+    const parent = rk.slice(0, dot)
+    if (!parentToChildren.has(parent)) parentToChildren.set(parent, [])
+    parentToChildren.get(parent)!.push(rk)
   }
+
+  const result: DrawingDisciplineGroup[] = []
+
+  for (const key of allKeys) {
+    if (key.includes('.')) continue
+    const list = byKey.get(key) ?? []
+    const dispEntry = getEntry(data, drawingId, key)
+    const label = dispEntry?.displayName ?? key
+
+    const childKeys = parentToChildren.get(key)
+    let subGroups: DrawingDisciplineGroup[] | undefined
+    if (childKeys && childKeys.length > 0) {
+      subGroups = childKeys
+        .sort((a, b) => a.localeCompare(b))
+        .map((ck) => {
+          const childList = byKey.get(ck) ?? []
+          const childDisp = getEntry(data, drawingId, ck)
+          const fullLabel = childDisp?.displayName ?? ck
+          const shortLabel = fullLabel.includes(' > ') ? fullLabel.split(' > ').pop() ?? fullLabel : ck.split('.').pop() ?? ck
+          return { disciplineKey: ck, label: shortLabel, entries: childList }
+        })
+        .filter((sg) => sg.entries.length > 0)
+      if (subGroups.length === 0) subGroups = undefined
+    }
+
+    result.push({ disciplineKey: key, label, entries: list, subGroups })
+  }
+
   return result.sort((a, b) => a.label.localeCompare(b.label))
 }
 
@@ -249,6 +289,18 @@ export function getRevisionChanges(
   return Array.isArray(rev?.changes) ? rev.changes : []
 }
 
+export function getRevisionDescription(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string | null,
+  revisionVersion: string | null,
+): string | null {
+  if (!drawingId || !disciplineKey || !revisionVersion) return null
+  const revisions = getRevisionsForDiscipline(data, drawingId, disciplineKey)
+  const rev = revisions.find((r) => r.version === revisionVersion)
+  return rev?.description ?? null
+}
+
 export function getRevisionDate(
   data: NormalizedProjectData,
   drawingId: string,
@@ -279,6 +331,102 @@ export function getImageForRevision(
   return latest?.image ?? null
 }
 
+export function getImageTransformForRevision(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string,
+  version: string | null,
+): ImageTransform | null {
+  const entry = getEntry(data, drawingId, disciplineKey)
+  if (!entry) return null
+  if (version) {
+    const rev = entry.revisions.find((r) => r.version === version)
+    const t = rev?.imageTransform ?? entry.imageTransform
+    if (!t) return null
+    return t
+  }
+  const t = entry.imageTransform ?? getLatestRevision(entry.revisions)?.imageTransform
+  if (!t) return null
+  return t
+}
+
+export interface PolygonForRevisionResult {
+  verticesInRefSpace: number[][]
+  imageTransform: ImageTransform
+  /** polygon이 정의된 기준 이미지 (픽셀 좌표). relativeTo와 다를 때 스케일링에 사용 */
+  polygonVerticesRaw?: number[][]
+  polygonBaseImage?: string
+}
+
+/** 특정 리비전의 polygon을 기준 좌표계(reference space)에서 반환. 없으면 null */
+export function getPolygonForRevision(
+  data: NormalizedProjectData,
+  drawingId: string,
+  disciplineKey: string,
+  version: string | null,
+): PolygonForRevisionResult | null {
+  const entry = getEntry(data, drawingId, disciplineKey)
+  if (!entry) return null
+
+  const imageTransform = getImageTransformForRevision(data, drawingId, disciplineKey, version)
+  if (!imageTransform) return null
+
+  const rev = version ? entry.revisions.find((r) => r.version === version) : null
+  const latestRev = getLatestRevision(entry.revisions)
+  const polygon = rev?.polygon ?? entry.polygon ?? latestRev?.polygon
+  if (!polygon?.vertices?.length) return null
+
+  const polyTransform =
+    rev?.polygonTransform ??
+    rev?.imageTransform ??
+    polygon.polygonTransform ??
+    entry.imageTransform ??
+    latestRev?.polygonTransform ??
+    latestRev?.imageTransform
+  if (!polyTransform) return null
+
+  const verticesInRefSpace = transformPolygon(polygon.vertices, polyTransform)
+  const polygonBaseImage = rev?.relativeTo ?? entry.relativeTo
+  const currentImage = version
+    ? entry.revisions.find((r) => r.version === version)?.image ?? entry.image
+    : entry.image
+
+  const result: PolygonForRevisionResult = { verticesInRefSpace, imageTransform }
+  if (polygonBaseImage && currentImage && polygonBaseImage !== currentImage) {
+    result.polygonVerticesRaw = polygon.vertices
+    result.polygonBaseImage = polygonBaseImage
+  }
+  return result
+}
+
+/** 겹쳐보기 가능한 공종 목록 (지역 키 제외, relativeTo 기준 정렬) */
+export function getOverlayableDisciplines(
+  data: NormalizedProjectData,
+  drawingId: string,
+): { key: string; label: string; hasImage: boolean }[] {
+  const byDrawing = data.disciplineRevisions[drawingId]
+  if (!byDrawing) return []
+
+  const result: { key: string; label: string; hasImage: boolean }[] = []
+  const prefixKeys = new Set<string>()
+  for (const k of Object.keys(byDrawing)) {
+    const dot = k.indexOf('.')
+    if (dot > 0) prefixKeys.add(k.slice(0, dot))
+  }
+
+  for (const [key, entry] of Object.entries(byDrawing)) {
+    if (key.includes('.')) continue
+    const hasImage = !!(entry.image || (entry.revisions.length > 0 && getLatestRevision(entry.revisions)))
+    if (!hasImage) continue
+    result.push({
+      key,
+      label: entry.displayName ?? key,
+      hasImage,
+    })
+  }
+  return result.sort((a, b) => a.label.localeCompare(b.label))
+}
+
 export const SPACE_LIST: {
   id: string
   slug: string
@@ -292,4 +440,94 @@ export const SPACE_LIST: {
 export function getDefaultDrawingIdForSlug(slug: string): string | null {
   const space = SPACE_LIST.find((s) => s.slug === slug)
   return space?.id ?? null
+}
+
+export interface RecentDrawingUpdate {
+  drawingId: string
+  drawingName: string
+  disciplineKey: string
+  disciplineLabel: string
+  revisionVersion: string
+  previousRevisionVersion: string | null
+  date: string
+  slug: string
+  spaceDisplayName: string
+  changes: string[]
+}
+
+function getSlugForDrawingId(data: NormalizedProjectData, drawingId: string): string {
+  let id: string | null = drawingId
+  while (id) {
+    const space = SPACE_LIST.find((s) => s.id === id)
+    if (space) return space.slug
+    const drawing: DrawingNode | undefined = data.drawings[id]
+    id = drawing?.parent ?? null
+  }
+  return SPACE_LIST[0]?.slug ?? '101building'
+}
+
+/**
+ * 모든 도면이 이미 존재한다고 가정하고,
+ * 현재 날짜와 가장 가까운 리비전 날짜를 가진 도면 하나를 '업데이트된 도면'으로 반환
+ */
+export function getRecentDrawingUpdates(
+  data: NormalizedProjectData,
+  _limit = 12,
+): RecentDrawingUpdate[] {
+  const items: (RecentDrawingUpdate & { dateTs: number })[] = []
+  const today = new Date()
+  const todayStart = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+
+  for (const [drawingId, byDiscipline] of Object.entries(data.disciplineRevisions)) {
+    const drawing = data.drawings[drawingId]
+    const drawingName = drawing?.name ?? drawingId
+
+    const slug = getSlugForDrawingId(data, drawingId)
+    const space = SPACE_LIST.find((s) => s.id === drawingId) ?? SPACE_LIST.find((s) => s.slug === slug)
+    const spaceDisplayName = space?.displayName ?? drawingName
+
+    for (const [disciplineKey, entry] of Object.entries(byDiscipline)) {
+      if (entry.revisions.length === 0) continue
+
+      const latest = getLatestRevision(entry.revisions)
+      if (!latest) continue
+
+      const dateStr = latest.date?.trim() ?? ''
+      const dateTs = dateStr ? Date.parse(dateStr.slice(0, 10)) : 0
+      if (Number.isNaN(dateTs)) continue
+
+      const revsByDate = [...entry.revisions].sort((a, b) => {
+        const ta = (a.date?.trim() ?? '').slice(0, 10) ? Date.parse((a.date ?? '').slice(0, 10)) : 0
+        const tb = (b.date?.trim() ?? '').slice(0, 10) ? Date.parse((b.date ?? '').slice(0, 10)) : 0
+        return (Number.isNaN(tb) ? 0 : tb) - (Number.isNaN(ta) ? 0 : ta)
+      })
+      const latestIdx = revsByDate.findIndex((r) => r.version === latest.version)
+      const prevRev = latestIdx >= 0 && latestIdx + 1 < revsByDate.length ? revsByDate[latestIdx + 1] : null
+      const previousRevisionVersion = prevRev?.version ?? null
+
+      items.push({
+        drawingId,
+        drawingName,
+        disciplineKey,
+        disciplineLabel: entry.displayName ?? disciplineKey,
+        revisionVersion: latest.version,
+        previousRevisionVersion,
+        date: dateStr,
+        dateTs,
+        slug,
+        spaceDisplayName,
+        changes: Array.isArray(latest.changes) ? latest.changes : [],
+      })
+    }
+  }
+
+  if (items.length === 0) return []
+
+  const closest = items.reduce((acc, cur) => {
+    const accDiff = Math.abs(acc.dateTs - todayStart)
+    const curDiff = Math.abs(cur.dateTs - todayStart)
+    return curDiff < accDiff ? cur : acc
+  })
+
+  return [closest].map(({ dateTs, ...rest }) => rest)
 }

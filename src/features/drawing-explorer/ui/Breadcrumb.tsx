@@ -1,54 +1,31 @@
 import { ChevronRight, Home, MapPin, Map, Layers, GitCommit } from 'lucide-react'
-
-type CrumbType = 'space' | 'discipline' | 'revision'
-
-interface CrumbItem {
-  id: string
-  name: string
-  type: CrumbType
-}
+import type { CrumbItem } from '../model/lib/buildBreadcrumbPath'
 
 export interface BreadcrumbProps {
-  pathIds: string[]
-  drawingNames: Record<string, string>
-  drawingId: string | null
+  path: CrumbItem[]
+  drawingName: string | null
+  disciplineShort: string | null
   onSelectDrawing: (id: string) => void
-  disciplineLabel?: string | null
   revisionVersion?: string | null
   revisionDate?: string | null
   revisionChanges?: string[]
+  revisionDescription?: string | null
+  isLatestRevision?: boolean
   trailing?: React.ReactNode
 }
 
 export function Breadcrumb({
-  pathIds,
-  drawingNames,
-  drawingId,
+  path,
+  drawingName,
+  disciplineShort,
   onSelectDrawing,
-  disciplineLabel = null,
   revisionVersion = null,
   revisionDate = null,
   revisionChanges = [],
+  revisionDescription = null,
+  isLatestRevision = false,
   trailing,
 }: BreadcrumbProps) {
-  const spaceCrumbs: CrumbItem[] = pathIds.map((id) => ({
-    id,
-    name: drawingNames[id] ?? id,
-    type: 'space' as const,
-  }))
-
-  const path: CrumbItem[] = [...spaceCrumbs]
-  if (disciplineLabel) path.push({ id: 'discipline', name: disciplineLabel, type: 'discipline' })
-  if (revisionVersion)
-    path.push({
-      id: 'revision',
-      name: revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion,
-      type: 'revision',
-    })
-
-  const drawingName = drawingId ? (drawingNames[drawingId] ?? null) : null
-  const disciplineShort = disciplineLabel ? disciplineLabel.split(' > ')[0] : null
-
   return (
     <div className="flex flex-col gap-1 sm:gap-1 lg:gap-1.5 landscape:gap-1.5 landscape:sm:gap-2">
       <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-1.5 lg:gap-2 landscape:gap-2">
@@ -131,45 +108,66 @@ export function Breadcrumb({
         {trailing != null ? <div className="shrink-0">{trailing}</div> : null}
       </div>
       {drawingName && (
-        <div className="rounded-lg border border-neutral-200 bg-white/80 px-2 py-2 shadow-sm sm:px-2.5 sm:py-2.5 lg:rounded-xl lg:px-4 lg:py-4 landscape:px-3 landscape:py-3 landscape:sm:px-4 landscape:sm:py-4">
-          <div className="mb-1.5 sm:mb-1.5 lg:mb-3 landscape:mb-2 landscape:sm:mb-3">
-            <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
-              현재 보고 있는 도면
-            </span>
-            <p className="text-[11px] font-medium leading-snug text-neutral-800 sm:text-[11px] lg:text-base xl:text-[20px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-base landscape:xl:text-[20px]">
-              {disciplineShort ? (
-                <>
-                  <span>"{drawingName}"</span>
-                  <span className="text-[11px] text-indigo-600 sm:text-[11px] lg:text-base xl:text-[20px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-base landscape:xl:text-[20px]">
-                    {' '}
-                    · {disciplineShort}
-                    {revisionVersion ? (
-                      <span>
-                        {' '}
-                        {revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion}
-                      </span>
-                    ) : (
-                      <span> (기본)</span>
-                    )}
-                  </span>
-                </>
-              ) : (
-                <span>"{drawingName}"</span>
+        <div className="max-w-5xl overflow-x-auto">
+          <div className="flex min-w-max flex-row gap-4 rounded-lg border border-neutral-200 bg-white/80 px-2 py-1 shadow-sm sm:gap-6 lg:gap-8 landscape:gap-4 landscape:px-3 landscape:py-3 landscape:sm:gap-6 landscape:sm:px-2 landscape:sm:py-2">
+            <div className="flex min-w-0 items-start justify-between gap-2 shrink-0">
+              <div>
+                <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:mb-0.5 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                  현재 도면
+                </span>
+                <p className="text-[10px] font-medium leading-snug text-neutral-800 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
+                  {disciplineShort ? (
+                    <span className="text-[10px] text-indigo-600 sm:text-[15px] landscape:text-[10px] landscape:sm:text-[15px]">
+                      {disciplineShort}
+                      {revisionVersion ? (
+                        <span>
+                          {' '}
+                          {revisionDate ? `${revisionVersion} (${revisionDate})` : revisionVersion}
+                        </span>
+                      ) : (
+                        <span> (기본)</span>
+                      )}
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+              {isLatestRevision && (
+                <span
+                  className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 sm:px-2.5 sm:py-1 sm:text-[10px]"
+                  title="현재 보고 있는 도면은 이 공종의 최신 리비전입니다"
+                >
+                  ★ 최신 도면
+                </span>
               )}
-            </p>
-          </div>
-          {revisionChanges.length > 0 && (
-            <div>
-              <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:text-[10px] lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
-                변경 사항
-              </span>
-              <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-[11px] lg:text-sm xl:text-[15px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-sm landscape:xl:text-[15px]">
-                {revisionChanges.map((change, i) => (
-                  <li key={i}>{change}</li>
-                ))}
-              </ul>
             </div>
-          )}
+            {(revisionChanges.length > 0 ||
+              (revisionDescription != null && revisionDescription !== '')) && (
+              <>
+                {revisionChanges.length > 0 && (
+                  <div className="min-w-0 shrink-0 border-l border-neutral-200 pl-4 sm:pl-6 landscape:pl-4 landscape:sm:pl-6">
+                    <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                      변경사항
+                    </span>
+                    <ul className="mt-0.5 list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-[11px] lg:text-sm xl:text-[15px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-sm landscape:xl:text-[15px]">
+                      {revisionChanges.map((change, i) => (
+                        <li key={i}>{change}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {revisionDescription != null && revisionDescription !== '' && (
+                  <div className="min-w-0 shrink-0 border-l border-neutral-200 pl-4 sm:pl-6 landscape:pl-4 landscape:sm:pl-6">
+                    <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400 sm:text-[10px] lg:mb-1 lg:text-[15px] landscape:mb-1 landscape:text-[10px] landscape:sm:text-xs landscape:lg:text-[15px]">
+                      내용
+                    </span>
+                    <p className="mt-0.5 text-[10px] text-neutral-700 sm:text-[11px] lg:text-sm xl:text-[15px] landscape:text-xs landscape:sm:text-sm landscape:lg:text-sm landscape:xl:text-[15px]">
+                      {revisionDescription}
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>

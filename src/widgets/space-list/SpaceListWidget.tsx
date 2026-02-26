@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Building2, MapPin } from 'lucide-react'
 import { SearchBar } from '@/shared/ui'
 import { useProjectInfo, SPACE_LIST } from '@/entities/project'
+import { RecentDrawingsWidget } from '@/widgets/recent-drawings'
 
 export function SpaceListWidget() {
   const { project, loading } = useProjectInfo()
@@ -32,7 +33,10 @@ export function SpaceListWidget() {
         </p>
       </header>
 
-      <main className="mx-auto max-w-4xl px-3 py-6 sm:px-4 sm:py-8">
+      <main className="mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <RecentDrawingsWidget />
+        </div>
         <div className="mb-4 sm:mb-6">
           <SearchBar
             id="space-search"
