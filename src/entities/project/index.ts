@@ -31,6 +31,7 @@ export {
   getRevisionDescription,
   getRevisionDate,
   SPACE_LIST,
+  getSpaceBySlug,
   getDefaultDrawingIdForSlug,
   getRecentDrawingUpdates,
   getImageTransformForRevision,
@@ -42,6 +43,7 @@ export type {
   DrawingDisciplineGroup,
   PolygonForRevisionResult,
   RecentDrawingUpdate,
+  SpaceItem,
 } from './lib/normalizedDrawings'
 
 export { useProjectData } from './model/useProjectData'

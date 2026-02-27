@@ -21,3 +21,7 @@ export {
   type DrawingPageHeaderProps,
   type DrawingPageHeaderAction,
 } from './ui/DrawingPageHeader'
+export {
+  DrawingPageGuard,
+  type DrawingPageGuardProps,
+} from './ui/DrawingPageGuard'

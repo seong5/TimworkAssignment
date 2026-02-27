@@ -1,29 +1,41 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useMemo, useEffect } from 'react'
-import { useProjectData } from '@/entities/project'
 import {
   getOverlayableDisciplines,
   getImageEntriesGroupedByDiscipline,
-  SPACE_LIST,
 } from '@/entities/project'
+import type { NormalizedProjectData } from '@/entities/project'
 import { Button } from '@/shared/ui'
 import {
   DisciplineOverlayView,
   OverlayLayerTree,
   DrawingPageHeader,
+  DrawingPageGuard,
   type OverlayLayer,
 } from '@/features/drawing-explorer'
-import { createInitialOverlayLayers } from '@/features/drawing-explorer/model'
+import {
+  createInitialOverlayLayers,
+  useBackToDrawing,
+} from '@/features/drawing-explorer/model'
 
 export interface DisciplineOverlayWidgetProps {
   slug: string | undefined
   drawingId: string | undefined
 }
 
-export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWidgetProps) {
+interface DisciplineOverlayContentProps {
+  slug: string
+  drawingId: string | undefined
+  data: NormalizedProjectData
+}
+
+function DisciplineOverlayContent({
+  slug,
+  drawingId,
+  data,
+}: DisciplineOverlayContentProps) {
   const navigate = useNavigate()
-  const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
-  const { data, loading, error } = useProjectData()
+  const handleBackToDrawing = useBackToDrawing(slug)
 
   const overlayableDisciplines = useMemo(() => {
     if (!data || !drawingId) return []
@@ -53,42 +65,6 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
   const handleReset = () => {
     if (!overlayableDisciplines.length || !data || !drawingId) return
     setLayers(createInitialOverlayLayers(data, drawingId, overlayableDisciplines))
-  }
-
-  const handleBackToDrawing = () => {
-    navigate(`/drawing/${slug}`)
-  }
-
-  if (!slug || !space) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
-          목록으로
-        </Button>
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <p className="text-sm text-gray-500 sm:text-base">도면 데이터를 불러오는 중…</p>
-      </div>
-    )
-  }
-
-  if (error || !data) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-red-600 sm:text-base">
-          데이터를 불러올 수 없습니다. {error?.message}
-        </p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
-          목록으로
-        </Button>
-      </div>
-    )
   }
 
   if (!drawingId || !data.drawings[drawingId]) {
@@ -140,5 +116,19 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
         </aside>
       </main>
     </div>
+  )
+}
+
+export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWidgetProps) {
+  return (
+    <DrawingPageGuard slug={slug}>
+      {({ slug: resolvedSlug, data }) => (
+        <DisciplineOverlayContent
+          slug={resolvedSlug}
+          drawingId={drawingId}
+          data={data}
+        />
+      )}
+    </DrawingPageGuard>
   )
 }
