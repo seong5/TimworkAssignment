@@ -1,4 +1,5 @@
 import { ChevronRight, Home, MapPin, Map, Layers, GitCommit } from 'lucide-react'
+import { Button } from '@/shared/ui'
 import type { CrumbItem } from '../model/lib/buildBreadcrumbPath'
 
 export interface BreadcrumbProps {
@@ -74,8 +75,8 @@ export function Breadcrumb({
                         </span>
                       </div>
                     ) : isSpace ? (
-                      <button
-                        type="button"
+                      <Button
+                        variant="ghost"
                         onClick={() => onSelectDrawing(item.id)}
                         className="group flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-medium text-neutral-500 transition-all hover:bg-neutral-200/50 hover:text-neutral-900 sm:px-1.5 sm:py-0.5 sm:text-[11px] lg:gap-1.5 lg:rounded-lg lg:px-2.5 lg:py-1.5 lg:text-sm landscape:gap-1 landscape:rounded-lg landscape:px-2 landscape:py-1 landscape:text-xs landscape:sm:gap-1.5 landscape:sm:px-2.5 landscape:sm:py-1.5 landscape:sm:text-sm"
                       >
@@ -85,7 +86,7 @@ export function Breadcrumb({
                         <span className="truncate max-w-[80px] sm:max-w-[100px] lg:max-w-none landscape:max-w-[120px] landscape:sm:max-w-[160px] landscape:lg:max-w-none">
                           {item.name}
                         </span>
-                      </button>
+                      </Button>
                     ) : (
                       <span className="flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-medium text-neutral-600 sm:gap-0.5 sm:px-1.5 sm:py-0.5 sm:text-[11px] lg:gap-1.5 lg:rounded-lg lg:px-2.5 lg:py-1.5 lg:text-sm landscape:gap-1 landscape:rounded-lg landscape:px-2 landscape:py-1 landscape:text-xs landscape:sm:gap-1.5 landscape:sm:px-2.5 landscape:sm:py-1.5 landscape:sm:text-sm">
                         {isDiscipline && (

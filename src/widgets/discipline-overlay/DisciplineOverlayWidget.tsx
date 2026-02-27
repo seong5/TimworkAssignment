@@ -6,6 +6,7 @@ import {
   getImageEntriesGroupedByDiscipline,
   SPACE_LIST,
 } from '@/entities/project'
+import { Button } from '@/shared/ui'
 import {
   DisciplineOverlayView,
   OverlayLayerTree,
@@ -62,13 +63,9 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -87,13 +84,9 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
         <p className="text-center text-sm text-red-600 sm:text-base">
           데이터를 불러올 수 없습니다. {error?.message}
         </p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -102,13 +95,9 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">도면을 선택해 주세요.</p>
-        <button
-          type="button"
-          onClick={handleBackToDrawing}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={handleBackToDrawing}>
           도면 보기로 이동
-        </button>
+        </Button>
       </div>
     )
   }

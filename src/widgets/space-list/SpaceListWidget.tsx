@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Building2, MapPin } from 'lucide-react'
-import { SearchBar } from '@/shared/ui'
+import { Button, SearchBar } from '@/shared/ui'
 import { useProjectInfo, SPACE_LIST } from '@/entities/project'
 import { RecentDrawingsWidget } from '@/widgets/recent-drawings'
 import TaLogo from '@/shared/assets/images/Ta-logo.png'
@@ -41,13 +41,9 @@ export function SpaceListWidget() {
         {error && (
           <div className="mt-3 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
             <p className="text-center text-sm text-red-600">{error.message}</p>
-            <button
-              type="button"
-              onClick={() => refetch()}
-              className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#cc7a00]"
-            >
+            <Button variant="primary" size="sm" onClick={() => refetch()}>
               다시 시도
-            </button>
+            </Button>
           </div>
         )}
       </header>

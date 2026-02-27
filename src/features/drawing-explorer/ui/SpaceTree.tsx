@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon, Layers } from 'lucide-react'
+import { Button } from '@/shared/ui'
 import type { DrawingImageEntry, DrawingDisciplineGroup } from '@/entities/project'
 
 export type { DrawingImageEntry, DrawingDisciplineGroup }
@@ -20,18 +21,20 @@ function RevisionList({
   onSelectImage?: (drawingId: string, disciplineKey: string, revisionVersion: string | null) => void
 }) {
   return (
-    <div className="ml-4 mt-0.5 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80 py-1 shadow-sm sm:ml-6">
-      <ul className="flex flex-col gap-0.5 py-1">
+    <div className="ml-4 mt-0.5 min-w-0 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80 py-1 shadow-sm sm:ml-6">
+      <ul className="flex min-w-0 flex-col gap-0.5 py-1">
         {entries.map((entry, idx) => {
           const isSelected =
             selectedDisciplineKey === disciplineKey &&
             (selectedRevisionVersion ?? null) === (entry.revisionVersion ?? null)
           return (
           <li key={`${entry.disciplineKey}-${entry.revisionVersion ?? 'base'}-${idx}`}>
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth
               onClick={() => onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)}
-              className={`flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:text-sm ${
+              className={`!min-h-0 !px-2 !py-1 flex items-center justify-start gap-1.5 text-left text-xs focus:ring-0 sm:gap-2 sm:!px-3 sm:text-sm ${
                 isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-200'
               }`}
             >
@@ -50,7 +53,7 @@ function RevisionList({
                   최신
                 </span>
               )}
-            </button>
+            </Button>
           </li>
         )})}
       </ul>
@@ -126,7 +129,7 @@ export function SpaceTree({
   const renderDisciplineLevel = (drawingId: string) => {
     const groups = disciplinesByDrawingId[drawingId] ?? []
     return (
-      <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2 sm:pl-2">
+      <div className="ml-1 min-w-0 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2 sm:pl-2">
         {groups.map((group) => {
           const nodeKey = disciplineNodeKey(drawingId, group.disciplineKey)
           const isExpanded = expandedDisciplineKeys.has(nodeKey)
@@ -137,10 +140,11 @@ export function SpaceTree({
 
           return (
             <div key={group.disciplineKey} className="flex flex-col gap-0.5">
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => handleDisciplineClick(drawingId, group.disciplineKey)}
-                className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-2.5 sm:text-sm ${
+                className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-2.5 sm:text-sm ${
                   isDisciplineSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-100'
                 }`}
               >
@@ -153,7 +157,7 @@ export function SpaceTree({
                 </span>
                 <Layers className="h-3 w-3 shrink-0 text-[#3907C7] sm:h-3.5 sm:w-3.5" />
                 <span className="min-w-0 flex-1 truncate text-neutral-700">{group.label}</span>
-              </button>
+              </Button>
               {isExpanded && (
                 <>
                   {hasEntries && (
@@ -174,10 +178,11 @@ export function SpaceTree({
                         selectedDrawingId === drawingId && selectedDisciplineKey === sub.disciplineKey
                       return (
                         <div key={sub.disciplineKey} className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:ml-2 sm:pl-2">
-                          <button
-                            type="button"
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleDisciplineClick(drawingId, sub.disciplineKey)}
-                            className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-2.5 sm:text-sm ${
+                            className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-2.5 sm:text-sm ${
                               isSubSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-100'
                             }`}
                           >
@@ -189,7 +194,7 @@ export function SpaceTree({
                               )}
                             </span>
                             <span className="min-w-0 flex-1 truncate text-neutral-700">{sub.label}</span>
-                          </button>
+                          </Button>
                           {isSubExpanded && sub.entries.length > 0 && (
                             <RevisionList
                               drawingId={drawingId}
@@ -213,14 +218,15 @@ export function SpaceTree({
   }
 
   return (
-    <div className="flex flex-col gap-0.5 p-1.5 sm:p-2">
-      <nav className="flex flex-col gap-0.5" aria-label="공간(건물) 트리">
+    <div className="flex min-h-0 min-w-0 flex-col gap-0.5 p-1.5 sm:p-2">
+      <nav className="flex min-w-0 flex-col gap-0.5" aria-label="공간(건물) 트리">
         {rootDrawing && (
           <div className="flex flex-col gap-0.5">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => handleDrawingClick(rootDrawing.id)}
-              className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
+              className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-3 sm:!py-1.5 sm:text-sm ${
                 selectedDrawingId === rootDrawing.id
                   ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold'
                   : 'hover:bg-gray-100'
@@ -234,23 +240,24 @@ export function SpaceTree({
                 )}
               </span>
               <span className="min-w-0 truncate font-medium">{rootDrawing.name}</span>
-            </button>
+            </Button>
             {expandedDrawingId === rootDrawing.id &&
               (disciplinesByDrawingId[rootDrawing.id]?.length ?? 0) > 0 &&
               renderDisciplineLevel(rootDrawing.id)}
           </div>
         )}
-        <div className="ml-1 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:pl-2">
+        <div className="ml-1 min-w-0 flex flex-col gap-0.5 border-l border-gray-200 pl-1.5 sm:pl-2">
           {childDrawings.map(({ id, name }) => {
             const isSelected = selectedDrawingId === id
             const isExpanded = expandedDrawingId === id
             const hasDisciplines = (disciplinesByDrawingId[id]?.length ?? 0) > 0
             return (
               <div key={id} className="flex flex-col gap-0.5">
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => handleDrawingClick(id)}
-                  className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
+                  className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-3 sm:!py-1.5 sm:text-sm ${
                     isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-100'
                   }`}
                 >
@@ -262,7 +269,7 @@ export function SpaceTree({
                     )}
                   </span>
                   <span className="min-w-0 flex-1 truncate">{name}</span>
-                </button>
+                </Button>
                 {isExpanded && hasDisciplines && renderDisciplineLevel(id)}
               </div>
             )

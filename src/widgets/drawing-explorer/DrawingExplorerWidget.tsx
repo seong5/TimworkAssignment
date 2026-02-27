@@ -1,8 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
+import { Button } from '@/shared/ui'
 import { useProjectData } from '@/entities/project'
-import { SpaceTree, Breadcrumb, DrawingViewer, DrawingPageHeader } from '@/features/drawing-explorer'
+import {
+  SpaceTree,
+  Breadcrumb,
+  DrawingViewer,
+  DrawingPageHeader,
+} from '@/features/drawing-explorer'
 import {
   getImageForSelection,
   getPolygonForRevision,
@@ -178,13 +184,9 @@ export function DrawingExplorerWidget({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -203,13 +205,9 @@ export function DrawingExplorerWidget({
         <p className="text-center text-sm text-red-600 sm:text-base">
           데이터를 불러올 수 없습니다. {error?.message}
         </p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -240,7 +238,7 @@ export function DrawingExplorerWidget({
       />
 
       <div className="flex flex-1 overflow-hidden pt-2 sm:pt-3">
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <main className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden">
           {selection.drawingId ? (
             <>
               <div className="flex shrink-0 flex-col gap-2 p-2 sm:gap-2 sm:p-2">
@@ -264,14 +262,15 @@ export function DrawingExplorerWidget({
                       aria-label="도면 검색"
                     />
                     {searchQuery && (
-                      <button
+                      <Button
+                        variant="ghost"
                         type="button"
                         onClick={clearSearchAndClose}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-gray-400 hover:text-gray-600"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 min-w-0 px-1.5 py-0.5 text-gray-400 hover:text-gray-600"
                         aria-label="검색어 지우기"
                       >
                         ×
-                      </button>
+                      </Button>
                     )}
                   </div>
                   {showSearchDropdown && (
@@ -287,8 +286,9 @@ export function DrawingExplorerWidget({
                               <li
                                 key={`${item.drawingId}-${item.disciplineKey}-${item.revisionVersion ?? 'base'}-${idx}`}
                               >
-                                <button
-                                  type="button"
+                                <Button
+                                  variant="ghost"
+                                  fullWidth
                                   onClick={() =>
                                     handleSelectFromSearch({
                                       type: 'entry',
@@ -297,15 +297,16 @@ export function DrawingExplorerWidget({
                                       revisionVersion: item.revisionVersion,
                                     })
                                   }
-                                  className="flex w-full items-center px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
+                                  className="justify-start px-3 py-2 text-left text-sm text-gray-700 hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
                                 >
                                   <span className="min-w-0 truncate">{item.entryLabel}</span>
-                                </button>
+                                </Button>
                               </li>
                             ) : (
                               <li key={item.drawingId}>
-                                <button
-                                  type="button"
+                                <Button
+                                  variant="ghost"
+                                  fullWidth
                                   onClick={() =>
                                     handleSelectFromSearch({
                                       type: 'drawing',
@@ -313,7 +314,7 @@ export function DrawingExplorerWidget({
                                       matchLabels: item.matchLabels,
                                     })
                                   }
-                                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
+                                  className="flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
                                 >
                                   <span className="min-w-0 truncate">{item.name}</span>
                                   {item.matchLabels.length > 0 && (
@@ -321,7 +322,7 @@ export function DrawingExplorerWidget({
                                       {item.matchLabels.join(', ')}
                                     </span>
                                   )}
-                                </button>
+                                </Button>
                               </li>
                             ),
                           )}
@@ -403,7 +404,7 @@ export function DrawingExplorerWidget({
             <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               공간(건물)
             </h2>
-            <div className="max-h-64 overflow-y-auto rounded-lg border border-gray-200 bg-white">
+            <div className="max-h-64 min-h-0 overflow-y-auto overflow-x-hidden rounded-lg border border-gray-200 bg-white">
               <SpaceTree
                 rootDrawing={rootDrawing}
                 childDrawings={childDrawings}
@@ -418,8 +419,8 @@ export function DrawingExplorerWidget({
           </section>
         </main>
 
-        <aside className="hidden w-64 shrink-0 overflow-y-auto border-l border-gray-200 bg-white lg:block lg:w-72">
-          <div className="flex flex-col gap-0.5 p-1.5 sm:p-2">
+        <aside className="hidden min-h-0 w-64 shrink-0 flex-col overflow-hidden border-l border-gray-200 bg-white lg:flex lg:w-72">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-0.5 overflow-y-auto p-1.5 sm:p-2">
             <h2 className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               {space.displayName}
             </h2>

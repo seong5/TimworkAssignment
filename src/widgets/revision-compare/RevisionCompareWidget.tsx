@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
+import { Button } from '@/shared/ui'
 import { useProjectData } from '@/entities/project'
 import { getRevisionsForDiscipline, SPACE_LIST } from '@/entities/project'
 import { RevisionCompareView, DrawingPageHeader } from '@/features/drawing-explorer'
@@ -68,13 +69,9 @@ export function RevisionCompareWidget({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -93,13 +90,9 @@ export function RevisionCompareWidget({
         <p className="text-center text-sm text-red-600 sm:text-base">
           데이터를 불러올 수 없습니다. {error?.message}
         </p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -110,13 +103,9 @@ export function RevisionCompareWidget({
         <p className="text-center text-sm text-gray-600 sm:text-base">
           비교할 도면과 공종을 선택해 주세요.
         </p>
-        <button
-          type="button"
-          onClick={handleBackToDrawing}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={handleBackToDrawing}>
           도면 보기로 이동
-        </button>
+        </Button>
       </div>
     )
   }
@@ -125,13 +114,9 @@ export function RevisionCompareWidget({
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">존재하지 않는 도면입니다.</p>
-        <button
-          type="button"
-          onClick={handleBackToDrawing}
-          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
-        >
+        <Button variant="primary" size="sm" onClick={handleBackToDrawing}>
           도면 보기로 이동
-        </button>
+        </Button>
       </div>
     )
   }
@@ -177,13 +162,14 @@ export function RevisionCompareWidget({
               </option>
             ))}
           </select>
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleBackToDrawing}
-            className="shrink-0 rounded border border-neutral-200 bg-white px-2 py-0.5 text-[9px] font-medium text-neutral-700 hover:bg-neutral-50 sm:rounded-lg sm:px-3 sm:py-1.5 sm:text-[10px]"
+            className="shrink-0 text-[9px] sm:text-[10px]"
           >
             단일 도면으로 보기
-          </button>
+          </Button>
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div className="rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2">

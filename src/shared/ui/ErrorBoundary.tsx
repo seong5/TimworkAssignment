@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Button } from './Button'
 
 export interface ErrorBoundaryProps {
   children: ReactNode
@@ -58,20 +59,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </details>
             )}
             <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={this.handleReset}
-                className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#cc7a00]"
-              >
+              <Button variant="primary" onClick={this.handleReset}>
                 다시 시도
-              </button>
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-              >
+              </Button>
+              <Button variant="ghost" onClick={() => window.location.reload()}>
                 새로고침
-              </button>
+              </Button>
             </div>
           </div>
         </div>

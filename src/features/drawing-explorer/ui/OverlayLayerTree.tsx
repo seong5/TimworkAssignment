@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, ImageIcon, Layers, RotateCcw } from 'lucide-react'
+import { Button } from '@/shared/ui'
 import type { DrawingImageEntry, DrawingDisciplineGroup } from '@/entities/project'
 import type { OverlayLayer } from './DisciplineOverlayView'
 
@@ -24,10 +25,11 @@ function OverlayRevisionList({
             (layer?.revisionVersion ?? null) === entry.revisionVersion
           return (
             <li key={`${entry.disciplineKey}-${entry.revisionVersion ?? 'base'}-${idx}`}>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                fullWidth
                 onClick={() => onSelectRevision(entry.disciplineKey, entry.revisionVersion)}
-                className={`flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-xs transition-colors hover:bg-gray-200 sm:gap-2 sm:px-3 sm:text-sm ${
+                className={`flex items-center justify-start gap-1.5 px-2 py-1.5 text-left text-xs hover:bg-gray-200 sm:gap-2 sm:px-3 sm:text-sm ${
                   isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : ''
                 }`}
               >
@@ -46,7 +48,7 @@ function OverlayRevisionList({
                     최신
                   </span>
                 )}
-              </button>
+              </Button>
             </li>
           )
         })}
@@ -112,15 +114,15 @@ export function OverlayLayerTree({
           {drawingName}
         </h2>
         {onReset && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            icon={<RotateCcw className="h-3 w-3" />}
             onClick={onReset}
-            className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700 sm:text-xs"
+            className="flex items-center gap-1 rounded px-2 py-1 text-[10px] font-medium text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 sm:text-xs"
             title="겹쳐보기 선택 초기화"
           >
-            <RotateCcw className="h-3 w-3" />
             초기화
-          </button>
+          </Button>
         )}
       </div>
       <nav className="flex flex-col gap-0.5" aria-label="공종 레이어 트리">
@@ -133,10 +135,10 @@ export function OverlayLayerTree({
             return (
               <div key={group.disciplineKey} className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-0.5">
-                  <button
-                    type="button"
+                  <Button
+                    variant="ghost"
                     onClick={() => handleDisciplineClick(group.disciplineKey)}
-                    className="flex flex-1 items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-gray-100 sm:gap-2 sm:px-2.5 sm:text-sm"
+                    className="flex flex-1 items-center justify-start gap-1.5 rounded-md px-2 py-1.5 text-left text-xs hover:bg-gray-100 sm:gap-2 sm:px-2.5 sm:text-sm"
                   >
                     <span className="shrink-0 text-gray-500" aria-hidden>
                       {isExpanded ? (
@@ -149,7 +151,7 @@ export function OverlayLayerTree({
                     <span className="min-w-0 flex-1 truncate text-neutral-700">
                       {group.label}
                     </span>
-                  </button>
+                  </Button>
                   <label className="flex shrink-0 items-center pr-2" title="겹쳐보기에 표시">
                     <input
                       type="checkbox"
