@@ -1,4 +1,5 @@
 # 🏗️ Welcome to TA!
+
 <img width="250" height="250" alt="Ta-logo" src="https://github.com/user-attachments/assets/04150be0-355c-40c1-8060-7230d03766f3" />
 
 Timwokr의 과제전형이라는 의미의 `Timwork-Assignment` 와 </br>
@@ -20,15 +21,15 @@ npm run dev
 
 ## 💻 기술 스택
 
-| 구분 | 기술 |
-|------|------|
-| 언어 | TypeScript |
-| 프레임워크 | React 18+ |
-| 빌드 도구 | Vite |
-| 스타일링 | Tailwind CSS |
-| 라우팅 | React Router |
-| 상태 관리 | Zustand |
-| 데이터 페칭 | TanStack Query |
+| 구분          | 기술                               |
+| ------------- | ---------------------------------- |
+| 언어          | TypeScript                         |
+| 프레임워크    | React 18+                          |
+| 빌드 도구     | Vite                               |
+| 스타일링      | Tailwind CSS                       |
+| 라우팅        | React Router                       |
+| 상태 관리     | Zustand                            |
+| 데이터 페칭   | TanStack Query                     |
 | UI 라이브러리 | react-zoom-pan-pinch, lucide-react |
 
 ## ✅ 구현 기능
@@ -44,7 +45,7 @@ npm run dev
 
 ## ❌ 미완성 기능
 
-- [ ] 에러 바운더리 및 폴백 UI
 - [ ] 로직 분리 (일부만 적용, 전체는 미적용)
 - [ ] 전체 도면 Polygon 좌표 미적용 (일부 도면은 기본 이미지로 렌더링)
 - [ ] 반응형 웹 디테일한 수정 미적용
+- [ ] 테스트 코드 미구현

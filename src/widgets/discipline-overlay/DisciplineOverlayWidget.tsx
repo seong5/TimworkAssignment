@@ -6,9 +6,11 @@ import {
   getImageEntriesGroupedByDiscipline,
   SPACE_LIST,
 } from '@/entities/project'
+import { Button } from '@/shared/ui'
 import {
   DisciplineOverlayView,
   OverlayLayerTree,
+  DrawingPageHeader,
   type OverlayLayer,
 } from '@/features/drawing-explorer'
 import { createInitialOverlayLayers } from '@/features/drawing-explorer/model'
@@ -61,13 +63,9 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -86,13 +84,9 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
         <p className="text-center text-sm text-red-600 sm:text-base">
           데이터를 불러올 수 없습니다. {error?.message}
         </p>
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-        >
+        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
           목록으로
-        </button>
+        </Button>
       </div>
     )
   }
@@ -101,13 +95,9 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
         <p className="text-center text-sm text-gray-600 sm:text-base">도면을 선택해 주세요.</p>
-        <button
-          type="button"
-          onClick={handleBackToDrawing}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-        >
+        <Button variant="primary" size="sm" onClick={handleBackToDrawing}>
           도면 보기로 이동
-        </button>
+        </Button>
       </div>
     )
   }
@@ -116,31 +106,21 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      <header className="shrink-0 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(-1)}
-            className="shrink-0 text-sm text-gray-500 hover:text-gray-700 sm:text-base"
-            aria-label="뒤로가기"
-          >
-            ← 뒤로가기
-          </button>
-          <span className="hidden shrink-0 text-gray-300 sm:inline">|</span>
-          <h1 className="min-w-0 truncate text-lg font-bold text-gray-900 sm:text-xl">
-            공종 겹쳐보기 · {drawingName}
-          </h1>
-          <button
-            type="button"
-            onClick={handleBackToDrawing}
-            className="shrink-0 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
-          >
-            단일로 보기
-          </button>
-        </div>
-      </header>
+      <DrawingPageHeader
+        backLabel="뒤로가기"
+        onBack={() => navigate(-1)}
+        title={`공종 겹쳐보기 · ${drawingName}`}
+        titleSize="md"
+        actions={[
+          {
+            label: '단일로 보기',
+            onClick: handleBackToDrawing,
+            variant: 'neutral',
+          },
+        ]}
+      />
 
-      <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
+      <main className="flex flex-1 flex-col overflow-hidden lg:flex-row">
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <DisciplineOverlayView
             data={data}
@@ -149,7 +129,7 @@ export function DisciplineOverlayWidget({ slug, drawingId }: DisciplineOverlayWi
             layers={layers}
           />
         </div>
-        <aside className="flex max-h-56 shrink-0 flex-col overflow-y-auto border-t border-gray-200 bg-white md:max-h-none md:w-64 md:border-l md:border-t-0 lg:w-72">
+        <aside className="flex max-h-40 min-h-0 shrink-0 flex-col overflow-y-auto border-t border-gray-200 bg-white sm:max-h-44 md:max-h-48 lg:max-h-none lg:w-64 lg:border-l lg:border-t-0 lg:w-72">
           <OverlayLayerTree
             drawingName={drawingName}
             groups={groups}

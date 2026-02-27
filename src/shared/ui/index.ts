@@ -1,3 +1,5 @@
 export { Button } from './Button'
 export type { ButtonVariant, ButtonSize } from './Button'
 export { SearchBar } from './SearchBar'
+export { ErrorBoundary } from './ErrorBoundary'
+export type { ErrorBoundaryProps } from './ErrorBoundary'
