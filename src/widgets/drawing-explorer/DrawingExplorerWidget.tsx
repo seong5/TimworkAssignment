@@ -234,7 +234,7 @@ function DrawingExplorerContent({
                       }}
                       onFocus={() => setIsSearchOpen(true)}
                       placeholder="공종으로 검색 ex) 소방, 건축"
-                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-[#3907C7] focus:outline-none focus:ring-1 focus:ring-[#3907C7] sm:py-2 sm:text-base"
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-navy-brand focus:outline-none focus:ring-1 focus:ring-navy-brand sm:py-2 sm:text-base"
                       aria-label="도면 검색"
                     />
                     {searchQuery && (
@@ -273,7 +273,7 @@ function DrawingExplorerContent({
                                       revisionVersion: item.revisionVersion,
                                     })
                                   }
-                                  className="justify-start px-3 py-2 text-left text-sm text-gray-700 hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
+                                  className="justify-start px-3 py-2 text-left text-sm text-gray-700 hover:bg-navy-brand/10 hover:text-navy-brand"
                                 >
                                   <span className="min-w-0 truncate">{item.entryLabel}</span>
                                 </Button>
@@ -290,7 +290,7 @@ function DrawingExplorerContent({
                                       matchLabels: item.matchLabels,
                                     })
                                   }
-                                  className="flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
+                                  className="flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 hover:bg-navy-brand/10 hover:text-navy-brand"
                                 >
                                   <span className="min-w-0 truncate">{item.name}</span>
                                   {item.matchLabels.length > 0 && (

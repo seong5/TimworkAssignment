@@ -30,7 +30,7 @@ function OverlayRevisionList({
                 fullWidth
                 onClick={() => onSelectRevision(entry.disciplineKey, entry.revisionVersion)}
                 className={`flex items-center justify-start gap-1.5 px-2 py-1.5 text-left text-xs hover:bg-gray-200 sm:gap-2 sm:px-3 sm:text-sm ${
-                  isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : ''
+                  isSelected ? 'bg-navy-brand/15 text-navy-brand font-semibold' : ''
                 }`}
               >
                 <ImageIcon className="h-3 w-3 shrink-0 text-gray-400 sm:h-3.5 sm:w-3.5" />
@@ -147,7 +147,7 @@ export function OverlayLayerTree({
                         <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       )}
                     </span>
-                    <Layers className="h-3 w-3 shrink-0 text-[#3907C7] sm:h-3.5 sm:w-3.5" />
+                    <Layers className="h-3 w-3 shrink-0 text-navy-brand sm:h-3.5 sm:w-3.5" />
                     <span className="min-w-0 flex-1 truncate text-neutral-700">
                       {group.label}
                     </span>

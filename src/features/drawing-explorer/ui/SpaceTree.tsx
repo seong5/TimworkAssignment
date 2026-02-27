@@ -37,7 +37,7 @@ function RevisionList({
                   onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)
                 }
                 className={`!min-h-0 !px-2 !py-1 flex items-center justify-start gap-1.5 text-left text-xs focus:ring-0 sm:gap-2 sm:!px-3 sm:text-sm ${
-                  isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-200'
+                  isSelected ? 'bg-navy-brand/15 text-navy-brand font-semibold' : 'hover:bg-gray-200'
                 }`}
               >
                 <ImageIcon className="h-3 w-3 shrink-0 text-gray-400 sm:h-3.5 sm:w-3.5" />
@@ -147,7 +147,7 @@ export function SpaceTree({
                 onClick={() => handleDisciplineClick(drawingId, group.disciplineKey)}
                 className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-2.5 sm:text-sm ${
                   isDisciplineSelected
-                    ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold'
+                    ? 'bg-navy-brand/15 text-navy-brand font-semibold'
                     : 'hover:bg-gray-100'
                 }`}
               >
@@ -158,7 +158,7 @@ export function SpaceTree({
                     <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   )}
                 </span>
-                <Layers className="h-3 w-3 shrink-0 text-[#3907C7] sm:h-3.5 sm:w-3.5" />
+                <Layers className="h-3 w-3 shrink-0 text-navy-brand sm:h-3.5 sm:w-3.5" />
                 <span className="min-w-0 flex-1 truncate text-neutral-700">{group.label}</span>
               </Button>
               {isExpanded && (
@@ -191,7 +191,7 @@ export function SpaceTree({
                             onClick={() => handleDisciplineClick(drawingId, sub.disciplineKey)}
                             className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-2.5 sm:text-sm ${
                               isSubSelected
-                                ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold'
+                                ? 'bg-navy-brand/15 text-navy-brand font-semibold'
                                 : 'hover:bg-gray-100'
                             }`}
                           >
@@ -239,7 +239,7 @@ export function SpaceTree({
               onClick={() => handleDrawingClick(rootDrawing.id)}
               className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-3 sm:!py-1.5 sm:text-sm ${
                 selectedDrawingId === rootDrawing.id
-                  ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold'
+                  ? 'bg-navy-brand/15 text-navy-brand font-semibold'
                   : 'hover:bg-gray-100'
               }`}
             >
@@ -270,7 +270,7 @@ export function SpaceTree({
                   onClick={() => handleDrawingClick(id)}
                   className={`!min-h-0 !px-2 !py-1 flex min-w-0 items-center justify-start gap-1.5 rounded-md text-left text-xs focus:ring-0 sm:gap-2 sm:!px-3 sm:!py-1.5 sm:text-sm ${
                     isSelected
-                      ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold'
+                      ? 'bg-navy-brand/15 text-navy-brand font-semibold'
                       : 'hover:bg-gray-100'
                   }`}
                 >

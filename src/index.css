@@ -5,3 +5,15 @@
     @apply min-h-screen antialiased bg-gray-50 text-gray-900;
   }
 }
+
+@theme {
+  /* 앰버(노랑) - 강조, CTA, 테두리 */
+  --color-amber-brand: #e69100;
+  --color-amber-brand-hover: #cc7a00;
+  --color-amber-brand-active: #b36b00;
+
+  /* 네이비(남색) - 선택, 링크, 포커스 */
+  --color-navy-brand: #3907c7;
+  --color-navy-brand-hover: #2d0599;
+  --color-navy-brand-active: #21046b;
+}

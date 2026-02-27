@@ -60,7 +60,7 @@ export function Breadcrumb({
                     )}
 
                     {isLast ? (
-                      <div className="flex items-center gap-0.5 rounded-md border border-neutral-200 bg-white px-1 py-0.5 text-[9px] font-bold text-[#3907C7] shadow-sm sm:px-1.5 sm:py-0.5 sm:text-[11px] md:px-1 md:py-0.5 md:text-[9px] lg:gap-1.5 lg:rounded-lg lg:px-2.5 lg:py-1.5 lg:text-sm landscape:gap-1 landscape:rounded-lg landscape:px-2 landscape:py-1 landscape:text-xs landscape:sm:gap-1.5 landscape:sm:px-2.5 landscape:sm:py-1.5 landscape:sm:text-sm">
+                      <div className="flex items-center gap-0.5 rounded-md border border-neutral-200 bg-white px-1 py-0.5 text-[9px] font-bold text-navy-brand shadow-sm sm:px-1.5 sm:py-0.5 sm:text-[11px] md:px-1 md:py-0.5 md:text-[9px] lg:gap-1.5 lg:rounded-lg lg:px-2.5 lg:py-1.5 lg:text-sm landscape:gap-1 landscape:rounded-lg landscape:px-2 landscape:py-1 landscape:text-xs landscape:sm:gap-1.5 landscape:sm:px-2.5 landscape:sm:py-1.5 landscape:sm:text-sm">
                         {isSpace && (
                           <Map className="h-2.5 w-2.5 sm:h-3 sm:w-3 md:h-2.5 md:w-2.5 lg:h-4 lg:w-4 landscape:h-3.5 landscape:w-3.5 landscape:sm:h-4 landscape:sm:w-4" />
                         )}
@@ -118,7 +118,7 @@ export function Breadcrumb({
                 </span>
                 <p className="text-[9px] font-medium leading-snug text-neutral-800 sm:text-[15px] md:text-[9px] lg:text-base landscape:text-[10px] landscape:sm:text-[15px]">
                   {disciplineShort ? (
-                    <span className="text-[9px] text-[#3907C7] sm:text-[15px] md:text-[9px] lg:text-base landscape:text-[10px] landscape:sm:text-[15px]">
+                    <span className="text-[9px] text-navy-brand sm:text-[15px] md:text-[9px] lg:text-base landscape:text-[10px] landscape:sm:text-[15px]">
                       {disciplineShort}
                       {revisionVersion ? (
                         <span>

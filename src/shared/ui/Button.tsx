@@ -32,11 +32,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const variantStyles: Record<ButtonVariant, string> = {
       primary:
-        'bg-[#E69100] text-white hover:bg-[#cc7a00] active:bg-[#b36b00] disabled:bg-gray-300 disabled:text-gray-500',
+        'bg-amber-brand text-white hover:bg-amber-brand-hover active:bg-amber-brand-active disabled:bg-gray-300 disabled:text-gray-500',
       secondary:
-        'bg-[#3907C7] text-white hover:bg-[#2d0599] active:bg-[#21046b] disabled:bg-gray-300 disabled:text-gray-500',
+        'bg-navy-brand text-white hover:bg-navy-brand-hover active:bg-navy-brand-active disabled:bg-gray-300 disabled:text-gray-500',
       outline:
-        'border-2 border-[#E69100] text-[#E69100] hover:bg-[#E69100]/10 active:bg-[#E69100]/20 disabled:border-gray-300 disabled:text-gray-300',
+        'border-2 border-amber-brand text-amber-brand hover:bg-amber-brand/10 active:bg-amber-brand/20 disabled:border-gray-300 disabled:text-gray-300',
       ghost: 'text-gray-700 hover:bg-gray-100 active:bg-gray-200 disabled:text-gray-300',
       danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 disabled:bg-red-300',
     }
@@ -48,7 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     const baseStyles =
-      'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E69100] disabled:cursor-not-allowed disabled:opacity-50'
+      'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-brand disabled:cursor-not-allowed disabled:opacity-50'
 
     const variantStyle = variantStyles[variant]
     const sizeStyle = sizeStyles[size]
