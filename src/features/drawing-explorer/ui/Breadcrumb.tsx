@@ -28,7 +28,7 @@ export function Breadcrumb({
   trailing,
 }: BreadcrumbProps) {
   return (
-    <div className="flex flex-col gap-0.5 sm:gap-1 md:gap-0.5 lg:gap-1.5 landscape:gap-1.5 landscape:sm:gap-2">
+    <div className="flex flex-col gap-0.5">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-1.5 md:gap-1 lg:gap-2 landscape:gap-2">
         <nav aria-label="현재 위치" className="flex min-w-0 items-center">
           {path.length === 0 ? (

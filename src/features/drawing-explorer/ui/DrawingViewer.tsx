@@ -50,7 +50,7 @@ export function DrawingViewer({
     )
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-1 p-2 sm:p-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-1 p-2 sm:p-2">
       <p className="shrink-0 text-[10px] text-[#E69100] sm:text-xs">
         이 구역에서 확대/축소가 가능합니다 (휠로 확대 · 드래그로 이동)
       </p>
