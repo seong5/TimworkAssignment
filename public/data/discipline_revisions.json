@@ -1,15 +1,15 @@
 {
   "00": {
     "전체": {
-      "image": "00_전체.png",
+      "image": "00_overview.png",
       "revisions": [],
       "displayName": "전체 배치도"
     }
   },
   "01": {
     "건축": {
-      "image": "01_101동 지상1층 평면도_건축.png",
-      "relativeTo": "01_101동 지상1층 평면도_건축.png",
+      "image": "01_101_floor1_arch.png",
+      "relativeTo": "01_101_floor1_arch.png",
       "imageTransform": {
         "x": 2481.136135433037,
         "y": 1750.0162014700181,
@@ -85,7 +85,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "02_101동 지상1층 평면도_건축_REV1.jpeg",
+          "image": "02_101_floor1_arch_REV1.jpeg",
           "date": "2024-01-15",
           "description": "초기 설계",
           "changes": []
@@ -94,7 +94,7 @@
       "displayName": "건축"
     },
     "공조설비": {
-      "relativeTo": "01_101동 지상1층 평면도_건축.png",
+      "relativeTo": "01_101_floor1_arch.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -165,7 +165,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "03_101동 지상1층 평면도_공조설비.jpeg",
+          "image": "03_101_floor1_hvac.jpeg",
           "date": "2024-01-20",
           "description": "초기 설계",
           "changes": []
@@ -174,8 +174,8 @@
       "displayName": "공조설비"
     },
     "구조": {
-      "relativeTo": "01_101동 지상1층 평면도_건축.png",
-      "image": "04_101동 지상1층 평면도_구조.png",
+      "relativeTo": "01_101_floor1_arch.png",
+      "image": "04_101_floor1_struct.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -247,7 +247,7 @@
       "displayName": "구조"
     },
     "구조.A": {
-      "relativeTo": "04_101동 지상1층 평면도_구조.png",
+      "relativeTo": "04_101_floor1_struct.png",
       "polygon": {
         "vertices": [],
         "polygonTransform": {
@@ -260,11 +260,11 @@
       "revisions": [
         {
           "version": "REV1A",
-          "image": "05_101동 지상1층 평면도_구조_REV1A.png",
+          "image": "05_101_floor1_struct_REV1A.png",
           "date": "2024-01-25",
           "description": "초기 구조 설계",
           "changes": [],
-          "relativeTo": "04_101동 지상1층 평면도_구조.png",
+          "relativeTo": "04_101_floor1_struct.png",
           "imageTransform": {
             "x": 1502.0957557561383,
             "y": 1373.7558154264723,
@@ -274,11 +274,11 @@
         },
         {
           "version": "REV2A",
-          "image": "05_101동 지상1층 평면도_구조_REV2A.jpeg",
+          "image": "05_101_floor1_struct_REV2A.jpeg",
           "date": "2024-05-15",
           "description": "최종 확정",
           "changes": ["내진 설계 반영", "슬라브 두께 증가"],
-          "relativeTo": "04_101동 지상1층 평면도_구조.png",
+          "relativeTo": "04_101_floor1_struct.png",
           "imageTransform": {
             "x": 2481,
             "y": 1754,
@@ -290,7 +290,7 @@
       "displayName": "구조 > A"
     },
     "구조.B": {
-      "relativeTo": "04_101동 지상1층 평면도_구조.png",
+      "relativeTo": "04_101_floor1_struct.png",
       "polygon": {
         "vertices": [],
         "polygonTransform": {
@@ -303,11 +303,11 @@
       "revisions": [
         {
           "version": "REV1B",
-          "image": "06_101동 지상1층 평면도_구조_REV1B.png",
+          "image": "06_101_floor1_struct_REV1B.png",
           "date": "2024-01-25",
           "description": "초기 설계",
           "changes": [],
-          "relativeTo": "04_101동 지상1층 평면도_구조.png",
+          "relativeTo": "04_101_floor1_struct.png",
           "imageTransform": {
             "x": 3170.7888053973224,
             "y": 1518.5958838723423,
@@ -317,11 +317,11 @@
         },
         {
           "version": "REV2B",
-          "image": "06_101동 지상1층 평면도_구조_REV2B.jpeg",
+          "image": "06_101_floor1_struct_REV2B.jpeg",
           "date": "2024-03-10",
           "description": "구조 보강",
           "changes": ["기둥 배치 변경", "보 단면 수정"],
-          "relativeTo": "04_101동 지상1층 평면도_구조.png",
+          "relativeTo": "04_101_floor1_struct.png",
           "imageTransform": {
             "x": 3164.078581519498,
             "y": 1522.3264950790513,
@@ -333,7 +333,7 @@
       "displayName": "구조 > B"
     },
     "배관설비": {
-      "relativeTo": "01_101동 지상1층 평면도_건축.png",
+      "relativeTo": "01_101_floor1_arch.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -404,7 +404,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "07_101동 지상1층 평면도_배관설비.jpeg",
+          "image": "07_101_floor1_plumbing.jpeg",
           "date": "2024-01-25",
           "description": "초기 설계",
           "changes": []
@@ -413,7 +413,7 @@
       "displayName": "배관설비"
     },
     "소방": {
-      "relativeTo": "01_101동 지상1층 평면도_건축.png",
+      "relativeTo": "01_101_floor1_arch.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -484,7 +484,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "08_101동 지상1층 평면도_소방.jpeg",
+          "image": "08_101_floor1_fire.jpeg",
           "date": "2024-01-30",
           "description": "초기 설계",
           "changes": []
@@ -495,8 +495,8 @@
   },
   "09": {
     "건축": {
-      "image": "09_주민공동시설_지상1층 평면도_건축.png",
-      "relativeTo": "09_주민공동시설_지상1층 평면도_건축.png",
+      "image": "09_facility_floor1_arch.png",
+      "relativeTo": "09_facility_floor1_arch.png",
       "imageTransform": {
         "x": 2481.0877820363035,
         "y": 1749.7345910541853,
@@ -522,7 +522,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "09_주민공동시설_지상1층 평면도_건축_REV1.jpeg",
+          "image": "09_facility_floor1_arch_REV1.jpeg",
           "date": "2024-01-15",
           "description": "초기 설계",
           "changes": [],
@@ -530,7 +530,7 @@
         },
         {
           "version": "REV2",
-          "image": "09_주민공동시설_지상1층 평면도_건축_REV2.jpeg",
+          "image": "09_facility_floor1_arch_REV2.jpeg",
           "date": "2024-02-20",
           "description": "레이아웃 변경",
           "changes": ["헬스장 확장", "로비 공간 조정"],
@@ -538,7 +538,7 @@
         },
         {
           "version": "REV3",
-          "image": "09_주민공동시설_지상1층 평면도_건축_REV3.jpeg",
+          "image": "09_facility_floor1_arch_REV3.jpeg",
           "date": "2024-04-10",
           "description": "시설 추가",
           "changes": ["독서실 추가", "카페 공간 확보"],
@@ -548,8 +548,8 @@
       "displayName": "건축"
     },
     "구조": {
-      "image": "10_주민공동시설_지상1층 평면도_구조.png",
-      "relativeTo": "09_주민공동시설_지상1층 평면도_건축.png",
+      "image": "10_facility_floor1_struct.png",
+      "relativeTo": "09_facility_floor1_arch.png",
       "imageTransform": {
         "x": 2477.6622076120084,
         "y": 1755.6688961939958,
@@ -575,7 +575,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "10_주민공동시설_지상1층 평면도_구조.png",
+          "image": "10_facility_floor1_struct.png",
           "date": "2024-01-20",
           "description": "초기 설계",
           "changes": []
@@ -584,8 +584,8 @@
       "displayName": "구조"
     },
     "설비": {
-      "image": "11_주민공동시설_지상1층 평면도_설비.jpeg",
-      "relativeTo": "09_주민공동시설_지상1층 평면도_건축.png",
+      "image": "11_facility_floor1_mech.jpeg",
+      "relativeTo": "09_facility_floor1_arch.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -601,7 +601,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "11_주민공동시설_지상1층 평면도_설비.jpeg",
+          "image": "11_facility_floor1_mech.jpeg",
           "date": "2024-01-25",
           "description": "초기 설계",
           "changes": []
@@ -610,8 +610,8 @@
       "displayName": "설비"
     },
     "소방": {
-      "image": "12_주민공동시설_지상1층 평면도_소방.jpeg",
-      "relativeTo": "09_주민공동시설_지상1층 평면도_건축.png",
+      "image": "12_facility_floor1_fire.jpeg",
+      "relativeTo": "09_facility_floor1_arch.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -627,7 +627,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "12_주민공동시설_지상1층 평면도_소방.jpeg",
+          "image": "12_facility_floor1_fire.jpeg",
           "date": "2024-02-01",
           "description": "초기 설계",
           "changes": []
@@ -638,13 +638,13 @@
   },
   "13": {
     "구조": {
-      "image": "13_주차장 지상1층 확대 평면도_구조.png",
-      "relativeTo": "13_주차장 지상1층 확대 평면도_구조.png",
+      "image": "13_parking_floor1_struct.png",
+      "relativeTo": "13_parking_floor1_struct.png",
       "imageTransform": { "x": 2481, "y": 1754, "scale": 1, "rotation": 0 },
       "revisions": [
         {
           "version": "REV1",
-          "image": "13_주차장 지상1층 확대 평면도_구조.png",
+          "image": "13_parking_floor1_struct.png",
           "date": "2024-01-15",
           "description": "초기 설계",
           "changes": []
@@ -653,7 +653,7 @@
       "displayName": "구조"
     },
     "소방": {
-      "relativeTo": "13_주차장 지상1층 확대 평면도_구조.png",
+      "relativeTo": "13_parking_floor1_struct.png",
       "imageTransform": { "x": 2481.0000000000005, "y": 1754, "scale": 1.01, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -680,7 +680,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "14_주차장 지상1층 확대 평면도_소방.jpeg",
+          "image": "14_parking_floor1_fire.jpeg",
           "date": "2024-01-20",
           "description": "초기 설계",
           "changes": []
@@ -689,7 +689,7 @@
       "displayName": "소방"
     },
     "설비": {
-      "relativeTo": "13_주차장 지상1층 확대 평면도_구조.png",
+      "relativeTo": "13_parking_floor1_struct.png",
       "imageTransform": {
         "x": 2482.9880483494244,
         "y": 1750.023903301152,
@@ -721,7 +721,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "15_주차장 지상1층 확대 평면도_설비.jpeg",
+          "image": "15_parking_floor1_mech.jpeg",
           "date": "2024-02-05",
           "description": "초기 설계",
           "changes": []
@@ -730,7 +730,7 @@
       "displayName": "설비"
     },
     "조경": {
-      "relativeTo": "13_주차장 지상1층 확대 평면도_구조.png",
+      "relativeTo": "13_parking_floor1_struct.png",
       "imageTransform": { "x": 2481, "y": 1755.988048349424, "scale": 1.01, "rotation": 0 },
       "polygon": {
         "vertices": [
@@ -757,7 +757,7 @@
       "revisions": [
         {
           "version": "REV1",
-          "image": "16_주차장 지상1층 확대 평면도_조경.jpeg",
+          "image": "16_parking_floor1_landscape.jpeg",
           "date": "2024-02-10",
           "description": "초기 설계",
           "changes": []
