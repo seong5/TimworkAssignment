@@ -404,7 +404,7 @@ export function DrawingExplorerWidget({
             <h2 className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
               공간(건물)
             </h2>
-            <div className="max-h-40 min-h-0 overflow-y-auto overflow-x-hidden rounded-lg border border-gray-200 bg-white sm:max-h-48 md:max-h-56">
+            <div className="max-h-40 min-h-0 overflow-y-auto overflow-x-hidden rounded-lg border border-gray-200 bg-white sm:max-h-44 md:max-h-48">
               <SpaceTree
                 rootDrawing={rootDrawing}
                 childDrawings={childDrawings}

@@ -172,16 +172,18 @@ export function RevisionCompareWidget({
           </Button>
         </div>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div className="rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2">
-            <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
-              기준 · 설명
-            </span>
-            <p className="min-h-[1.5em] text-[10px] text-neutral-700 sm:text-xs">
-              {leftPanel.description ?? '—'}
-            </p>
+          <div className="flex flex-row gap-2 rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2 lg:flex-col lg:gap-0">
+            <div className="min-w-0 flex-1 shrink-0">
+              <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+                기준 · 설명
+              </span>
+              <p className="min-h-[1.5em] text-[10px] text-neutral-700 sm:text-xs">
+                {leftPanel.description ?? '—'}
+              </p>
+            </div>
             {leftPanel.changes.length > 0 && (
-              <>
-                <span className="mt-1 mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+              <div className="min-w-0 flex-1 shrink-0 border-l border-neutral-200 pl-2 lg:border-l-0 lg:border-t lg:border-neutral-200 lg:pt-1 lg:pl-0">
+                <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
                   변경 사항
                 </span>
                 <ul className="list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-xs">
@@ -189,19 +191,21 @@ export function RevisionCompareWidget({
                     <li key={i}>{c}</li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
           </div>
-          <div className="rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2">
-            <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
-              비교 · 설명
-            </span>
-            <p className="min-h-[1.5em] text-[10px] text-neutral-700 sm:text-xs">
-              {rightPanel.description ?? '—'}
-            </p>
+          <div className="flex flex-row gap-2 rounded-md border border-neutral-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2 lg:flex-col lg:gap-0">
+            <div className="min-w-0 flex-1 shrink-0">
+              <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+                비교 · 설명
+              </span>
+              <p className="min-h-[1.5em] text-[10px] text-neutral-700 sm:text-xs">
+                {rightPanel.description ?? '—'}
+              </p>
+            </div>
             {rightPanel.changes.length > 0 && (
-              <>
-                <span className="mt-1 mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
+              <div className="min-w-0 flex-1 shrink-0 border-l border-neutral-200 pl-2 lg:border-l-0 lg:border-t lg:border-neutral-200 lg:pt-1 lg:pl-0">
+                <span className="mb-0.5 block text-[9px] font-bold uppercase tracking-wider text-neutral-400">
                   변경 사항
                 </span>
                 <ul className="list-inside list-disc space-y-0.5 text-[10px] text-neutral-700 sm:text-xs">
@@ -209,7 +213,7 @@ export function RevisionCompareWidget({
                     <li key={i}>{c}</li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
           </div>
         </div>
