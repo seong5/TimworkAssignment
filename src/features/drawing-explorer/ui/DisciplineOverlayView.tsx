@@ -118,10 +118,10 @@ export function DisciplineOverlayView({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-1 p-1.5 sm:p-3 md:p-4">
-      <p className="shrink-0 text-[10px] text-[#E69100] sm:text-xs">
+      <p className="shrink-0 text-[10px] text-amber-brand sm:text-xs">
         이 구역에서 확대/축소가 가능합니다 (휠로 확대 · 드래그로 이동)
       </p>
-      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border-2 border-[#E69100]/60 bg-gray-50">
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-lg border-2 border-amber-brand/60 bg-gray-50">
         <TransformWrapper key={overlayKey} initialScale={1} minScale={0.5} maxScale={4}>
           <TransformComponent
             wrapperClass="w-full h-full min-h-0 overflow-hidden"

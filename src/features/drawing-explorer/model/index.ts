@@ -37,3 +37,9 @@ export {
   type UseCompareVersionsParams,
   type UseCompareVersionsResult,
 } from './useCompareVersions'
+export { useBackToDrawing } from './useBackToDrawing'
+export {
+  useDrawingPageGuard,
+  type DrawingPageGuardStatus,
+  type UseDrawingPageGuardResult,
+} from './useDrawingPageGuard'

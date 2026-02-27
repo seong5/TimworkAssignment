@@ -75,9 +75,9 @@ export function SpaceListWidget() {
               <li key={space.id}>
                 <Link
                   to={`/drawing/${space.slug}`}
-                  className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-[#E69100]/40 hover:shadow-md sm:p-6"
+                  className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-amber-brand/40 hover:shadow-md sm:p-6"
                 >
-                  <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#E69100]/20 text-[#E69100] transition-colors group-hover:bg-[#E69100]/30 sm:mb-3 sm:h-12 sm:w-12">
+                  <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-amber-brand/20 text-amber-brand transition-colors group-hover:bg-amber-brand/30 sm:mb-3 sm:h-12 sm:w-12">
                     <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
                   </span>
                   <span className="text-base font-semibold text-gray-900 sm:text-lg">{space.displayName}</span>

@@ -445,8 +445,15 @@ export const SPACE_LIST: {
   { id: '13', slug: 'parkinglot', displayName: '주차장' },
 ]
 
+export type SpaceItem = (typeof SPACE_LIST)[number]
+
+export function getSpaceBySlug(slug: string | undefined): SpaceItem | null {
+  if (!slug) return null
+  return SPACE_LIST.find((s) => s.slug === slug) ?? null
+}
+
 export function getDefaultDrawingIdForSlug(slug: string): string | null {
-  const space = SPACE_LIST.find((s) => s.slug === slug)
+  const space = getSpaceBySlug(slug)
   return space?.id ?? null
 }
 

@@ -2,12 +2,12 @@ import { useNavigate } from 'react-router-dom'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 import { Button } from '@/shared/ui'
-import { useProjectData } from '@/entities/project'
 import {
   SpaceTree,
   Breadcrumb,
   DrawingViewer,
   DrawingPageHeader,
+  DrawingPageGuard,
 } from '@/features/drawing-explorer'
 import {
   getImageForSelection,
@@ -20,8 +20,8 @@ import {
   getRevisionsForDiscipline,
   getBreadcrumbIds,
   getOverlayableDisciplines,
-  SPACE_LIST,
 } from '@/entities/project'
+import type { NormalizedProjectData, SpaceItem } from '@/entities/project'
 import {
   useDrawingExplorerStore,
   useDrawingExplorerInit,
@@ -37,16 +37,24 @@ export interface DrawingExplorerWidgetProps {
   initialRevisionVersion?: string
 }
 
-export function DrawingExplorerWidget({
+interface DrawingExplorerContentProps {
+  slug: string
+  space: SpaceItem
+  data: NormalizedProjectData
+  initialDrawingId?: string
+  initialDisciplineKey?: string
+  initialRevisionVersion?: string
+}
+
+function DrawingExplorerContent({
   slug,
+  space,
+  data,
   initialDrawingId,
   initialDisciplineKey,
   initialRevisionVersion,
-}: DrawingExplorerWidgetProps) {
+}: DrawingExplorerContentProps) {
   const navigate = useNavigate()
-  const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
-
-  const { data, loading, error } = useProjectData()
   const { selection, setSelection, setDrawingId } = useDrawingExplorerStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearchOpen, setIsSearchOpen] = useState(false)
@@ -58,7 +66,7 @@ export function DrawingExplorerWidget({
   }, [])
 
   const { rootDrawing, childDrawings, disciplinesByDrawingId, allowedDrawingIds } =
-    useDrawingTreeData(data, space ?? null)
+    useDrawingTreeData(data, space)
 
   useDrawingExplorerInit({
     slug,
@@ -67,7 +75,7 @@ export function DrawingExplorerWidget({
     initialRevisionVersion,
     data,
     allowedDrawingIds,
-    spaceId: space?.id ?? null,
+    spaceId: space.id,
   })
 
   const { filteredSearchResults, handleSelectFromSearch } = useDrawingSearch(
@@ -180,38 +188,6 @@ export function DrawingExplorerWidget({
     ],
   )
 
-  if (!slug || !space) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
-          목록으로
-        </Button>
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <p className="text-sm text-gray-500 sm:text-base">도면 데이터를 불러오는 중…</p>
-      </div>
-    )
-  }
-
-  if (error || !data) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-red-600 sm:text-base">
-          데이터를 불러올 수 없습니다. {error?.message}
-        </p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
-          목록으로
-        </Button>
-      </div>
-    )
-  }
-
   const showSearchDropdown = isSearchOpen && searchQuery.trim().length > 0
 
   return (
@@ -258,7 +234,7 @@ export function DrawingExplorerWidget({
                       }}
                       onFocus={() => setIsSearchOpen(true)}
                       placeholder="공종으로 검색 ex) 소방, 건축"
-                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-[#3907C7] focus:outline-none focus:ring-1 focus:ring-[#3907C7] sm:py-2 sm:text-base"
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-navy-brand focus:outline-none focus:ring-1 focus:ring-navy-brand sm:py-2 sm:text-base"
                       aria-label="도면 검색"
                     />
                     {searchQuery && (
@@ -297,7 +273,7 @@ export function DrawingExplorerWidget({
                                       revisionVersion: item.revisionVersion,
                                     })
                                   }
-                                  className="justify-start px-3 py-2 text-left text-sm text-gray-700 hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
+                                  className="justify-start px-3 py-2 text-left text-sm text-gray-700 hover:bg-navy-brand/10 hover:text-navy-brand"
                                 >
                                   <span className="min-w-0 truncate">{item.entryLabel}</span>
                                 </Button>
@@ -314,7 +290,7 @@ export function DrawingExplorerWidget({
                                       matchLabels: item.matchLabels,
                                     })
                                   }
-                                  className="flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
+                                  className="flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 hover:bg-navy-brand/10 hover:text-navy-brand"
                                 >
                                   <span className="min-w-0 truncate">{item.name}</span>
                                   {item.matchLabels.length > 0 && (
@@ -438,5 +414,27 @@ export function DrawingExplorerWidget({
         </aside>
       </div>
     </div>
+  )
+}
+
+export function DrawingExplorerWidget({
+  slug,
+  initialDrawingId,
+  initialDisciplineKey,
+  initialRevisionVersion,
+}: DrawingExplorerWidgetProps) {
+  return (
+    <DrawingPageGuard slug={slug}>
+      {({ slug: resolvedSlug, space, data }) => (
+        <DrawingExplorerContent
+          slug={resolvedSlug}
+          space={space}
+          data={data}
+          initialDrawingId={initialDrawingId}
+          initialDisciplineKey={initialDisciplineKey}
+          initialRevisionVersion={initialRevisionVersion}
+        />
+      )}
+    </DrawingPageGuard>
   )
 }

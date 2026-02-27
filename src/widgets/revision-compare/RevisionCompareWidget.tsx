@@ -1,12 +1,17 @@
 import { useNavigate } from 'react-router-dom'
 import { useMemo } from 'react'
 import { Button } from '@/shared/ui'
-import { useProjectData } from '@/entities/project'
-import { getRevisionsForDiscipline, SPACE_LIST } from '@/entities/project'
-import { RevisionCompareView, DrawingPageHeader } from '@/features/drawing-explorer'
+import { getRevisionsForDiscipline } from '@/entities/project'
+import type { NormalizedProjectData } from '@/entities/project'
+import {
+  RevisionCompareView,
+  DrawingPageHeader,
+  DrawingPageGuard,
+} from '@/features/drawing-explorer'
 import {
   useCompareVersions,
   getRevisionComparePanels,
+  useBackToDrawing,
 } from '@/features/drawing-explorer/model'
 
 export interface RevisionCompareWidgetProps {
@@ -17,16 +22,25 @@ export interface RevisionCompareWidgetProps {
   initialRight?: string
 }
 
-export function RevisionCompareWidget({
+interface RevisionCompareContentProps {
+  slug: string
+  drawingId: string | undefined
+  disciplineKey: string | undefined
+  data: NormalizedProjectData
+  initialLeft?: string
+  initialRight?: string
+}
+
+function RevisionCompareContent({
   slug,
   drawingId,
   disciplineKey,
+  data,
   initialLeft,
   initialRight,
-}: RevisionCompareWidgetProps) {
+}: RevisionCompareContentProps) {
   const navigate = useNavigate()
-  const space = slug ? SPACE_LIST.find((s) => s.slug === slug) : null
-  const { data, loading, error } = useProjectData()
+  const handleBackToDrawing = useBackToDrawing(slug)
 
   const currentRevisions = useMemo(() => {
     if (!data || !drawingId || !disciplineKey) return []
@@ -60,42 +74,6 @@ export function RevisionCompareWidget({
       drawingName: data.drawings[drawingId]?.name ?? '도면',
     })
   }, [data, drawingId, disciplineKey, compareLeft, compareRight])
-
-  const handleBackToDrawing = () => {
-    navigate(`/drawing/${slug}`)
-  }
-
-  if (!slug || !space) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-gray-600 sm:text-base">잘못된 공간 경로입니다.</p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
-          목록으로
-        </Button>
-      </div>
-    )
-  }
-
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <p className="text-sm text-gray-500 sm:text-base">도면 데이터를 불러오는 중…</p>
-      </div>
-    )
-  }
-
-  if (error || !data) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-gray-50 px-4 py-8">
-        <p className="text-center text-sm text-red-600 sm:text-base">
-          데이터를 불러올 수 없습니다. {error?.message}
-        </p>
-        <Button variant="primary" size="sm" onClick={() => navigate('/')}>
-          목록으로
-        </Button>
-      </div>
-    )
-  }
 
   if (!drawingId || !disciplineKey) {
     return (
@@ -223,5 +201,28 @@ export function RevisionCompareWidget({
         <RevisionCompareView leftPanel={leftPanel} rightPanel={rightPanel} />
       </main>
     </div>
+  )
+}
+
+export function RevisionCompareWidget({
+  slug,
+  drawingId,
+  disciplineKey,
+  initialLeft,
+  initialRight,
+}: RevisionCompareWidgetProps) {
+  return (
+    <DrawingPageGuard slug={slug}>
+      {({ slug: resolvedSlug, data }) => (
+        <RevisionCompareContent
+          slug={resolvedSlug}
+          drawingId={drawingId}
+          disciplineKey={disciplineKey}
+          data={data}
+          initialLeft={initialLeft}
+          initialRight={initialRight}
+        />
+      )}
+    </DrawingPageGuard>
   )
 }
