@@ -42,7 +42,7 @@ export function SearchBar({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-base text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:py-2.5 sm:pl-10"
+          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-base text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-[#3907C7] focus:outline-none focus:ring-1 focus:ring-[#3907C7] sm:py-2.5 sm:pl-10"
           aria-label={label ?? placeholder}
         />
         {value && (

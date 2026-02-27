@@ -32,7 +32,7 @@ function RevisionList({
               type="button"
               onClick={() => onSelectImage?.(drawingId, entry.disciplineKey, entry.revisionVersion)}
               className={`flex w-full items-center gap-1.5 px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:text-sm ${
-                isSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-200'
+                isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-200'
               }`}
             >
               <ImageIcon className="h-3 w-3 shrink-0 text-gray-400 sm:h-3.5 sm:w-3.5" />
@@ -141,7 +141,7 @@ export function SpaceTree({
                 type="button"
                 onClick={() => handleDisciplineClick(drawingId, group.disciplineKey)}
                 className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-2.5 sm:text-sm ${
-                  isDisciplineSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-100'
+                  isDisciplineSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-100'
                 }`}
               >
                 <span className="shrink-0 text-gray-500" aria-hidden>
@@ -151,7 +151,7 @@ export function SpaceTree({
                     <ChevronRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   )}
                 </span>
-                <Layers className="h-3 w-3 shrink-0 text-indigo-500 sm:h-3.5 sm:w-3.5" />
+                <Layers className="h-3 w-3 shrink-0 text-[#3907C7] sm:h-3.5 sm:w-3.5" />
                 <span className="min-w-0 flex-1 truncate text-neutral-700">{group.label}</span>
               </button>
               {isExpanded && (
@@ -178,7 +178,7 @@ export function SpaceTree({
                             type="button"
                             onClick={() => handleDisciplineClick(drawingId, sub.disciplineKey)}
                             className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-2.5 sm:text-sm ${
-                              isSubSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-100'
+                              isSubSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-100'
                             }`}
                           >
                             <span className="shrink-0 text-gray-500" aria-hidden>
@@ -222,7 +222,7 @@ export function SpaceTree({
               onClick={() => handleDrawingClick(rootDrawing.id)}
               className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
                 selectedDrawingId === rootDrawing.id
-                  ? 'bg-blue-200 text-blue-900 font-semibold'
+                  ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold'
                   : 'hover:bg-gray-100'
               }`}
             >
@@ -251,7 +251,7 @@ export function SpaceTree({
                   type="button"
                   onClick={() => handleDrawingClick(id)}
                   className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors sm:gap-2 sm:px-3 sm:py-2 sm:text-sm ${
-                    isSelected ? 'bg-blue-200 text-blue-900 font-semibold' : 'hover:bg-gray-100'
+                    isSelected ? 'bg-[#3907C7]/15 text-[#3907C7] font-semibold' : 'hover:bg-gray-100'
                   }`}
                 >
                   <span className="shrink-0 text-gray-500" aria-hidden>

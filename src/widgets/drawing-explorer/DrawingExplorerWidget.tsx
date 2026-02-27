@@ -181,7 +181,7 @@ export function DrawingExplorerWidget({
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
         >
           목록으로
         </button>
@@ -206,7 +206,7 @@ export function DrawingExplorerWidget({
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
         >
           목록으로
         </button>
@@ -260,7 +260,7 @@ export function DrawingExplorerWidget({
                       }}
                       onFocus={() => setIsSearchOpen(true)}
                       placeholder="공종으로 검색 ex) 소방, 건축"
-                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:py-2 sm:text-base"
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition-colors focus:border-[#3907C7] focus:outline-none focus:ring-1 focus:ring-[#3907C7] sm:py-2 sm:text-base"
                       aria-label="도면 검색"
                     />
                     {searchQuery && (
@@ -297,7 +297,7 @@ export function DrawingExplorerWidget({
                                       revisionVersion: item.revisionVersion,
                                     })
                                   }
-                                  className="flex w-full items-center px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-indigo-50 hover:text-indigo-900"
+                                  className="flex w-full items-center px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
                                 >
                                   <span className="min-w-0 truncate">{item.entryLabel}</span>
                                 </button>
@@ -313,7 +313,7 @@ export function DrawingExplorerWidget({
                                       matchLabels: item.matchLabels,
                                     })
                                   }
-                                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-indigo-50 hover:text-indigo-900"
+                                  className="flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-[#3907C7]/10 hover:text-[#3907C7]"
                                 >
                                   <span className="min-w-0 truncate">{item.name}</span>
                                   {item.matchLabels.length > 0 && (

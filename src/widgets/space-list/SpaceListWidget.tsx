@@ -44,7 +44,7 @@ export function SpaceListWidget() {
             <button
               type="button"
               onClick={() => refetch()}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+              className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#cc7a00]"
             >
               다시 시도
             </button>
@@ -79,9 +79,9 @@ export function SpaceListWidget() {
               <li key={space.id}>
                 <Link
                   to={`/drawing/${space.slug}`}
-                  className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-indigo-200 hover:shadow-md sm:p-6"
+                  className="group flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-all hover:border-[#E69100]/40 hover:shadow-md sm:p-6"
                 >
-                  <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 transition-colors group-hover:bg-indigo-200 sm:mb-3 sm:h-12 sm:w-12">
+                  <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#E69100]/20 text-[#E69100] transition-colors group-hover:bg-[#E69100]/30 sm:mb-3 sm:h-12 sm:w-12">
                     <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
                   </span>
                   <span className="text-base font-semibold text-gray-900 sm:text-lg">{space.displayName}</span>

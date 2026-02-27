@@ -34,7 +34,7 @@ export function RecentDrawingsWidget() {
           <button
             type="button"
             onClick={() => refetch()}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+            className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#cc7a00]"
           >
             다시 시도
           </button>
@@ -75,14 +75,14 @@ export function RecentDrawingsWidget() {
           return (
             <article
               key={`${item.drawingId}-${item.disciplineKey}-${item.revisionVersion}`}
-              className="group flex flex-col rounded-lg border border-gray-100 bg-gray-50/50 p-3 transition-colors hover:border-indigo-200 hover:bg-indigo-50/30"
+              className="group flex flex-col rounded-lg border border-gray-100 bg-gray-50/50 p-3 transition-colors hover:border-[#E69100]/30 hover:bg-[#E69100]/5"
             >
               <div className="mb-1.5 flex items-start gap-2">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-indigo-100 text-indigo-600">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-[#E69100]/20 text-[#E69100]">
                   <FileText className="h-3 w-3" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[10px] font-medium text-indigo-600 sm:text-xs">
+                  <p className="truncate text-[10px] font-medium text-[#E69100] sm:text-xs">
                     {item.spaceDisplayName}
                   </p>
                   <p className="truncate text-xs font-semibold text-gray-900 sm:text-sm">
@@ -109,14 +109,14 @@ export function RecentDrawingsWidget() {
               <div className="mt-auto flex flex-wrap gap-1.5">
                 <Link
                   to={`/drawing/${item.slug}?drawing=${encodeURIComponent(item.drawingId)}&discipline=${encodeURIComponent(item.disciplineKey)}&revision=${encodeURIComponent(item.revisionVersion)}`}
-                  className="inline-flex items-center gap-0.5 rounded bg-indigo-600 px-2 py-1 text-[10px] font-medium text-white transition-colors hover:bg-indigo-700 sm:text-xs"
+                  className="inline-flex items-center gap-0.5 rounded bg-[#E69100] px-2 py-1 text-[10px] font-medium text-white transition-colors hover:bg-[#cc7a00] sm:text-xs"
                 >
                   도면 보기
                   <ArrowRightCircle className="h-3 w-3" />
                 </Link>
                 <Link
                   to={`/drawing/${item.slug}/compare?${compareParams.toString()}`}
-                  className="inline-flex items-center gap-0.5 rounded border border-gray-200 bg-white px-2 py-1 text-[10px] font-medium text-gray-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 sm:text-xs"
+                  className="inline-flex items-center gap-0.5 rounded border border-gray-200 bg-white px-2 py-1 text-[10px] font-medium text-gray-700 transition-colors hover:border-[#3907C7]/30 hover:bg-[#3907C7]/10 hover:text-[#3907C7] sm:text-xs"
                 >
                   <GitCompare className="h-3 w-3" />
                   비교

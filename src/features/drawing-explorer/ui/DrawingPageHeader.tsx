@@ -51,10 +51,10 @@ export function DrawingPageHeader({
               const variant = action.variant ?? 'secondary'
               const buttonClass =
                 variant === 'primary'
-                  ? 'rounded-lg border border-indigo-600 bg-indigo-600 px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:text-[15px]'
+                  ? 'rounded-lg border border-[#E69100] bg-[#E69100] px-2.5 py-1.5 text-[10px] font-medium text-white transition-colors hover:bg-[#cc7a00] disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 sm:text-[15px]'
                   : variant === 'neutral'
                     ? 'rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400'
-                    : 'rounded-lg border px-2.5 py-1.5 text-[10px] font-medium transition-colors disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400 sm:border-indigo-200 sm:bg-indigo-50 sm:text-indigo-700 sm:hover:bg-indigo-100 sm:disabled:border-gray-200 sm:disabled:bg-gray-50 sm:disabled:text-gray-400 sm:text-[15px]'
+                    : 'rounded-lg border px-2.5 py-1.5 text-[10px] font-medium transition-colors disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400 sm:border-[#3907C7]/30 sm:bg-[#3907C7]/10 sm:text-[#3907C7] sm:hover:bg-[#3907C7]/15 sm:disabled:border-gray-200 sm:disabled:bg-gray-50 sm:disabled:text-gray-400 sm:text-[15px]'
 
               return (
                 <button

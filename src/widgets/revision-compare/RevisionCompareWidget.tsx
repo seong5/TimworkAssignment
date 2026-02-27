@@ -71,7 +71,7 @@ export function RevisionCompareWidget({
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
         >
           목록으로
         </button>
@@ -96,7 +96,7 @@ export function RevisionCompareWidget({
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
         >
           목록으로
         </button>
@@ -113,7 +113,7 @@ export function RevisionCompareWidget({
         <button
           type="button"
           onClick={handleBackToDrawing}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
         >
           도면 보기로 이동
         </button>
@@ -128,7 +128,7 @@ export function RevisionCompareWidget({
         <button
           type="button"
           onClick={handleBackToDrawing}
-          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          className="rounded-lg bg-[#E69100] px-4 py-2 text-sm font-medium text-white hover:bg-[#cc7a00]"
         >
           도면 보기로 이동
         </button>
